@@ -1,0 +1,34 @@
+{
+    "tasks": {
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": [".next/**", "dist/**"]
+        },
+        "dev": {
+            "cache": false
+        },
+        "db:studio": {
+            "cache": false,
+            "outputs": []
+        },
+        "db:pull": {
+            "cache": false
+        },
+        "db:push": {
+            "cache": false
+        },
+        "db:generate": {
+            "cache": false,
+            "outputs": ["src/db/migrations/**"]
+        },
+        "db:migrate": {
+            "cache": false
+        },
+        "lint": {
+            "outputs": []
+        },
+        "test": {
+            "outputs": []
+        }
+    }
+}
