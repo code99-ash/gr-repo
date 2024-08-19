@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
-import { env } from 'src/env/env.schema';
+import { env } from 'src/common/env/env.schema';
 
 config();
 
