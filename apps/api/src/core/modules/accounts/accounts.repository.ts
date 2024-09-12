@@ -9,7 +9,7 @@ import {
   UpdateSensitiveBaseAccount,
   accounts,
 } from './db/accounts.db';
-import { AccountType } from './schemas/account.schemas';
+import { AccountType } from './entities/account.entity';
 
 @Injectable()
 export class AccountsRepository {

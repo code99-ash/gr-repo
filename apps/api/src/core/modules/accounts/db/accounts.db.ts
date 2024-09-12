@@ -11,7 +11,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { organizations } from '../../organizations/db/organizations.db';
 import { users } from '../../users/db/users.db';
-import { AccountType } from '../schemas/account.schemas';
+import { AccountType } from '../entities/account.entity';
 import { z } from 'zod';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 

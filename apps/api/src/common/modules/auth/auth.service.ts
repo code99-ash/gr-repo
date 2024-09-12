@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { ResetPasswordDto } from './auth.dto';
 import { PASSWORD_ROUNDS } from 'src/common/config/app.config';
 import { AccountsService } from 'src/core/modules/accounts/accounts.service';
-import { BasicAccount } from 'src/core/modules/accounts/entities/account.entity';
+import { BasicAccount } from 'src/core/modules/accounts/schemas/account.schema';
 
 @Injectable()
 export class AuthService {

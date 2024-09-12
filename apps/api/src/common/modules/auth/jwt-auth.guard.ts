@@ -8,7 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { Permission } from './permissions.service';
-import { Account } from '../../../core/modules/accounts/entities/account.entity';
+import { Account } from '../../../core/modules/accounts/schemas/account.schema';
 
 @Injectable()
 export class JWTAuthGuard extends AuthGuard('jwt') {

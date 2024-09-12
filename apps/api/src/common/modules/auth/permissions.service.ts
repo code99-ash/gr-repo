@@ -1,7 +1,7 @@
 import * as micromatch from 'micromatch';
 
 import { Domains, Resources, Actions } from './permissions.interface';
-import { Account } from '../../../core/modules/accounts/entities/account.entity';
+import { Account } from '../../../core/modules/accounts/schemas/account.schema';
 
 export class Permission {
   domain: Domains;

@@ -7,6 +7,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { DbModule } from 'src/common/db/db.module';
 import { getAllRouteModules } from 'src/common/routes/routes.util';
 import { routes } from 'src/common/routes/routes';
+import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { routes } from 'src/common/routes/routes';
     //   inject: [MailService],
     // }),
     DbModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

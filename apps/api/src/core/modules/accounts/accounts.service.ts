@@ -7,9 +7,9 @@ import {
   UpdateBaseAccount,
   UpdateSensitiveBaseAccount,
 } from './db/accounts.db';
-import { BasicAccount, CreateBasicAccount } from './entities/account.entity';
+import { BasicAccount, CreateBasicAccount } from './schemas/account.schema';
 import { PASSWORD_ROUNDS } from 'src/common/config/app.config';
-import { AccountType } from './schemas/account.schemas';
+import { AccountType } from './entities/account.entity';
 import { ToggleActiveAccountState } from './dto/account.dto';
 
 @Injectable()

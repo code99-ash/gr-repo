@@ -1,4 +1,4 @@
-import { AccountType } from '../../../core/modules/accounts/schemas/account.schemas';
+import { AccountType } from '../../../core/modules/accounts/entities/account.entity';
 
 export interface JWTPayload {
   username: string;
