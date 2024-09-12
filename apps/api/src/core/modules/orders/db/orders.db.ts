@@ -9,6 +9,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { pgTable } from 'drizzle-orm/pg-core';
 import { return_requests } from 'src/core/modules/return_requests/db/return_requests.db';
+import { z } from 'zod';
 
 export const orders = pgTable('orders', {
   id: serial('id').primaryKey(),
@@ -23,3 +24,13 @@ export const orders = pgTable('orders', {
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').$onUpdateFn(() => new Date()),
 });
+
+export const OrderMeta = z.object({});
+
+// export const BaseOrder = createSelectSchema(orders, {
+//   meta: OrderMeta,
+// });
+
+// export const CreateBaseOrder = createInsertSchema(orders, {
+//   meta: OrderMeta,
+// });
