@@ -57,23 +57,27 @@ export class Permission {
     /**
      * Role comparison is one way - this does not check for true equality
      * in this case it's possible that a == b is true, but b == a is false at the same time.
-     * 'this' is a permission that the user has, 'pattern' is a permission that is being checked for.
-     * If the permission in 'this' has an asterisk for something the 'pattern' requires, then the requirement is considered as fulfilled
+     * 'this' is a permission that the user has, 'other' is a permission that is being checked for.
+     * If the permission in 'this' has an asterisk for something the 'other' requires, then the requirement is considered as fulfilled
      * e.g. if 'this' = organization:57d03f57-7019-4d9b-8105-9b57a48937c7:payment:*
-     * and 'pattern' = organization:57d03f57-7019-4d9b-8105-9b57a48937c7:payment:list
-     * then the check passes and we return true. This does not work in the opposite direction, 'pattern' may not have asterisks inside.
+     * and 'other' = organization:57d03f57-7019-4d9b-8105-9b57a48937c7:payment:list
+     * then the check passes and we return true. This does not work in the opposite direction, 'other' may not have asterisks inside.
      */
     if (!(pattern instanceof Permission)) {
       return false;
     }
 
-    const domain_match = micromatch.isMatch(this.domain, pattern.domain);
-    const domain_id_match = micromatch.isMatch(
-      this.domain_id,
-      pattern.domain_id,
-    );
-    const resource_match = micromatch.isMatch(this.resource, pattern.resource);
-    const action_match = micromatch.isMatch(this.action, pattern.action);
+    // if the permission is a wildcard, then we want to perform a reverse matching check
+    const domain = this.domain === '*' ? pattern.domain : this.domain;
+    const domain_id =
+      this.domain_id === '*' ? pattern.domain_id : this.domain_id;
+    const resource = this.resource === '*' ? pattern.resource : this.resource;
+    const action = this.action === '*' ? pattern.action : this.action;
+
+    const domain_match = micromatch.isMatch(domain, pattern.domain);
+    const domain_id_match = micromatch.isMatch(domain_id, pattern.domain_id);
+    const resource_match = micromatch.isMatch(resource, pattern.resource);
+    const action_match = micromatch.isMatch(action, pattern.action);
 
     return domain_match && domain_id_match && resource_match && action_match;
   }
