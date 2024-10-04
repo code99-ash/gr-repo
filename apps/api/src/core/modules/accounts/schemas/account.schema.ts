@@ -17,6 +17,11 @@ export const CreateBasicAccount = CreateBaseAccount.extend({
   email: z.string(),
 });
 
+export const CreateAdminAccount = CreateBaseAccount.extend({
+  type: z.enum([AccountType.ADMIN]).default(AccountType.ADMIN),
+  email: z.string(),
+});
+
 const Account = createSelectSchema(accounts, {
   permissions: Permissions,
 });

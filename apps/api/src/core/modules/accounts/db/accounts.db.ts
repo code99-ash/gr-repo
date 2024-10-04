@@ -22,10 +22,12 @@ export const Permissions = z.array(z.string());
 export const accounts = pgTable('accounts', {
   id: serial('id').primaryKey(),
   uid: varchar('uid', { length: 256 }).$default(createId).unique().notNull(),
-  organization_uid: text('organization_uid').references(
-    () => organizations.uid,
-  ),
-  user_uid: text('user_uid').references(() => users.uid),
+  organization_uid: text('organization_uid')
+    .references(() => organizations.uid)
+    .notNull(),
+  user_uid: text('user_uid')
+    .references(() => users.uid)
+    .notNull(),
   email: text('email').notNull(),
   type: type('type').notNull(),
   permissions: jsonb('permissions')

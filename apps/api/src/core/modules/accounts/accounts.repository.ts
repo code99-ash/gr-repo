@@ -40,7 +40,15 @@ export class AccountsRepository {
   }
 
   async create(accountSchema: ORM<typeof CreateBaseAccount>) {
-    return this.db.insert(accounts).values(accountSchema).returning();
+    const [account] = await this.db
+      .insert(accounts)
+      .values(accountSchema)
+      .returning({
+        uid: accounts.uid,
+        email: accounts.email,
+        type: accounts.type,
+      });
+    return account;
   }
 
   async update(

@@ -7,7 +7,11 @@ import {
   UpdateBaseAccount,
   UpdateSensitiveBaseAccount,
 } from './db/accounts.db';
-import { BasicAccount, CreateBasicAccount } from './schemas/account.schema';
+import {
+  BasicAccount,
+  CreateAdminAccount,
+  CreateBasicAccount,
+} from './schemas/account.schema';
 import { PASSWORD_ROUNDS } from 'src/common/config/app.config';
 import { AccountType } from './entities/account.entity';
 import { ToggleActiveAccountState } from './dto/account.dto';
@@ -57,6 +61,24 @@ export class AccountsService {
     password = await bcrypt.hash(password, PASSWORD_ROUNDS);
     const model = Model(CreateBasicAccount, {
       ...createBasicAccountSchema,
+      password,
+    });
+    return await this.accountRepository.create(model);
+  }
+
+  async createAdminAccount(
+    createAdminAccountSchema: ISchema<typeof CreateAdminAccount>,
+  ) {
+    const alreadyExisting = await this.accountRepository.get(
+      'email',
+      createAdminAccountSchema.email,
+    );
+    if (alreadyExisting) throw new Error('Account with email already exists');
+    let password: number | string = Math.random() * 100000000; // generate a random password to be changed later on invite
+    password = password.toString();
+    password = await bcrypt.hash(password, PASSWORD_ROUNDS);
+    const model = Model(CreateAdminAccount, {
+      ...createAdminAccountSchema,
       password,
     });
     return await this.accountRepository.create(model);

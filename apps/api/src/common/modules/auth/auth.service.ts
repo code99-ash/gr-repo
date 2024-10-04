@@ -11,14 +11,23 @@ import { ResetPasswordDto } from './auth.dto';
 import { PASSWORD_ROUNDS } from 'src/common/config/app.config';
 import { AccountsService } from 'src/core/modules/accounts/accounts.service';
 import { BasicAccount } from 'src/core/modules/accounts/schemas/account.schema';
+import { EventEmittions } from 'src/common/events/event.model';
+import { ForgotPasswordEventPayload } from './auth.schema';
+import { UsersService } from 'src/core/modules/users/users.service';
+import { OrganizationsService } from 'src/core/modules/organizations/organizations.service';
+import { CreateOrganizationDto } from 'src/core/modules/organizations/dto/create-organization.dto';
+import { CreateUserDto } from 'src/core/modules/users/dto/create-user.dto';
+import { CreateAdminAccountDto } from 'src/core/modules/accounts/dto/account.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly accountsService: AccountsService,
+    private readonly organizationsService: OrganizationsService,
     private readonly jwtService: JwtService,
     private readonly eventEmitter: EventEmitter2,
     private readonly configService: ConfigService,
+    private readonly usersService: UsersService,
   ) {}
 
   async validateAccountCredentials(email: string, password: string) {
@@ -39,6 +48,32 @@ export class AuthService {
     return Model(BasicAccount, account);
   }
 
+  async createAccountUserOrganization(
+    accountData: CreateAdminAccountDto,
+    userData: CreateUserDto,
+    organizationData: CreateOrganizationDto,
+  ) {
+    // Create the organization
+    const organization =
+      await this.organizationsService.create(organizationData);
+
+    // Create the user
+    const user = await this.usersService.create(userData);
+
+    // Create the account
+    const account = await this.accountsService.createAdminAccount({
+      ...accountData,
+      organization_uid: organization.uid,
+      user_uid: user.uid,
+    });
+
+    return {
+      account,
+      user,
+      organization,
+    };
+  }
+
   async login(account: ORM<typeof BasicAccount>) {
     const payload: JWTPayload = {
       username: '',
@@ -55,27 +90,31 @@ export class AuthService {
   }
 
   async forgotPassword(email: string) {
-    throw new Error(`Method not implemented, ${email}`);
-    // const account = await this.accountsService.getBaseAccount('email', email);
+    // throw new Error(`Method not implemented, ${email}`);
+    const account = await this.accountsService.getBaseAccount('email', email);
 
-    // if (!account) throw new NotFoundException('Account not found');
+    if (!account) throw new NotFoundException('Account not found');
 
-    // const { invite_token } = await this.generateAccountJWTToken(email);
-    // const invite_link = `${this.configService.get<string>(
-    //   'ADMIN_BASE_URL',
-    // )}/reset-password?token=${invite_token}`;
+    const { invite_token } = await this.generateAccountJWTToken(email);
+    const invite_link = `${this.configService.get<string>(
+      'ADMIN_BASE_URL',
+    )}/reset-password?token=${invite_token}`;
 
-    // // send notifications event
-    // await this.eventEmitter.emitAsync(
-    //   EventEmittions.auth.forgot_password,
-    //   Model(ForgotPasswordEventPayload, {
-    //     email: account.email,
-    //     invite_link,
-    //     recipient_name: account.first_name,
-    //   }),
-    // );
+    const user = await this.usersService.findOne(account.user_uid);
 
-    // return true;
+    if (!user) throw new NotFoundException('User not found');
+
+    // send notifications event
+    await this.eventEmitter.emitAsync(
+      EventEmittions.auth.forgot_password,
+      Model(ForgotPasswordEventPayload, {
+        email: account.email,
+        invite_link,
+        recipient_name: user.first_name,
+      }),
+    );
+
+    return true;
   }
 
   async resetPassword(data: ResetPasswordDto & { email: string }) {

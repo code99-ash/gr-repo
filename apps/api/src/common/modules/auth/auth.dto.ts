@@ -6,6 +6,9 @@ import {
   LoginUserSchema,
   ResetPasswordSchema,
 } from './auth.schema';
+import { CreateAdminAccount } from 'src/core/modules/accounts/schemas/account.schema';
+import { CreateOrganization, CreateUser } from 'src/common/db/schemas';
+import { z } from 'zod';
 
 export class LoginUserDto extends createZodDto(extendApi(LoginUserSchema)) {}
 
@@ -19,4 +22,14 @@ export class ForgotPasswordEventPayloadDto extends createZodDto(
 
 export class ResetPasswordDto extends createZodDto(
   extendApi(ResetPasswordSchema),
+) {}
+
+export class SignupAdminDto extends createZodDto(
+  extendApi(
+    z.object({
+      account: CreateAdminAccount,
+      organization: CreateOrganization,
+      user: CreateUser,
+    }),
+  ),
 ) {}

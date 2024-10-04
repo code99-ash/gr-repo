@@ -26,7 +26,12 @@ export class UsersRepository {
   }
 
   async create(userSchema: ORM<typeof CreateUser>) {
-    return this.db.insert(users).values(userSchema).returning();
+    const [user] = await this.db.insert(users).values(userSchema).returning({
+      uid: users.uid,
+      first_name: users.first_name,
+      last_name: users.last_name,
+    });
+    return user;
   }
 
   async update(uid: string, userSchema: ORM<typeof UpdateUser>) {
