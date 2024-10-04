@@ -8,11 +8,13 @@ import { LocalStrategy } from './local.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { AccountsModule } from 'src/core/modules/accounts/accounts.module';
 import { UsersModule } from 'src/core/modules/users/users.module';
+import { OrganizationsModule } from 'src/core/modules/organizations/organizations.module';
 
 @Module({
   imports: [
     AccountsModule,
     UsersModule,
+    OrganizationsModule,
     ConfigModule,
     PassportModule,
     JwtModule.registerAsync({
