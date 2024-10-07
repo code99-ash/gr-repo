@@ -10,20 +10,16 @@ import { ConfigService } from '@nestjs/config';
 import { ResetPasswordDto } from './auth.dto';
 import { PASSWORD_ROUNDS } from 'src/common/config/app.config';
 import { AccountsService } from 'src/core/modules/accounts/accounts.service';
-import { BasicAccount } from 'src/core/modules/accounts/schemas/account.schema';
 import { EventEmittions } from 'src/common/events/event.model';
 import { ForgotPasswordEventPayload } from './auth.schema';
 import { UsersService } from 'src/core/modules/users/users.service';
-import { OrganizationsService } from 'src/core/modules/organizations/organizations.service';
-import { CreateOrganizationDto } from 'src/core/modules/organizations/dto/create-organization.dto';
-import { CreateUserDto } from 'src/core/modules/users/dto/create-user.dto';
 import { CreateAdminAccountDto } from 'src/core/modules/accounts/dto/account.dto';
+import { BaseAccount } from 'src/common/db/schemas';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly accountsService: AccountsService,
-    private readonly organizationsService: OrganizationsService,
     private readonly jwtService: JwtService,
     private readonly eventEmitter: EventEmitter2,
     private readonly configService: ConfigService,
@@ -37,7 +33,7 @@ export class AuthService {
 
     if (!result) return null;
 
-    return Model(BasicAccount, account);
+    return Model(BaseAccount, account);
   }
 
   async verifyAccountToken(uid: string) {
@@ -45,36 +41,26 @@ export class AuthService {
 
     if (!account) return null;
 
-    return Model(BasicAccount, account);
+    return Model(BaseAccount, account);
   }
 
-  async createAccountUserOrganization(
-    accountData: CreateAdminAccountDto,
-    userData: CreateUserDto,
-    organizationData: CreateOrganizationDto,
-  ) {
-    // Create the organization
-    const organization =
-      await this.organizationsService.create(organizationData);
+  async createAccountUserOrganization(accountData: CreateAdminAccountDto) {
+    const hashed_password = await bcrypt.hash(
+      accountData.password,
+      PASSWORD_ROUNDS,
+    );
 
-    // Create the user
-    const user = await this.usersService.create(userData);
+    accountData.password = hashed_password;
 
-    // Create the account
     const account = await this.accountsService.createAdminAccount({
       ...accountData,
-      organization_uid: organization.uid,
-      user_uid: user.uid,
+      password: hashed_password,
     });
 
-    return {
-      account,
-      user,
-      organization,
-    };
+    return account;
   }
 
-  async login(account: ORM<typeof BasicAccount>) {
+  async login(account: ORM<typeof BaseAccount>) {
     const payload: JWTPayload = {
       username: '',
       sub: account.uid,

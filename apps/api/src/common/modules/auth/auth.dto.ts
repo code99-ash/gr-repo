@@ -5,10 +5,8 @@ import {
   ForgotPasswordSchema,
   LoginUserSchema,
   ResetPasswordSchema,
+  SignupAdminSchema,
 } from './auth.schema';
-import { CreateAdminAccount } from 'src/core/modules/accounts/schemas/account.schema';
-import { CreateOrganization, CreateUser } from 'src/common/db/schemas';
-import { z } from 'zod';
 
 export class LoginUserDto extends createZodDto(extendApi(LoginUserSchema)) {}
 
@@ -25,11 +23,5 @@ export class ResetPasswordDto extends createZodDto(
 ) {}
 
 export class SignupAdminDto extends createZodDto(
-  extendApi(
-    z.object({
-      account: CreateAdminAccount,
-      organization: CreateOrganization,
-      user: CreateUser,
-    }),
-  ),
+  extendApi(SignupAdminSchema),
 ) {}

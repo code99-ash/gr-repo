@@ -9,6 +9,11 @@ import {
   CORE_SERVER_API_DEFAULT_VERSION,
   CORE_SERVER_PORT,
 } from '../common/config/app.config';
+import { SwaggerModule } from '@nestjs/swagger';
+import {
+  privateDocsConfig,
+  privateDocsOptions,
+} from 'src/common/config/api-docs.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -40,6 +45,14 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
+  const adminApiDoc = SwaggerModule.createDocument(
+    app,
+    privateDocsConfig,
+    privateDocsOptions,
+  );
+  SwaggerModule.setup('api/docs', app, adminApiDoc);
+
   await app.listen(CORE_SERVER_PORT);
+  console.log(`Server is running on port ${CORE_SERVER_PORT}`);
 }
 bootstrap();

@@ -19,3 +19,12 @@ export const ResetPasswordSchema = z.object({
   password: z.string(),
   token: z.string(),
 });
+
+export const SignupAdminSchema = z.object({
+  email: z.string().email(),
+  password: z.string(),
+  organization_name: z.string(),
+  first_name: z.string(),
+  last_name: z.string(),
+  middle_name: z.string().optional(),
+});

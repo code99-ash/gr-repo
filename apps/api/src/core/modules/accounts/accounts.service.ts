@@ -76,6 +76,7 @@ export class AccountsService {
     if (alreadyExisting) throw new Error('Account with email already exists');
     let password: number | string = Math.random() * 100000000; // generate a random password to be changed later on invite
     password = password.toString();
+    console.log('🚀 ~ AccountsService ~ password:', password);
     password = await bcrypt.hash(password, PASSWORD_ROUNDS);
     const model = Model(CreateAdminAccount, {
       ...createAdminAccountSchema,

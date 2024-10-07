@@ -22,11 +22,23 @@ import {
   SignupAdminDto,
 } from './auth.dto';
 import { Validator } from 'src/common/pipes/validation.pipe';
-import { ForgotPasswordSchema, ResetPasswordSchema } from './auth.schema';
+import {
+  ForgotPasswordSchema,
+  ResetPasswordSchema,
+  SignupAdminSchema,
+} from './auth.schema';
+import { OrganizationsService } from 'src/core/modules/organizations/organizations.service';
+import { UsersService } from 'src/core/modules/users/users.service';
+import { AccountType } from 'src/core/modules/accounts/entities/account.entity';
+import { RolePermissions } from './permissions.model';
 
 @Controller()
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private readonly organizationsService: OrganizationsService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @UseGuards(LocalAuthGuard)
   @ApiBearerAuth()
@@ -39,14 +51,28 @@ export class AuthController {
 
   @ApiBody({ type: SignupAdminDto })
   @Post('signup')
-  async signup(@Body(new Validator(SignupAdminDto)) body: SignupAdminDto) {
-    const user = await this.authService.createAccountUserOrganization(
-      body.account,
-      body.user,
-      body.organization,
-    );
-    if (!user) throw new NotFoundException();
-    return user;
+  async signup(@Body(new Validator(SignupAdminSchema)) body: SignupAdminDto) {
+    // Create the organization
+    const organization = await this.organizationsService.create({
+      name: body.organization_name,
+    });
+
+    // Create the user
+    const user = await this.usersService.create({
+      first_name: body.first_name,
+      last_name: body.last_name,
+      middle_name: body.middle_name,
+    });
+
+    const account = await this.authService.createAccountUserOrganization({
+      ...body,
+      organization_uid: organization.uid,
+      user_uid: user.uid,
+      type: AccountType.ADMIN,
+      permissions: RolePermissions.super_admin, // TODO: Change this to the actual role
+    });
+
+    return account;
   }
 
   @UseGuards(JWTAuthGuard)
