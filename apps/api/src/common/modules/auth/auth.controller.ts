@@ -31,6 +31,8 @@ import { OrganizationsService } from 'src/core/modules/organizations/organizatio
 import { UsersService } from 'src/core/modules/users/users.service';
 import { AccountType } from 'src/core/modules/accounts/entities/account.entity';
 import { RolePermissions } from './permissions.model';
+import { SafeBaseAccount } from 'src/common/db/schemas';
+import { Model, ORM } from 'src/common/repository';
 
 @Controller()
 export class AuthController {
@@ -80,7 +82,17 @@ export class AuthController {
   @Permissions([`*:*:${Resources.USER}:${Actions.READ}`])
   @Get('profile')
   async getProfile(@Request() req: IRequest) {
-    return req.user;
+    if (!req.user) throw new NotFoundException();
+    const account = Model(
+      SafeBaseAccount,
+      req.user as ORM<typeof SafeBaseAccount>,
+    );
+
+    const user = await this.usersService.findOne(account.user_uid);
+    return {
+      ...account,
+      ...user,
+    };
   }
 
   @ApiBody({ type: ForgotPasswordDto })

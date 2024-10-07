@@ -24,3 +24,10 @@ export const UpdateUser = CreateUser.omit({
 });
 
 export const BaseUser = createSelectSchema(users);
+
+export const SafeBaseUser = BaseUser.omit({
+  is_deleted: true,
+  deleted_at: true,
+  updated_at: true,
+  created_at: true,
+});

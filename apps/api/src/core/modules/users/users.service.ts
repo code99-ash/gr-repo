@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
-import { ISchema } from 'src/common/repository';
-import { CreateUser, UpdateUser, users } from './db/users.db';
+import { ISchema, Model, ORM } from 'src/common/repository';
+import { CreateUser, SafeBaseUser, UpdateUser, users } from './db/users.db';
 import { eq } from 'drizzle-orm';
 
 @Injectable()
@@ -18,8 +18,9 @@ export class UsersService {
     });
   }
 
-  findOne(id: string) {
-    return this.usersRepository.get('uid', id);
+  async findOne(id: string) {
+    const user = await this.usersRepository.get('uid', id);
+    return Model(SafeBaseUser, user as ORM<typeof SafeBaseUser>);
   }
 
   update(id: string, updateUserDto: ISchema<typeof UpdateUser>) {
