@@ -1,8 +1,34 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider"
 
-const inter = Inter({ subsets: ["latin"] });
+import localFont from "next/font/local";
+
+const satoshi = localFont({
+  src: [
+    {
+      path: "../../public/fonts/Satoshi/Satoshi-Black.otf",
+      weight: "900",
+    },
+    {
+      path: "../../public/fonts/Satoshi/Satoshi-Bold.otf",
+      weight: "700",
+    },
+    {
+      path: "../../public/fonts/Satoshi/Satoshi-Light.otf",
+      weight: "300",
+    },
+    {
+      path: "../../public/fonts/Satoshi/Satoshi-Medium.otf",
+      weight: "500",
+    },
+    {
+      path: "../../public/fonts/Satoshi/Satoshi-Regular.otf",
+      weight: "400",
+    },
+  ],
+  variable: "--font-satoshi"
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,7 +42,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+          rel="stylesheet"
+        />
+      </head>
+      <body className={satoshi.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
