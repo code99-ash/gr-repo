@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import Link from 'next/link';
 import './layout.css';
 import { useTheme } from 'next-themes';
+import UserLogoutCard from '@/components/user-logout-card';
 
 const top_navs = [
     {
@@ -50,22 +51,7 @@ export default function SideBar() {
                 }
             </nav>
             <nav className="flex flex-col gap-y-1 mt-2 text-foreground px-3 pb-2">
-                <div className='flex items-center justify-between py-2 px-2 gap-2 border border-border rounded-xl'>
-                    <Image 
-                        src="/images/avatar.png" 
-                        alt="" 
-                        width={30} 
-                        height={30} 
-                        className='rounded-full'
-                    />
-                    <div className='text-foreground'>
-                        <p className='text-sm satoshi-medium'>Vee Adams</p>
-                        <p className='opacity-70 text-xs'>Admin</p>
-                    </div>
-                    <Button variant="ghost">
-                        <span className="material-symbols-outlined text-sm">logout</span>
-                    </Button>
-                </div>
+                <UserLogoutCard />
             </nav>
         </section>
     </>
