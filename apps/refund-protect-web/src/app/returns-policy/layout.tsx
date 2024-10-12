@@ -2,10 +2,13 @@
 import React, { useMemo, useState } from 'react'
 import { ModeToggle } from '@/components/mode-toggle';
 import SideBar from './side-bar';
+import { useThinNavStore } from '@/store/thinNavStore';
 
 
 export default function DashboardLayout({children}: Readonly<{ children: React.ReactNode }>) {
-    const [thinNav, setThinNav] = useState(false);
+    const thinNav = useThinNavStore(state => state.thinNav);
+    const toggleThinNav = useThinNavStore(state => state.toggleThinNav);
+
     const [mobileOpen, setMobileOpen] = useState(false);
 
     const manageClass = useMemo(() => {
@@ -28,7 +31,7 @@ export default function DashboardLayout({children}: Readonly<{ children: React.R
             </div>
             <section className='flex flex-col grow bg-accent p-1'>
                 <header className="flex-none h-[45px] flex items-center justify-between">
-                    <button className="hidden md:inline" onClick={() => setThinNav(!thinNav)}>
+                    <button className="hidden md:inline" onClick={toggleThinNav}>
                         <span className="material-symbols-outlined">menu_open</span>
                     </button>
                     <ModeToggle />
