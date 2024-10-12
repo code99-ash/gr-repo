@@ -2,6 +2,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation';
+import { Button } from "@/components/ui/button"
 import Link from 'next/link';
 import './layout.css';
 
@@ -67,19 +68,35 @@ export default function SideNav() {
                     ))
                 }
             </nav>
-            <nav className="flex flex-col gap-y-1 mt-2 text-foreground">
+            <nav className="flex flex-col gap-y-1 mt-2 text-foreground px-3 pb-2">
                 {
                     btm_navs.map((nav, i) => (
                         <Link
                             key={i}
                             href={nav.href}
-                            className={`side-link ${pathname===nav.href? 'active':''}`}
+                            className={`side-link bottom ${pathname===nav.href? 'active':''}`}
                         >
                             <span className="material-symbols-outlined">{nav.icon}</span>
                             <span>{nav.label}</span>
                         </Link>
                     ))
                 }
+                <div className='flex items-center justify-between py-2 px-2 gap-2 border border-border rounded-xl'>
+                    <Image 
+                        src="/images/avatar.png" 
+                        alt="" 
+                        width={30} 
+                        height={30} 
+                        className='rounded-full'
+                    />
+                    <div className='text-foreground'>
+                        <p className='text-sm satoshi-medium'>Vee Adams</p>
+                        <p className='opacity-70 text-xs'>Admin</p>
+                    </div>
+                    <Button variant="ghost">
+                        <span className="material-symbols-outlined text-sm">logout</span>
+                    </Button>
+                </div>
             </nav>
         </section>
     </>

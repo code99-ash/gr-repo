@@ -20,13 +20,33 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .satoshi-300, .satoshi-light {
+    font-weight: 300; /* Satoshi-Light weight */
+  }
+  
+  .satoshi-400, .satoshi-regular {
+    font-weight: 400; /* Satoshi-Regular weight */
+  }
+  
+  .satoshi-500, .satoshi-medium {
+    font-weight: 500; /* Satoshi-Medium weight */
+  }
+  
+  .satoshi-700, .satoshi-bold {
+    font-weight: 700; /* Satoshi-Bold weight */
+  }
+  
+  .satoshi-900, .satoshi-black {
+    font-weight: 900; /* Satoshi-Black weight */
+  }
 }
 
 
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --foreground: 0, 0%, 14.1%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;

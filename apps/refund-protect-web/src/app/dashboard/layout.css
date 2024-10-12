@@ -13,6 +13,10 @@
     @apply ml-2
 }
 
+.side-link.bottom {
+    @apply px-0;
+}
+
 .thin-nav .side-link {
     @apply px-0 py-0 justify-center;
 }
