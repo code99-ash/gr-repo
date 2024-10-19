@@ -10,6 +10,18 @@ EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."option_type" AS ENUM('product', 'order', 'customer', 'duration');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."status" AS ENUM('draft', 'published', 'active');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "accounts" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"uid" varchar(256) NOT NULL,
@@ -109,6 +121,23 @@ CREATE TABLE IF NOT EXISTS "users" (
 	CONSTRAINT "users_uid_unique" UNIQUE("uid")
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "policies" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"uid" varchar(256) NOT NULL,
+	"organization_uid" text,
+	"policy_name" text NOT NULL,
+	"policy_type" "option_type" NOT NULL,
+	"current_flow" jsonb NOT NULL,
+	"policy_history" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	"status" "status" DEFAULT 'draft' NOT NULL,
+	"activated_by" text,
+	"activated_at" timestamp,
+	"deleted_at" timestamp,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now(),
+	CONSTRAINT "policies_uid_unique" UNIQUE("uid")
+);
+--> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "accounts" ADD CONSTRAINT "accounts_organization_uid_organizations_uid_fk" FOREIGN KEY ("organization_uid") REFERENCES "public"."organizations"("uid") ON DELETE no action ON UPDATE no action;
 EXCEPTION
@@ -153,6 +182,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "return_requests" ADD CONSTRAINT "return_requests_customer_uid_customers_uid_fk" FOREIGN KEY ("customer_uid") REFERENCES "public"."customers"("uid") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "policies" ADD CONSTRAINT "policies_organization_uid_organizations_uid_fk" FOREIGN KEY ("organization_uid") REFERENCES "public"."organizations"("uid") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "policies" ADD CONSTRAINT "policies_activated_by_users_uid_fk" FOREIGN KEY ("activated_by") REFERENCES "public"."users"("uid") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

@@ -3,7 +3,7 @@ import { DBQueryConfig, eq } from 'drizzle-orm';
 import { type Database } from 'src/common/db/db.types';
 import { DB } from 'src/common/db/drizzle.provider';
 import { policies } from './db/policies.db';
-import { CreatePolicyDto } from './dto/create-policy.dto';
+import { CreatePolicyDto, UnprocessedPolicyCreateDto } from './dto/create-policy.dto';
 import { UpdatePolicyDto } from './dto/update-policy.dto';
 import { ActivatePolicyDto } from './dto/activate-policy.dto';
 import { FlowRecordDto } from './dto/policy-flow.dto';
@@ -30,31 +30,13 @@ export class PoliciesRepository {
         return this._get(key, id);
     }
 
-    async saveAsDraft(policySchema: CreatePolicyDto) {
+    async saveAs(policySchema: CreatePolicyDto) {
         const [policy] = await this.db.insert(policies)
                                     .values(policySchema)
                                     .returning();
     
         return policy;
     }
-
-    async saveAs(
-        policySchema: CreatePolicyDto, 
-        current_flow: FlowRecordDto,
-        user_id: string
-    ) { // as published / active
-        const [policy] = await this.db.insert(policies)
-                                .values({
-                                    ...policySchema,
-                                    status: policySchema.status,
-                                    activated_at: new Date(),
-                                    activated_by: user_id,
-                                    current_flow: { ...current_flow, activated_by: user_id },
-                                })
-                                .returning();
-        return policy
-    }
-    
 
     async update(id: number, policySchema: UpdatePolicyDto) {
         

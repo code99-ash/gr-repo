@@ -7,16 +7,18 @@ import {
     timestamp,
     varchar,
 } from 'drizzle-orm/pg-core';
-import { createInsertSchema } from 'drizzle-zod';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { organizations } from '../../organizations/db/organizations.db'
 import { users } from '../../users/db/users.db';
 import { z } from 'zod';
 import { createId } from '@paralleldrive/cuid2';
   
-export const NodeSchema = z.object({
+const NodeTypeEnum = z.enum(['conditions', 'user-input', 'action']);
+
+export const NodeRecord = z.record(z.object({
     id: z.string(),
     parent: z.string().nullable(),
-    node_type: z.enum(['conditions', 'user-input', 'action']),
+    node_type: NodeTypeEnum,
     data: z.any(),
     branches: z.array(
         z.object({
@@ -24,13 +26,13 @@ export const NodeSchema = z.object({
             label: z.string().nullable()
         })
     ),
-})
+}))
 
 export const FlowRecord = z.object({
-    policy_flow: z.record(NodeSchema),
+    policy_flow: NodeRecord,
     created_at: z.string(),
     policy_name: z.string(),
-    activated_by: z.string(),
+    activated_by: z.string().nullable(),
     policy_flow_uid: z.string(),
 })
 
@@ -43,7 +45,7 @@ export const status = pgEnum('status', ['draft', 'published', 'active']);
 export const policies = pgTable('policies', {
     id: serial('id').primaryKey(),
     uid: varchar('uid', { length: 256 }).$default(createId).unique().notNull(),
-    organization_uid: varchar('organization_uid').references(() => organizations.uid).notNull(),
+    organization_uid: text('organization_uid').references(() => organizations.uid), // nullable for now
     policy_name: text('policy_name').notNull(),
     policy_type: policy_type('policy_type').notNull(),
     current_flow: jsonb('current_flow')
@@ -51,7 +53,8 @@ export const policies = pgTable('policies', {
                     .notNull(),
     policy_history: jsonb('policy_history')
                     .$type<z.infer<typeof PolicyHistory>>()
-                    .default([]),
+                    .default([])
+                    .notNull(),
     status: status('status').default('draft').notNull(),
     activated_by: text('activated_by').references(() => users.uid),
     activated_at: timestamp('activated_at'),
@@ -60,11 +63,24 @@ export const policies = pgTable('policies', {
     updated_at: timestamp('updated_at').defaultNow().$onUpdateFn(() => new Date()),
 });
 
+export const SelectPolicy = createSelectSchema(policies, {
+    current_flow: FlowRecord,
+    policy_history: PolicyHistory
+})
+
 // refine the json types with proper validation to improve types
 export const CreatePolicy = createInsertSchema(policies, {
     current_flow: FlowRecord,
     policy_history: PolicyHistory
 })
+
+export const UnprocessedPolicyCreate = createInsertSchema(policies).omit({
+    current_flow: true
+})
+.extend({
+    policy_history: PolicyHistory.optional(),
+});
+  
 
 export const UpdatePolicy = CreatePolicy.omit({
     uid: true,

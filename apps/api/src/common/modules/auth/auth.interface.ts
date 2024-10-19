@@ -5,6 +5,7 @@ export interface JWTPayload {
   sub: string;
   type: AccountType;
   permissions: Array<string>;
+  organization_uid: string;
 }
 
 export interface InviteUserJWTTokenPayload {

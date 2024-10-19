@@ -1,6 +1,6 @@
 import { createZodDto } from '@anatine/zod-nestjs';
 import { extendApi } from '@anatine/zod-openapi';
-import { PolicyHistory, FlowRecord } from '../db/policies.db';
+import { PolicyHistory, FlowRecord, NodeRecord } from '../db/policies.db';
 
 export class PolicyHistoryDto extends createZodDto(
   extendApi(PolicyHistory),
@@ -8,4 +8,8 @@ export class PolicyHistoryDto extends createZodDto(
 
 export class FlowRecordDto extends createZodDto(
   extendApi(FlowRecord),
+) {}
+
+export class NodeRecordDto extends createZodDto(
+  extendApi(NodeRecord)
 ) {}

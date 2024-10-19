@@ -47,6 +47,7 @@
     "axios": "^1.7.4",
     "bcrypt": "^5.1.1",
     "bullAdapter": "link:@bull-board/api/bullAdapter",
+    "deep-object-diff": "^1.1.9",
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.24.0",
     "drizzle-orm": "^0.33.0",
