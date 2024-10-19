@@ -1,0 +1,34 @@
+.side-link {
+    @apply flex items-center gap-2 px-[14px] py-[8px] relative h-[50px];
+}
+
+.side-link ::before {
+    @apply content-[''] border-[4px] border-transparent h-full absolute top-0 left-0;
+}
+.side-link.active ::before {
+    @apply border-primary rounded-r-md;
+}
+
+.side-link > span:first-child {
+    @apply ml-2
+}
+
+.side-link.bottom {
+    @apply px-0;
+}
+
+.thin-nav .side-link {
+    @apply px-0 py-0 justify-center;
+}
+.thin-nav {
+    @apply overflow-hidden;
+}
+.thin-nav .side-link ::before, .thin-nav .side-link > span:nth-child(2) {
+    @apply hidden;
+}
+.thin-nav .side-link > span:first-child {
+    @apply ml-0;
+}
+.thin-nav .side-link.active > span:first-child {
+    @apply text-primary;
+}
