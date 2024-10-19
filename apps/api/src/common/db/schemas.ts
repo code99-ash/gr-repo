@@ -13,3 +13,4 @@ export * from '../../core/modules/return_requests/db/return_requests-customers.d
 export * from '../../core/modules/return_requests/db/return_requests-orders.db';
 export * from '../../core/modules/users/db/users.db';
 export * from '../../core/modules/users/db/users-accounts.db';
+export * from '../../core/modules/policies/db/policies.db';

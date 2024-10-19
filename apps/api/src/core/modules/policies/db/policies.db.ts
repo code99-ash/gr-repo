@@ -13,14 +13,28 @@ import { users } from '../../users/db/users.db';
 import { z } from 'zod';
 import { createId } from '@paralleldrive/cuid2';
   
-export const PolicyFlowRecord = z.object({
-    options: z.array(z.number()),
-    created_at: z.string(),
-    title: z.string(),
-    policy_history_uid: z.string(),
+export const NodeSchema = z.object({
+    id: z.string(),
+    parent: z.string().nullable(),
+    node_type: z.enum(['conditions', 'user-input', 'action']),
+    data: z.any(),
+    branches: z.array(
+        z.object({
+            node_id: z.any(),
+            label: z.string().nullable()
+        })
+    ),
 })
 
-export const PolicyHistory = z.array(PolicyFlowRecord);
+export const FlowRecord = z.object({
+    policy_flow: z.record(NodeSchema),
+    created_at: z.string(),
+    policy_name: z.string(),
+    activated_by: z.string(),
+    policy_flow_uid: z.string(),
+})
+
+export const PolicyHistory = z.array(FlowRecord);
 
 export const policy_type = pgEnum('option_type', ['product', 'order', 'customer', 'duration']);
 export const status = pgEnum('status', ['draft', 'published', 'active']);
@@ -33,7 +47,7 @@ export const policies = pgTable('policies', {
     policy_name: text('policy_name').notNull(),
     policy_type: policy_type('policy_type').notNull(),
     current_flow: jsonb('current_flow')
-                    .$type<z.infer<typeof PolicyFlowRecord>>()
+                    .$type<z.infer<typeof FlowRecord>>()
                     .notNull(),
     policy_history: jsonb('policy_history')
                     .$type<z.infer<typeof PolicyHistory>>()
@@ -48,8 +62,9 @@ export const policies = pgTable('policies', {
 
 // refine the json types with proper validation to improve types
 export const CreatePolicy = createInsertSchema(policies, {
-    current_flow: PolicyFlowRecord
-});
+    current_flow: FlowRecord,
+    policy_history: PolicyHistory
+})
 
 export const UpdatePolicy = CreatePolicy.omit({
     uid: true,
@@ -61,7 +76,7 @@ export const UpdatePolicy = CreatePolicy.omit({
 .partial()
 .extend({
     policy_history: PolicyHistory.optional(),
-    current_flow: PolicyFlowRecord.optional(),
+    current_flow: FlowRecord.optional(),
 });
   
 export const ActivatePolicy = CreatePolicy.pick({
@@ -69,7 +84,7 @@ export const ActivatePolicy = CreatePolicy.pick({
     activated_at: true,
     activated_by: true
 }).extend({
-    current_flow: PolicyFlowRecord,
+    current_flow: FlowRecord,
 });
 
 export const DeletePolicy = CreatePolicy.pick({
