@@ -94,7 +94,10 @@ export class PoliciesService {
 
     const newStatus = updatePolicyDto.status ?? existingPolicy.status;
 
-    if(newStatus !== 'draft' && !this._flowIsComplete(new_flow)) {
+    // In case, new_flow is not intended to be updated
+
+    const policy_flow = new_flow ?? existingPolicy.current_flow.policy_flow
+    if(newStatus !== 'draft' && !this._flowIsComplete(policy_flow)) {
       throw new Error(`Incomplete flow cannot be ${newStatus}`);
     }
 
@@ -102,7 +105,7 @@ export class PoliciesService {
     // Deep check differences in policy flow
     const existing_flow = existingPolicy.current_flow.policy_flow;
 
-    if(this._flowChanged(existing_flow, new_flow)) { // flow Changed,
+    if(this._flowChanged(existing_flow, policy_flow)) { // flow Changed,
       // console.log('flow changed');
       return await this.updateWithPolicyFlow(id, updatePolicyDto, existing_flow, new_flow)
     
