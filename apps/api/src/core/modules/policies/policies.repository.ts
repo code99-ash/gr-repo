@@ -5,6 +5,8 @@ import { DB } from 'src/common/db/drizzle.provider';
 import { policies } from './db/policies.db';
 import { CreatePolicyDto } from './dto/create-policy.dto';
 import { UpdatePolicyDto } from './dto/update-policy.dto';
+import { ActivatePolicyDto } from './dto/activate-policy.dto';
+import { FlowRecordDto } from './dto/policy-flow.dto';
 
 
 @Injectable()
@@ -28,12 +30,29 @@ export class PoliciesRepository {
         return this._get(key, id);
     }
 
-    async create(policySchema: CreatePolicyDto) {
+    async saveAsDraft(policySchema: CreatePolicyDto) {
         const [policy] = await this.db.insert(policies)
                                     .values(policySchema)
                                     .returning();
     
         return policy;
+    }
+
+    async saveAs(
+        policySchema: CreatePolicyDto, 
+        current_flow: FlowRecordDto,
+        user_id: string
+    ) { // as published / active
+        const [policy] = await this.db.insert(policies)
+                                .values({
+                                    ...policySchema,
+                                    status: policySchema.status,
+                                    activated_at: new Date(),
+                                    activated_by: user_id,
+                                    current_flow: { ...current_flow, activated_by: user_id },
+                                })
+                                .returning();
+        return policy
     }
     
 
@@ -45,6 +64,25 @@ export class PoliciesRepository {
                                             .returning();
 
         return updatedPolicy;
+    }
+
+    async activate(
+        id: number, 
+        activateSchema: ActivatePolicyDto, 
+        current_flow: FlowRecordDto, 
+        user_id: string
+    ) {
+     
+        const [activated] = await this.db.update(policies).set({
+            status: activateSchema.status,
+            activated_at: new Date(),
+            activated_by: user_id,
+            current_flow: { ...current_flow, activated_by: user_id }
+        })
+        .where(eq(policies.id, id))
+        .returning()
+
+        return activated;
     }
 
     async deleteAnyway(key: 'uid'|'id', id: string | number) {
