@@ -13,6 +13,7 @@ import '@xyflow/react/dist/style.css';
 import { useParams } from 'next/navigation';
 import axiosInstance from '@/lib/axios';
 import { usePolicyStore } from '@/store/policies/policy-store';
+import { useRouter } from 'next/navigation';
 
 const accepted_types: PolicyTypes[] = ['duration', 'order', 'customer', 'product']
 
@@ -23,6 +24,7 @@ interface AwaitResponse {
 
 export default function ProductPolicyBuiler() {
   const params = useParams()
+  const router = useRouter()
   const policyForm = usePolicyForm()
   const { initializeGraph } = useReactflowStore();
   const {selectedNode, setPolicyType, incomplete_nodes} = policyForm;
@@ -46,7 +48,7 @@ export default function ProductPolicyBuiler() {
 
   const saveToDraft = async() => {
     try {
-      setResponse((prev) => ({...prev, loading: false}))
+      setResponse((prev) => ({...prev, loading: true}))
 
       const fd = {
         policy_flow: policyForm.policy_flow,
@@ -61,6 +63,7 @@ export default function ProductPolicyBuiler() {
       const resp = await axiosInstance.post('/policies', JSON.stringify(fd));
       newPolicy(resp.data)
       console.log(resp)
+      router.push(`/build-success?uid=${resp.data.uid}`)
 
     }catch(error) {
       setResponse((prev) => ({...prev, error}))
