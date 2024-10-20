@@ -1,7 +1,7 @@
 import ActionNode from '@/app/returns-policy/custom-nodes/action-node';
-import ConditionNode from '@/app/returns-policy/custom-nodes/condition-node';
 import SelectNode from '@/app/returns-policy/custom-nodes/select-node';
 import UserInputNode from '@/app/returns-policy/custom-nodes/userinput-node';
+import RootConditionNode from '@/app/returns-policy/custom-nodes/condition-node/root-cond-node';
 import { BranchType } from '@/interfaces/common.interface';
 import { MarkerType } from '@xyflow/react';
 
@@ -16,7 +16,7 @@ export const nodeTypeMatch: any = {
 }
 
 export const nodeTypes = { 
-  conditionNode: ConditionNode,
+  conditionNode: RootConditionNode,
   userInputNode: UserInputNode,
   actionNode: ActionNode,
   selectNode: SelectNode

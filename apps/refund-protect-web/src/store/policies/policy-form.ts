@@ -2,6 +2,10 @@ import { getNodeDataProps } from "@/lib/reactflow-resolver";
 import { create } from "zustand";
 import { BranchType } from '@/interfaces/common.interface';
 import { useReactflowStore } from "../react-flow/reactflow-store";
+import { OrderConditionData, OrderConditionType } from "@/interfaces/order.interfact";
+import { DurationConditionData } from "@/interfaces/duration.interface";
+import { CustomerConditionData } from "@/interfaces/customer.interface";
+import { ProductConditionData } from "@/interfaces/product.interface";
 
 interface MyNodeType {
     id: string;
@@ -13,7 +17,7 @@ interface MyNodeType {
 }
 
 type NodeTypes = 'user-input' | 'action' | 'conditions';
-type PolicyTypes = 'product' | 'duration' | 'customer' | 'order';
+export type PolicyTypes = 'product' | 'duration' | 'customer' | 'order';
 
 interface PolicyFlow {
     [key: string]: MyNodeType;
@@ -29,6 +33,11 @@ interface PolicyFormType {
     modifyNode: (node_id: string, data: any) => void;
     removeNode: (node_id: string) => void;
     clearUploadChildren?: (node_id: string) => void;
+    getConditionData: (policy_type: PolicyTypes) => void;
+    defaultOrderCondition: () => OrderConditionData;
+    defaultCustomerCondition: () => CustomerConditionData;
+    defaultProductCondition: () => ProductConditionData;
+    defaultDurationCondition: () => DurationConditionData;
 }
 
 interface PolicyBuildHelper {
@@ -48,11 +57,52 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
             id: 'head',
             parent: null,
             node_type: "conditions",
-            data: {
-                rule: "any",
-                list: [],
-            },
+            data: null,
             branches: [],
+        }
+    },
+
+    getConditionData(policy_type) {
+        switch (policy_type) {
+            case 'order':
+                return get().defaultOrderCondition()
+            case 'duration':
+                return get().defaultDurationCondition()
+            case 'customer':
+                return get().defaultCustomerCondition()
+            default:
+                return get().defaultProductCondition()
+        }      
+    },
+
+    defaultOrderCondition(): OrderConditionData {
+        return {
+            category: 'Discounted orders',
+            operator: 'is less than',
+            value: 10000
+        }
+    },
+
+    defaultDurationCondition(): DurationConditionData {
+        return {
+            period: 'Hours',
+            periodValue: 1
+        }
+    },
+
+    defaultCustomerCondition(): CustomerConditionData {
+        return {
+            expectedPeriod: 10,
+            operator: 'is less than',
+            period: 'Days',
+            periodValue: 2
+        }
+    },
+
+    defaultProductCondition(): ProductConditionData {
+        return {
+            ruling: 'any',
+            list: []
         }
     },
 
@@ -62,8 +112,41 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
     setPolicyName: (name) => {
         set({ policy_name: name })
     },
-    setPolicyType: (type) => {
-        set({ policy_type: type })
+    setPolicyType: (type: PolicyTypes) => { // resetting policy type means refreshing data
+
+        // Refresh react-flow rendered nodes & edges
+        useReactflowStore.getState().setNodes([])
+        useReactflowStore.getState().setEdges([])
+
+        const data = get().getConditionData(type);
+        console.log('policy_type', type)
+        set({
+            selectedNode: null,
+            incomplete_nodes: [],
+            policy_name: `Returns policy builder - ${type}`,
+            policy_type: type,
+            policy_flow: {
+                head: {
+                    id: 'head',
+                    parent: null,
+                    node_type: "conditions",
+                    data: data,
+                    branches: [],
+                }
+            },
+        })
+
+        useReactflowStore.getState().initializeGraph({
+            head: {
+                id: 'head',
+                parent: null,
+                node_type: "conditions",
+                data: data,
+                branches: [],
+            }
+        })
+
+        
     },
 
     selectNode: (node) => {

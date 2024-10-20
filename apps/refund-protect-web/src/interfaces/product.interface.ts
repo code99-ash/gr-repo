@@ -12,11 +12,13 @@ enum AssetActionTypeEnum {
     ManualReview = 'Manual Review',
 }
 
+export interface ProductConditionData {
+    ruling: 'any' | 'all'
+    list: string[]
+}
+
 export interface ProductConditionType extends BaseNodeType {
-    data: {
-        ruling: 'any' | 'all'
-        list: string[]
-    }
+    data: ProductConditionData
 }
 
 export interface UserInputType extends BaseNodeType {

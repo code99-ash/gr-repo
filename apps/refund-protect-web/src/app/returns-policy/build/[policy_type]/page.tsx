@@ -7,26 +7,27 @@ import EdittableTitle from './edittable-title';
 import { Button } from '@/components/ui/button';
 
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
-import { usePolicyForm } from '@/store/policies/policy-form';
+import { PolicyTypes, usePolicyForm } from '@/store/policies/policy-form';
 
 import '@xyflow/react/dist/style.css';
 import { useParams } from 'next/navigation';
 
-const accepted_types = ['duration', 'order', 'customer', 'product']
+const accepted_types: PolicyTypes[] = ['duration', 'order', 'customer', 'product']
 
 export default function ProductPolicyBuiler() {
   const params = useParams()
   const { initializeGraph } = useReactflowStore();
-  const {selectedNode, setPolicyType, policy_flow} = usePolicyForm()
+  const {selectedNode, setPolicyType} = usePolicyForm()
 
 
   useEffect(() => {
     // get policy type
-    const param_type = params.policy_type as string
-    const policy_type = accepted_types.includes(param_type)? params.policy_type : 'product'
-    setPolicyType(policy_type)
+    const param_type = params.policy_type as PolicyTypes
+    const policy_type = accepted_types.includes(param_type)? param_type : 'product'
 
-    initializeGraph(policy_flow)
+    setPolicyType(policy_type) // policy_flow will be refreshed
+
+    // initializeGraph(policy_flow)
   }, [initializeGraph])
 
   const publishFlow = () => {

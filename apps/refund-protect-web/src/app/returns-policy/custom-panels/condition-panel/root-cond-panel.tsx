@@ -19,13 +19,15 @@ export default function RootConditionPanel() {
             case 'customer':
                 return <CustomerConditionPanel />
             case 'duration':
-                return <DurationConditionPanel />
+                return <DurationConditionPanel  />
             default:
                 return null
         }
     }, [policy_type])
 
     return (
-        <div>{selectedNode && activePanel}</div>
+        <div>
+            {selectedNode && activePanel}
+        </div>
     )
 }

@@ -1,12 +1,16 @@
 import { BaseNodeType } from "./common.interface";
 
+export interface CustomerConditionData {
+    expectedPeriod: number;
+    operator: 'is less than';
+
+    // Dont think this is necessary
+    period: 'Hours' | 'Days' | 'Weeks' | 'Months' | 'Years'
+    periodValue: number
+}
+
 export interface CustomerConditionType extends BaseNodeType {
-    data: {
-        expected: number;
-        operator: 'is less than';
-        period: 'Hours' | 'Days' | 'Weeks' | 'Months' | 'Years'
-        periodValue: number
-    }
+    data: CustomerConditionData
 }
 
 enum CustomerActionTypeEnum {

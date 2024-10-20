@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Button } from '@/components/ui/button';
 import { Checkbox } from "@/components/ui/checkbox"
 import { ProductConditionType } from '@/interfaces/product.interface';
+import { usePolicyForm } from '@/store/policies/policy-form';
+import { UpdateNodeCtx } from '../selected-panel';
 
 const rulings = [
   { code: 'any', label: 'ANY condition selected' },
@@ -24,22 +26,20 @@ const defaultConditions = [
   'Used', // fixed typo 'Userd'
 ];
 
-interface PropType {
-  node: ProductConditionType,
-  updateNode: (node: any, node_id?: string) => void
-}
-
-export default function ProductConditionPanel({node, updateNode}: PropType) {
+export default function ProductConditionPanel() {
+  const { updateNode } = useContext(UpdateNodeCtx)
   const [activeRuling, setActiveRuling] = useState('any');
+  const selectedNode = usePolicyForm(state => state.selectedNode) as ProductConditionType
 
   const [defaultUsed, setDefaultUsed] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [form, setForm] = useState<string>('');
 
   useEffect(() => {
-    setCategories(node.data.list || []);
-    setActiveRuling(node.data.ruling || 'any');
-  }, [node]);
+    console.log(selectedNode)
+    setCategories(selectedNode.data.list || []);
+    setActiveRuling(selectedNode.data.ruling || 'any');
+  }, [selectedNode]);
 
   const updateCategory = (category: string) => {
     setDefaultUsed((prev) => {
@@ -53,10 +53,10 @@ export default function ProductConditionPanel({node, updateNode}: PropType) {
 
   useEffect(() => {
     const newNode = {
-      ...node,
+      ...selectedNode,
       data: { ruling: activeRuling, list: [...categories, ...defaultUsed] }
     }
-    updateNode(newNode, node.id)
+    updateNode(newNode, selectedNode.id)
   }, [activeRuling, categories, defaultUsed])
 
   const appendCategory = (e: React.FormEvent<HTMLFormElement>) => {

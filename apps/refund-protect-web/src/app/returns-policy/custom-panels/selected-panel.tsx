@@ -1,5 +1,4 @@
-'use client';
-import React, { useEffect, useMemo } from 'react'
+import React, { createContext, useMemo } from 'react'
 import RootConditionPanel from './condition-panel/root-cond-panel';
 import UserInputPanel from './userinput-panel';
 import ActionPanel from './action-panel';
@@ -7,46 +6,52 @@ import { Button } from '@/components/ui/button';
 import { usePolicyForm } from '@/store/policies/policy-form';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
 
+// Define the type for updateNode function
+interface UpdateNodeContextType {
+    updateNode: (updatedNode: UpdatedNodeType) => void;
+}
+
+// Define the type for updatedNode
+interface UpdatedNodeType {
+    id: string;
+    data: any; // You can replace `any` with the specific type if you have a defined shape for node data
+}
+
+// Create the context with a default value (an empty function)
+export const UpdateNodeCtx = createContext<UpdateNodeContextType>({ updateNode: () => {} });
 
 export default function SelectedPanel() {
-    const {updateNode: renderUpdate} = useReactflowStore(state => state);
-    const {modifyNode, selectedNode, selectNode} = usePolicyForm()
-    // const option_flow = useNewPolicy(state => state.option_flow)
+    const { updateNode: renderUpdate } = useReactflowStore(state => state);
+    const { modifyNode, selectedNode, selectNode } = usePolicyForm();
 
     const closePanel = () => {
-        selectNode(null)
+        selectNode(null);
     }
 
-    const updateNode = (updatedNode: any) => {
-        // // update rendered flow 
+    const updateNode = (updatedNode: UpdatedNodeType) => {
+        // Update rendered flow
         renderUpdate({
             ...updatedNode,
             data: {
                 ...updatedNode.data,
-                node_id: updatedNode.id // For interraction on rendered flow
+                node_id: updatedNode.id, // For interaction on rendered flow
             }
-        })
+        });
 
-        // // update original data
-        modifyNode(updatedNode.id, updatedNode.data)
+        // Update original data
+        modifyNode(updatedNode.id, updatedNode.data);
     }
-
-    // useEffect(() => {
-    //     if(option_flow && selectedNode) {
-    //         console.log(option_flow[selectedNode.id]['data'])
-    //     }
-    // }, [option_flow])
 
     const activePanel = useMemo(() => {
         switch (selectedNode?.node_type) {
             case 'user-input':
-                return <UserInputPanel node={selectedNode} updateNode={updateNode} />
+                return <UserInputPanel />;
             case 'action':
-                return <ActionPanel node={selectedNode} updateNode={updateNode} />
+                return <ActionPanel />;
             default:
-                return <RootConditionPanel />
+                return <RootConditionPanel />;
         }
-    }, [selectedNode])
+    }, [selectedNode]);
 
     return (
         <div className='relative p-3'>
@@ -54,7 +59,11 @@ export default function SelectedPanel() {
                 className="material-symbols-outlined absolute top-2 right-2 text-foreground"
                 role='button' onClick={closePanel}
             >close</span>
-            { selectedNode? activePanel : null }
+            {selectedNode ? (
+                <UpdateNodeCtx.Provider value={{ updateNode }}>
+                    {activePanel}
+                </UpdateNodeCtx.Provider>
+            ) : null}
         </div>
-    )
+    );
 }

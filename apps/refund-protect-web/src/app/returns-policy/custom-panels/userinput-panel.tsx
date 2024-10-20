@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import DeleteNodeConfirm from './delete-node-confirm';
 import { UserInputType } from '@/interfaces/product.interface';
 import { usePolicyForm } from '@/store/policies/policy-form';
+import { UpdateNodeCtx } from './selected-panel';
 
 
 const categories = [
@@ -26,16 +27,14 @@ interface FormType {
   message: string
 }
 
-interface PropType {
-  node: UserInputType,
-  updateNode: (node: any) => void
-}
-
-export default function UserInputPanel({node, updateNode}: PropType) {
+export default function UserInputPanel() {
+  const { updateNode } = useContext(UpdateNodeCtx)
   const removeNode = usePolicyForm(state => state.removeNode);
   const clearUploadChildren = usePolicyForm(state => state.clearUploadChildren);
   const incomplete_nodes = usePolicyForm(state => state.incomplete_nodes);
   const updateIncomplete = usePolicyForm(state => state.updateIncomplete);
+  const selectedNode = usePolicyForm(state => state.selectedNode) as UserInputType
+  const selectNode = usePolicyForm(state => state.selectNode)
 
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [form, setForm] = useState<FormType>({
@@ -45,23 +44,23 @@ export default function UserInputPanel({node, updateNode}: PropType) {
 
   useEffect(() => {
     setForm({
-      input_type: node.data.input_type,
-      message: node.data.message
+      input_type: selectedNode.data.input_type,
+      message: selectedNode.data.message
     })
-  }, [node])
+  }, [selectedNode])
 
   useEffect(() => {
     if(form.input_type === 'upload') {
-      clearUploadChildren(node.id)
+      clearUploadChildren(selectedNode.id)
 
       // since it will have no branch, add to incomplete nodes
-      updateIncomplete([...incomplete_nodes, node.id]);
+      updateIncomplete([...incomplete_nodes, selectedNode.id]);
     }
   }, [form.input_type])
 
   const updateNodeValue = (value: any, prop: any, dataProp: string) => {
     let newNode = {
-      ...node,
+      ...selectedNode,
       data: {...form, [dataProp]: value}
     }
 
@@ -71,8 +70,9 @@ export default function UserInputPanel({node, updateNode}: PropType) {
   }
 
   const deleteAnyway = () => {
-    removeNode(node.id)
+    removeNode(selectedNode.id)
     setConfirmDelete(false)
+    selectNode(null)
   }
 
   return (

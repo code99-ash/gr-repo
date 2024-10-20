@@ -1,6 +1,6 @@
 'use client';
 import { ActionType } from '@/interfaces/policies.types';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -13,6 +13,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import DeleteNodeConfirm from './delete-node-confirm';
 import { usePolicyForm } from '@/store/policies/policy-form';
+import { UpdateNodeCtx } from './selected-panel';
 
 
 const baseActions: string[] = [
@@ -29,15 +30,14 @@ const customerActions: string[] = [
   'Decline'
 ]
 
-interface PropType {
-    node: ActionType,
-    updateNode: (node: any, node_id?: string) => void
-}
 
-export default function ActionPanel({node, updateNode}: PropType) {
+export default function ActionPanel() {
+  const { updateNode } = useContext(UpdateNodeCtx)
   const policy_type = usePolicyForm(state => state.policy_type)
   const [action, setAction] = useState('Decline')
   const [message, setMessage] = useState('')
+  const selectedNode = usePolicyForm(state => state.selectedNode) as ActionType
+  const selectNode = usePolicyForm(state => state.selectNode)
 
   const removeNode = usePolicyForm(state => state.removeNode);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -45,15 +45,15 @@ export default function ActionPanel({node, updateNode}: PropType) {
   const actions = useMemo(() => policy_type === 'customer'? customerActions : baseActions, [policy_type])
 
   useEffect(() => {
-    setAction(node.data.action_type)
-    setMessage(node.data?.message || '')
-  }, [node])
+    setAction(selectedNode.data.action_type)
+    setMessage(selectedNode.data?.message || '')
+  }, [selectedNode])
 
   const setActionType = (value: string) => {
     setAction(value)
 
     const newNode = {
-      ...node,
+      ...selectedNode,
       data: { action_type: value, message}
     }
 
@@ -64,7 +64,7 @@ export default function ActionPanel({node, updateNode}: PropType) {
     setMessage(e.target.value)
 
     const newNode = {
-      ...node,
+      ...selectedNode,
       data: { action_type: action, message: e.target.value }
     }
 
@@ -72,8 +72,9 @@ export default function ActionPanel({node, updateNode}: PropType) {
   }
 
   const deleteAnyway = () => {
-    removeNode(node.id)
+    removeNode(selectedNode.id)
     setConfirmDelete(false)
+    selectNode(null)
   }
 
 
