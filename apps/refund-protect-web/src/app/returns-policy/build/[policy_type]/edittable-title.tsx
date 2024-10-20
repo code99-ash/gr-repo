@@ -2,15 +2,21 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { usePolicyForm } from '@/store/policies/policy-form';
+import { useSearchParams } from 'next/navigation';
+import { usePolicyStore } from '@/store/policies/policy-store';
 
 export default function EdittableTitle() {
     const policy_name = usePolicyForm(state => state.policy_name)
+    const policies = usePolicyStore(state => state.policies)
     const setPolicyName = usePolicyForm(state => state.setPolicyName)
+    const setPolicyType = usePolicyForm(state => state.setPolicyType)
 
     const initialName = useRef(policy_name).current // Initial name is preserved using useRef
     const [name, setName] = useState(policy_name)
     const [edit, setEdit] = useState(false)
     const inputRef = useRef(null)
+    const searchParams = useSearchParams()
+
 
     // Focus on the input when editing starts
     useEffect(() => {
@@ -33,6 +39,23 @@ export default function EdittableTitle() {
         }
 
     }
+
+
+    // Modify
+    const policyUID = searchParams.get('uid');
+    
+    useEffect(() => {
+        if(!policyUID) return;
+
+        const policy = policies.find(each => each.uid === policyUID);
+
+        if(!policy) return;
+
+        // Set policy title
+        setName(policy.policy_name)
+
+
+    }, [policyUID])
 
     return (
         <div className="flex items-center gap-1">

@@ -24,11 +24,14 @@ export interface PolicyFlow {
 }
 
 interface PolicyFormType {
+    policy_id?: number;
     policy_name: string;
     policy_type: PolicyTypes;
     policy_flow: PolicyFlow;
+    setPolicyId: (id: number) => void;
     setPolicyName: (name: string) => void;
-    setPolicyType: (type: PolicyTypes) => void;
+    setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => void;
+    setPolicyFlow: (type: PolicyFlow) => void;
     addNewNode: (node_id: string, node_type: NodeTypes, parent_id: string) => void;
     modifyNode: (node_id: string, data: any) => void;
     removeNode: (node_id: string) => void;
@@ -109,10 +112,16 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
     updateIncomplete(incomplete_nodes) {
         set({ incomplete_nodes })
     },
+    setPolicyId: (policy_id) => {
+        set({ policy_id })
+    },
+    setPolicyFlow: (policy_flow) => {
+        set({ policy_flow })
+    },
     setPolicyName: (name) => {
         set({ policy_name: name })
     },
-    setPolicyType: (type: PolicyTypes) => { // resetting policy type means refreshing data
+    setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => { // resetting policy type means refreshing data
 
         // Refresh react-flow rendered nodes & edges
         useReactflowStore.getState().setNodes([])
@@ -121,35 +130,39 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
         const data = get().getConditionData(type);
         // console.log('policy_type', type)
 
-        let policy_flow: PolicyFlow = {
-            head: {
-                id: 'head',
-                parent: null,
-                node_type: "conditions",
-                data: data,
-                branches: [],
-            }
-        }
+        let policy_flow = existing_flow;
 
-        if(type === "duration") { // Add decline action by Default
-
-            const uid = new Date().getTime().toString();
-            const actionNode: MyNodeType = {
-                id: uid,
-                parent: 'head',
-                node_type: "action",
-                data: {
-                    action_type: "Decline",
-                    message: ""
-                },
-                branches: []
-            }
-
-            policy_flow.head.branches = [ {node_id: uid, label: null} ]
-
+        if(!existing_flow) {
             policy_flow = {
-                ...policy_flow,
-                [uid]: actionNode
+                head: {
+                    id: 'head',
+                    parent: null,
+                    node_type: "conditions",
+                    data: data,
+                    branches: [],
+                }
+            }
+    
+            if(type === "duration") { // Add decline action by Default
+    
+                const uid = new Date().getTime().toString();
+                const actionNode: MyNodeType = {
+                    id: uid,
+                    parent: 'head',
+                    node_type: "action",
+                    data: {
+                        action_type: "Decline",
+                        message: ""
+                    },
+                    branches: []
+                }
+    
+                policy_flow.head.branches = [ {node_id: uid, label: null} ]
+    
+                policy_flow = {
+                    ...policy_flow,
+                    [uid]: actionNode
+                }
             }
         }
 
@@ -162,6 +175,9 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
             policy_type: type,
             policy_flow: policy_flow,
         })
+
+        // console.log('After Set', policy_flow)
+
 
         useReactflowStore.getState().initializeGraph(get().policy_flow)
 

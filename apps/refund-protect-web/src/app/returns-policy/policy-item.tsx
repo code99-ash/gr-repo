@@ -1,5 +1,6 @@
 'use client';
 import { PolicyListType } from '@/store/policies/policy-store';
+import { useRouter } from 'next/navigation';
 import React, { useMemo } from 'react'
 
 function formatDate(timestamp: string) {
@@ -15,15 +16,19 @@ function formatDate(timestamp: string) {
 }
 
 export default function PolicyItem({policy}: {policy: PolicyListType}) {
+    const router = useRouter()
     // const variantBorder = policy.status === 'draft'? "border-[#2A9E69]" : "border-[#FDB747]"
     // const variantText = policy.status === 'draft'? "text-[#2A9E69]" : "text-[#FDB747]"
 
     const date = useMemo(() => formatDate(policy.updated_at), [policy])
 
     return (
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-1 bg-card p-3 rounded shadow-sm hover:border hover:border-border'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-1 bg-card p-3 rounded shadow-sm hover:border hover:border-border group'>
             <section className='space-y-2'>
-                <h1 className="text-primary satoshi-medium">{policy.policy_name}</h1>
+                <h1 
+                    className="text-primary satoshi-medium group-hover:underline cursor-pointer w-max"
+                    onClick={() => router.push(`/returns-policy/build/${policy.policy_type}?uid=${policy.uid}`)}
+                >{policy.policy_name}</h1>
                 <p className="text-foreground text-xs uppercase">{policy.policy_type}</p>
             </section>
             <section className="grid grid-cols-5 gap-3">

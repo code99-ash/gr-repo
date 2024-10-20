@@ -9,7 +9,7 @@ export default function ActionNode({data}: { data: any }) {
     
     const nodeEdge = useMemo(() => edges.find(edge => edge.source === data.node_id), [edges, data.node_id])
 
-    console.log('action node data', data)
+    // console.log('action node data', data)
 
     return (
       <NodeWrapper node_id={data.node_id}>

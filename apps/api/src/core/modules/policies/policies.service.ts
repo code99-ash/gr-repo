@@ -103,9 +103,9 @@ export class PoliciesService {
 
 
     // Deep check differences in policy flow
-    const existing_flow = existingPolicy.current_flow.policy_flow;
+    const existing_flow = existingPolicy.current_flow;
 
-    if(this._flowChanged(existing_flow, policy_flow)) { // flow Changed,
+    if(this._flowChanged(existing_flow.policy_flow, policy_flow)) { // flow Changed,
       // console.log('flow changed');
       return await this.updateWithPolicyFlow(id, updatePolicyDto, existing_flow, new_flow)
     
@@ -117,11 +117,11 @@ export class PoliciesService {
 
   }
 
-  async updateWithPolicyFlow(id: number, updatePolicyDto: UpdatePolicyDto, currFlow: NodeRecordDto, newFlow: NodeRecordDto) {
+  async updateWithPolicyFlow(id: number, updatePolicyDto: UpdatePolicyDto, existingFlow: FlowRecordDto, newFlow: NodeRecordDto) {
     const data = { // prepare flow record
       ...updatePolicyDto,
       current_flow: {
-        ...currFlow,
+        ...existingFlow,
         policy_flow: newFlow
       }
     } as UpdatePolicyDto

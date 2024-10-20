@@ -32,6 +32,7 @@ interface PolicyState {
   policies: PolicyListType[],
   setPolicies: (data: PolicyListType[]) => void;
   newPolicy: (data: PolicyListType) => void;
+  updatePolicy: (data: PolicyListType) => void;
 }
 
 export const usePolicyStore = create<PolicyState>((set, get) => ({
@@ -44,5 +45,12 @@ export const usePolicyStore = create<PolicyState>((set, get) => ({
     set({
       policies: [policy, ...get().policies]
     })
-  }
+  },
+  updatePolicy(policy: PolicyListType) {
+    set({
+      policies: get().policies.map(each => (
+        (each.uid === policy.uid)? {...each, ...policy} : each
+      ))
+    })
+  },
 }));
