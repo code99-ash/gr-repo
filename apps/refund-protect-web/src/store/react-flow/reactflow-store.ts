@@ -14,7 +14,7 @@ export const useReactflowStore = create<AppState>((set, get) => ({
     edges: [],
     viewport: {x: 0, y: 0, zoom: 1.5},
     initializeGraph: (option_flow) => {
-        console.log('initialize graph', option_flow)
+        // console.log('initialize graph', option_flow)
         set({ nodes: getInitialNodes(option_flow), edges: getInitialEdges(option_flow) });
     },
 
@@ -99,6 +99,18 @@ export const useReactflowStore = create<AppState>((set, get) => ({
                 } : node
             ),
         });
+
+        set({
+            edges: get().edges.map(edge =>
+                edge.target === updatedNode.id? {
+                    ...edge,
+                    label: updatedNode.label,
+                    data: {
+                        label: updatedNode.label
+                    }
+                } : edge
+            )
+        })
 
         get().layoutGraph(); // Re-layout after updating node
     },

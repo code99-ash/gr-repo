@@ -119,7 +119,7 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
         useReactflowStore.getState().setEdges([])
 
         const data = get().getConditionData(type);
-        console.log('policy_type', type)
+        // console.log('policy_type', type)
 
         let policy_flow: PolicyFlow = {
             head: {
@@ -153,7 +153,7 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
             }
         }
 
-        console.log('Before Set', policy_flow)
+        // console.log('Before Set', policy_flow)
 
         set({
             selectedNode: null,

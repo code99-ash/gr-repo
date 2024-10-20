@@ -135,3 +135,7 @@
 .node-panel-header .material-symbols-outlined {
   @apply text-primary -ml-1;
 }
+
+.react-flow__edge-text::content('Yes') {
+  @apply bg-primary !important;
+}

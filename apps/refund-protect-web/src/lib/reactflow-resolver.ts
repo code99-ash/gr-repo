@@ -135,6 +135,10 @@ export const transformEdges = (flow: any) => {
       source: node.id,
       target: branch.node_id,
       label: branch.label || null,
+      type: 'custom',
+      data: {
+        label: branch.label || null,
+      },
       reconnectable: 'target',
       markerEnd: {
         type: MarkerType.ArrowClosed,

@@ -1,9 +1,10 @@
 'use client';
 import { getNodeDataProps, nodeTypeMatch, nodeTypes } from '@/lib/reactflow-resolver';
-import { Background, ConnectionState, Controls, FinalConnectionState, MarkerType, OnConnectEnd, ReactFlow, useReactFlow } from '@xyflow/react';
+import { Background, ConnectionState, Controls, EdgeTypes, FinalConnectionState, MarkerType, OnConnectEnd, ReactFlow, useReactFlow } from '@xyflow/react';
 import React, { useCallback } from 'react'
 import { usePolicyForm } from '@/store/policies/policy-form';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
+import CustomNodeEdge from '../custom-node-edge'
 
 export default function BuildOption() {
     const { screenToFlowPosition, getViewport } = useReactFlow();
@@ -27,7 +28,8 @@ export default function BuildOption() {
         node_id: string, 
         newType: 'user-input' | 'action' | 'conditions', 
         position: any, 
-        parent_id: string
+        parent_id: string,
+        label: 'Yes' | 'No' | null
     ) => {
         const nodeDataProps = getNodeDataProps(newType);
 
@@ -41,6 +43,7 @@ export default function BuildOption() {
                 node_id,
                 ...nodeDataProps,
             },
+            label: label,
             position: position,
         })
 
@@ -67,42 +70,50 @@ export default function BuildOption() {
             const node_id = new Date().getTime().toString();
 
             const newNode = {
-            id: node_id,
-            position: {x: 0, y: 0},
-            parent: connectionState?.fromNode?.id,
-            type: 'selectNode',
-            draggable: false,
-            data: {
-                parentId: connectionState?.fromNode?.id,
-                label: 'Selection Node',
-                node_id,
-                onCreateNode,
-                position: {x: 0, y: 0}
-            },
+                id: node_id,
+                position: {x: 0, y: 0},
+                parent: connectionState?.fromNode?.id,
+                type: 'selectNode',
+                draggable: false,
+                data: {
+                    parentId: connectionState?.fromNode?.id,
+                    label: 'Selection Node',
+                    node_id,
+                    onCreateNode,
+                    position: {x: 0, y: 0}
+                },
             };
     
             showSelectionNode(newNode);
             addEdge({
-            id: node_id,
-            source: connectionState?.fromNode?.id,
-            target: node_id,
-            sourceHandle: connectionState.fromHandle?.id,
-            reconnectable: 'target',
-            markerEnd: {
-                type: MarkerType.ArrowClosed,
-                width: 10,
-                height: 10,
-                color: '#2A9E69'
-            },
-            style: {
-                strokeWidth: 2,
-                stroke: '#2A9E69'
-            }
+                id: node_id,
+                source: connectionState?.fromNode?.id,
+                target: node_id,
+                sourceHandle: connectionState.fromHandle?.id,
+                reconnectable: 'target',
+                type: 'custom',
+                data: {
+                    label: null
+                },
+                markerEnd: {
+                    type: MarkerType.ArrowClosed,
+                    width: 10,
+                    height: 10,
+                    color: '#2A9E69'
+                },
+                style: {
+                    strokeWidth: 2,
+                    stroke: '#2A9E69'
+                }
             })
         }
         },
         [screenToFlowPosition],
     );
+
+    const edgeTypes: EdgeTypes = {
+        custom: CustomNodeEdge
+    }
 
     return (
         <ReactFlow
@@ -113,6 +124,7 @@ export default function BuildOption() {
             onConnectEnd={onConnectEnd}
             nodeTypes={nodeTypes}
             defaultViewport={viewport}
+            edgeTypes={edgeTypes}
         >
             <Background />
             <Controls />
