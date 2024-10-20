@@ -45,7 +45,10 @@ export default function BuildSuccess() {
                   <p>Would you like to add more conditions to your Returns policy?</p>
                 </div>
                 <div className="flex flex-col gap-y-4 items-start">
-                  <button className='bg-primary text-white satoshi-medium text-base rounded-md px-[12px] py-[8px]'>
+                  <button 
+                    className='bg-primary text-white satoshi-medium text-base rounded-md px-[12px] py-[8px]'
+                    onClick={() => router.push(`/returns-policy/build/${policy?.policy_type}?uid=${uid}`)}  
+                  >
                     Add other conditions
                   </button>
                   <button 
