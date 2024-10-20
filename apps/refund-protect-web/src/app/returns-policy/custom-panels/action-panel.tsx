@@ -30,6 +30,10 @@ const customerActions: string[] = [
   'Decline'
 ]
 
+const durationActions: string[] = [
+  'Decline'
+]
+
 export default function ActionPanel() {
   const { updateNode } = useContext(UpdateNodeCtx)
   const policy_type = usePolicyForm(state => state.policy_type)
@@ -41,7 +45,16 @@ export default function ActionPanel() {
   const removeNode = usePolicyForm(state => state.removeNode);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const actions = useMemo(() => policy_type === 'customer'? customerActions : baseActions, [policy_type])
+  const actions = useMemo(() => {
+    switch (policy_type) {
+      case 'duration':
+        return durationActions;
+      case 'customer':
+        return customerActions
+      default:
+        return baseActions
+    }
+  }, [policy_type])
 
   useEffect(() => {
     setAction(selectedNode.data.action_type)
@@ -85,11 +98,15 @@ export default function ActionPanel() {
         Action
       </header>
 
-      <DeleteNodeConfirm
-        confirmDelete={confirmDelete}
-        setConfirmDelete={setConfirmDelete}
-        deleteAnyway={deleteAnyway}
-      />
+      {
+        policy_type !== "duration" && ( // No node can be deleted on duration flow
+          <DeleteNodeConfirm
+            confirmDelete={confirmDelete}
+            setConfirmDelete={setConfirmDelete}
+            deleteAnyway={deleteAnyway}
+          />
+        )
+      }
 
       <main className='border rounded-xl p-3 space-y-3'>
 

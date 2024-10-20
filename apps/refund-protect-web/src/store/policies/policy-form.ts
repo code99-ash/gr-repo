@@ -120,23 +120,8 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
 
         const data = get().getConditionData(type);
         console.log('policy_type', type)
-        set({
-            selectedNode: null,
-            incomplete_nodes: [],
-            policy_name: `Returns policy builder - ${type}`,
-            policy_type: type,
-            policy_flow: {
-                head: {
-                    id: 'head',
-                    parent: null,
-                    node_type: "conditions",
-                    data: data,
-                    branches: [],
-                }
-            },
-        })
 
-        useReactflowStore.getState().initializeGraph({
+        let policy_flow: PolicyFlow = {
             head: {
                 id: 'head',
                 parent: null,
@@ -144,7 +129,43 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
                 data: data,
                 branches: [],
             }
+        }
+
+        if(type === "duration") { // Add decline action by Default
+
+            const uid = new Date().getTime().toString();
+            const actionNode: MyNodeType = {
+                id: uid,
+                parent: 'head',
+                node_type: "action",
+                data: {
+                    action_type: "Decline",
+                    message: ""
+                },
+                branches: []
+            }
+
+            policy_flow.head.branches = [ {node_id: uid, label: null} ]
+
+            policy_flow = {
+                ...policy_flow,
+                [uid]: actionNode
+            }
+        }
+
+        console.log('Before Set', policy_flow)
+
+        set({
+            selectedNode: null,
+            incomplete_nodes: [],
+            policy_name: `Returns policy builder - ${type}`,
+            policy_type: type,
+            policy_flow: policy_flow,
         })
+
+        useReactflowStore.getState().initializeGraph(get().policy_flow)
+
+        // useReactflowStore.getState().layoutGraph()
 
         
     },
