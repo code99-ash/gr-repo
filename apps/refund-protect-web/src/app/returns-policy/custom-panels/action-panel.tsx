@@ -20,7 +20,7 @@ const baseActions: string[] = [
   'Accept Exchange',
   'Accept Refund',
   'Manual Review',
-  'AI Review',
+  // 'AI Review',
   'Decline'
 ];
 
@@ -29,7 +29,6 @@ const customerActions: string[] = [
   'Accept Refund',
   'Decline'
 ]
-
 
 export default function ActionPanel() {
   const { updateNode } = useContext(UpdateNodeCtx)

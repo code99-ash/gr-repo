@@ -6,6 +6,7 @@ import { usePolicyForm } from '@/store/policies/policy-form';
 
 export default function SelectNode({ data }: { data: any }) {
     const policy_flow = usePolicyForm(state => state.policy_flow)
+    const policy_type = usePolicyForm(state => state.policy_type)
 
     const handleReplaceNode = useCallback((newType: string) => {
         data.onCreateNode(
@@ -35,13 +36,17 @@ export default function SelectNode({ data }: { data: any }) {
             
             {/* <h1 className="text-green text-[10px] satoshi-bold capitalize">Select Option</h1> */}
             <div className="w-full flex flex-col">
-                <Button variant='outline'
-                    className={`text-sm ${isUpload? 'opacity-20':''}`}
-                    onClick={() => handleReplaceNode('user-input')}
-                    disabled={isUpload}
-                >
-                    User Input
-                </Button>
+                {
+                    policy_type === 'product' && (
+                        <Button variant='outline'
+                            className={`text-sm ${isUpload? 'opacity-20':''}`}
+                            onClick={() => handleReplaceNode('user-input')}
+                            disabled={isUpload}
+                        >
+                            User Input
+                        </Button>
+                    )
+                }
                 <Button variant='outline'
                     className="text-sm"
                     onClick={() => handleReplaceNode('action')}
