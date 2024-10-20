@@ -2,7 +2,7 @@
 import React, { useMemo, useState } from 'react'
 import SideNav from './side-nav';
 import { ModeToggle } from '@/components/mode-toggle';
-import { useThinNavStore } from '@/store/thinNavStore';
+import { useThinNavStore } from '@/store/thin-nav-store';
 
 
 export default function DashboardLayout({children}: Readonly<{ children: React.ReactNode }>) {

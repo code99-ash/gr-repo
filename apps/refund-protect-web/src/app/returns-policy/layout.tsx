@@ -2,10 +2,10 @@
 import React, { useMemo, useState } from 'react'
 import { ModeToggle } from '@/components/mode-toggle';
 import SideBar from './side-bar';
-import { useThinNavStore } from '@/store/thinNavStore';
+import { useThinNavStore } from '@/store/thin-nav-store';
 
 
-export default function DashboardLayout({children}: Readonly<{ children: React.ReactNode }>) {
+export default function DashboardLayout({children}: { children: React.ReactNode }) {
     const thinNav = useThinNavStore(state => state.thinNav);
     const toggleThinNav = useThinNavStore(state => state.toggleThinNav);
 
@@ -26,7 +26,8 @@ export default function DashboardLayout({children}: Readonly<{ children: React.R
 
     return (
         <div className='flex h-[100vh]'>
-            <div className={`transition-all overflow-hidden flex flex-col gap-2 h-full bg-background ${manageClass}`}>
+            <div className={`sticky top-0 transition-all overflow-hidden flex 
+                flex-col gap-2 h-[100vh] bg-background ${manageClass}`}>
                 <SideBar />
             </div>
             <section className='flex flex-col grow bg-accent p-1'>

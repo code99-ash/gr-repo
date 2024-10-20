@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import React from 'react'
 import { Button } from './ui/button';
-import { useThinNavStore } from '@/store/thinNavStore';
+import { useThinNavStore } from '@/store/thin-nav-store';
 
 export default function UserLogoutCard() {
     const thinNav = useThinNavStore(state => state.thinNav)
