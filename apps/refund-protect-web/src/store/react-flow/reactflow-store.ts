@@ -12,7 +12,7 @@ const getInitialEdges = (option_flow: any) => option_flow ? transformEdges(optio
 export const useReactflowStore = create<AppState>((set, get) => ({
     nodes: [],
     edges: [],
-    viewport: {x: 0, y: 0, zoom: 1},
+    viewport: {x: 0, y: 0, zoom: 1.5},
     initializeGraph: (option_flow) => {
         console.log('initialize graph', option_flow)
         set({ nodes: getInitialNodes(option_flow), edges: getInitialEdges(option_flow) });
