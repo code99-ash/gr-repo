@@ -2,7 +2,7 @@ import { getNodeDataProps } from "@/lib/reactflow-resolver";
 import { create } from "zustand";
 import { BranchType } from '@/interfaces/common.interface';
 import { useReactflowStore } from "../react-flow/reactflow-store";
-import { OrderConditionData, OrderConditionType } from "@/interfaces/order.interfact";
+import { OrderConditionData } from "@/interfaces/order.interface";
 import { DurationConditionData } from "@/interfaces/duration.interface";
 import { CustomerConditionData } from "@/interfaces/customer.interface";
 import { ProductConditionData } from "@/interfaces/product.interface";
@@ -19,7 +19,7 @@ interface MyNodeType {
 type NodeTypes = 'user-input' | 'action' | 'conditions';
 export type PolicyTypes = 'product' | 'duration' | 'customer' | 'order';
 
-interface PolicyFlow {
+export interface PolicyFlow {
     [key: string]: MyNodeType;
 }
 
