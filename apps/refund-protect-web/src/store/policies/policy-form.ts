@@ -7,7 +7,7 @@ import { DurationConditionData } from "@/interfaces/duration.interface";
 import { CustomerConditionData } from "@/interfaces/customer.interface";
 import { ProductConditionData } from "@/interfaces/product.interface";
 
-interface MyNodeType {
+export interface MyNodeType {
     id: string;
     parent: string | null;
     node_type: NodeTypes;

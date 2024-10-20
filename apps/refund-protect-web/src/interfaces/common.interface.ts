@@ -3,7 +3,7 @@ export type FlowTypes = 'product' | 'customer' | 'order' | 'duration'
 export interface BaseNodeType {
     id: string;
     parent: string;
-    position: { x: number, y: number };
+    position?: { x: number, y: number };
     node_type: 'user-input' | 'action' | 'conditions';
     branches: BranchType[];
 }

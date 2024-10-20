@@ -7,7 +7,8 @@ import EdittableTitle from './edittable-title';
 import { Button } from '@/components/ui/button';
 
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
-import { PolicyTypes, usePolicyForm } from '@/store/policies/policy-form';
+import { PolicyFlow, PolicyTypes, usePolicyForm } from '@/store/policies/policy-form';
+import { incompleteNodeDetected } from '@/lib/flow-tree-check'
 
 import '@xyflow/react/dist/style.css';
 import { useParams, useSearchParams } from 'next/navigation';
@@ -28,7 +29,7 @@ export default function ProductPolicyBuiler() {
   const policyForm = usePolicyForm()
   const policies = usePolicyStore(state => state.policies);
   const { initializeGraph } = useReactflowStore();
-  const {selectedNode, setPolicyType, setPolicyName, setPolicyId } = policyForm;
+  const {selectedNode, setPolicyType, setPolicyName, setPolicyId, incomplete_nodes } = policyForm;
   const newPolicy = usePolicyStore(state => state.newPolicy)
   const updatePolicy = usePolicyStore(state => state.updatePolicy)
 
@@ -81,7 +82,6 @@ export default function ProductPolicyBuiler() {
     const request_method = policyUID? 'patch' : 'post'
     const request_path = policyUID? `/policies/${policyForm.policy_id}` : '/policies';
 
-    console.log(request_path)
     try {
       setResponse((prev) => ({...prev, loading: true}))
 
@@ -122,15 +122,54 @@ export default function ProductPolicyBuiler() {
     }
   }
 
-  const publishFlow = () => {
-    try {
-      console.log(usePolicyForm())
+ 
 
-    }catch(err) {
-      console.log(err)
+  const publishFlow = async() => {
+    const request_method = policyUID? 'patch' : 'post'
+    const request_path = policyUID? `/policies/${policyForm.policy_id}` : '/policies';
+
+    if(incompleteNodeDetected(policyForm.policy_flow)) {
+      alert('Policy with incomplete nodes cannot be published')
+      return;
+    }
+
+    try {
+      setResponse((prev) => ({...prev, loading: true}))
+
+      const fd: any = {
+        policy_flow: policyForm.policy_flow,
+        data: {
+          policy_name: policyForm.policy_name,
+          policy_type: policyForm.policy_type,
+          status: 'published'
+        }
+      };
+
+      if(!policyUID) { // Not Editting
+        fd.policy_flow = policyForm.policy_flow
+      }else {
+        fd.new_flow = policyForm.policy_flow
+      }
+      
+      
+      const resp = await axiosInstance[request_method](request_path, JSON.stringify(fd));
+
+      if(!policyUID) {
+        newPolicy(resp.data)
+        router.push(`/build-success?uid=${resp.data.uid}`)
+      }else {
+        updatePolicy(resp.data)
+        router.push('/returns-policy')
+      }
+      
+      // console.log(resp)
+
+    }catch(error) {
+      setResponse((prev) => ({...prev, error}))
+    } finally {
+      setResponse((prev) => ({...prev, loading: false}))
     }
   }
-
 
 
   return (

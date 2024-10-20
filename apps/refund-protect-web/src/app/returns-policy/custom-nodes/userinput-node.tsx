@@ -21,12 +21,13 @@ export default function UserInputNode({ data }: { data: any }) {
     useEffect(() => {
         if (!flowNode) return;
 
+        const isQuestion = flowNode.data.input_type === 'question'
         const branchLength = flowNode.branches.length;
-        const expectedLength = flowNode.data.input_type === 'upload' ? 1 : 2;
+        const expectedLength = !isQuestion ? 1 : 2;
         const alreadyIdle = incomplete_nodes.includes(data.node_id);
 
         // Update incomplete nodes if branch length is less than expected
-        if (branchLength < expectedLength) {
+        if (branchLength < expectedLength || (isQuestion && !flowNode.data.message?.trim())) {
             if (!alreadyIdle) {
                 updateIncomplete([...incomplete_nodes, data.node_id]);
             }
