@@ -32,7 +32,7 @@ interface PolicyFormType {
     setPolicyName: (name: string) => void;
     setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => void;
     setPolicyFlow: (type: PolicyFlow) => void;
-    addNewNode: (node_id: string, node_type: NodeTypes, parent_id: string) => void;
+    addNewNode: (node_id: string, node_type: NodeTypes, parent_id: string, label: any) => void;
     modifyNode: (node_id: string, data: any) => void;
     removeNode: (node_id: string) => void;
     clearUploadChildren?: (node_id: string) => void;
@@ -190,7 +190,7 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
         set({ selectedNode: node })
     },
     
-    addNewNode: (node_id, node_type, parent_id) => {
+    addNewNode: (node_id, node_type, parent_id, label) => {
 
         set((state) => {
             let updated = {
@@ -214,7 +214,7 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
                         ...parentNode.branches,
                         {
                             node_id: node_id,
-                            label: null,
+                            label: label,
                         }
                     ]
                 };

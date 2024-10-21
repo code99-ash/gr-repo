@@ -25,6 +25,7 @@ export default function SelectNode({ data }: { data: any }) {
     }, [data, policy_flow]);
 
     const label = useMemo(() => {
+        console.log(data.parentId)
         const parent_node = policy_flow[data.parentId];
         let edgeLabel = 'Yes';
 

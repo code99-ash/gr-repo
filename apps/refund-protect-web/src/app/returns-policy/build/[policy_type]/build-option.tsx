@@ -48,7 +48,7 @@ export default function BuildOption() {
         })
 
         // Add node to original form;
-        addNewNode(node_id, newType, parent_id)
+        addNewNode(node_id, newType, parent_id, label)
         // console.log(node_id)
     }
 

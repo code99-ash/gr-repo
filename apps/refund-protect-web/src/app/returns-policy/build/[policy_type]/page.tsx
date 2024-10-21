@@ -28,7 +28,7 @@ export default function ProductPolicyBuiler() {
   const policyForm = usePolicyForm()
   const policies = usePolicyStore(state => state.policies);
   const { initializeGraph } = useReactflowStore();
-  const {selectedNode, setPolicyType, setPolicyName, setPolicyId, incomplete_nodes } = policyForm;
+  const {selectedNode, setPolicyType, setPolicyName, setPolicyId, policy_flow } = policyForm;
   const newPolicy = usePolicyStore(state => state.newPolicy)
   const updatePolicy = usePolicyStore(state => state.updatePolicy)
 
@@ -77,6 +77,7 @@ export default function ProductPolicyBuiler() {
     if(!policyUID) {
       initializePage()
     }
+    // console.log('policy_flow', pol/icy_flow)
 
     // initializeGraph(policy_flow)
   }, [initializeGraph])
