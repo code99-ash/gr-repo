@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PoliciesRepository } from './policies.repository';
 import { CreatePolicyDto, UnprocessedPolicyCreateDto } from './dto/create-policy.dto';
 import { isNull, eq, and } from 'drizzle-orm'; // Ensure eq is imported
@@ -56,31 +56,41 @@ export class PoliciesService {
     return Object.keys(diff(original, current)).length > 0
   }
 
-  create(policy_flow: NodeRecordDto, unprocessedPolicy: UnprocessedPolicyCreateDto) {
+  async create(policy_flow: NodeRecordDto, unprocessedPolicy: UnprocessedPolicyCreateDto) {
     const {status} = unprocessedPolicy;
 
     // Prevent Save for non-draft status if flow is incomplete
     if(status && status !== 'draft' && !this._flowIsComplete(policy_flow)) {
-      throw new Error(`Incomplete flow cannot be ${status}`);
+      throw new BadRequestException(`Incomplete flow cannot be ${status}`);
     }
 
     const current_flow = this._createFlow(policy_flow, unprocessedPolicy.policy_name)
     const policyDto =  this._getCreateDto(unprocessedPolicy, current_flow)
 
-    return this.policiesRepository.saveAs(policyDto);
+    try {
+      return await this.policiesRepository.saveAs(policyDto);
+    } catch (error) {
+      throw new InternalServerErrorException('Error saving policy');
+    }
   }
 
-  findAll(organization_uid?: string) {
-    return this.policiesRepository.list({
-      where: and(
-        isNull(policies.deleted_at),
+  async findAll(organization_uid?: string) {
+    try {
+      return await this.policiesRepository.list({
+        where: and(isNull(policies.deleted_at)),
         // eq(policies.organization_uid, organization_uid)
-      )
-    });
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Error fetching policies');
+    }
   }
   
-  findOne(id: number) {
-    return this.policiesRepository.get('id', id)
+  async findOne(id: number) {
+    const policy = await this.policiesRepository.get('id', id);
+    if (!policy) {
+      throw new NotFoundException(`Policy with ID ${id} not found.`);
+    }
+    return policy;
   }
 
   async update(id: number, updatePolicyDto: UpdatePolicyDto, new_flow: NodeRecordDto) {
@@ -89,7 +99,7 @@ export class PoliciesService {
     // console.log('existingPolicy', existingPolicy);
 
     if(!existingPolicy) {
-      throw new Error(`Policy with ID ${id} not found.`)
+      throw new NotFoundException(`Policy with ID ${id} not found.`);
     }
 
     const newStatus = updatePolicyDto.status ?? existingPolicy.status;
@@ -98,53 +108,69 @@ export class PoliciesService {
 
     const policy_flow = new_flow ?? existingPolicy.current_flow.policy_flow
     if(newStatus !== 'draft' && !this._flowIsComplete(policy_flow)) {
-      throw new Error(`Incomplete flow cannot be ${newStatus}`);
+      throw new BadRequestException(`Incomplete flow cannot be ${newStatus}`);
     }
 
 
     // Deep check differences in policy flow
-    const existing_flow = existingPolicy.current_flow.policy_flow;
+    const existing_flow = existingPolicy.current_flow;
 
-    if(this._flowChanged(existing_flow, policy_flow)) { // flow Changed,
+    if(this._flowChanged(existing_flow.policy_flow, policy_flow)) { // flow Changed,
       // console.log('flow changed');
       return await this.updateWithPolicyFlow(id, updatePolicyDto, existing_flow, new_flow)
     
     }else {
       // console.log('flow DID NOT change');
-      return await this.policiesRepository.update(id, updatePolicyDto)
+      try {
+
+        return await this.policiesRepository.update(id, updatePolicyDto)
+
+      }catch(error) {
+        throw new InternalServerErrorException('Error updating policy');
+      }
     }
     
 
   }
 
-  async updateWithPolicyFlow(id: number, updatePolicyDto: UpdatePolicyDto, currFlow: NodeRecordDto, newFlow: NodeRecordDto) {
-    const data = { // prepare flow record
+  async updateWithPolicyFlow(id: number, updatePolicyDto: UpdatePolicyDto, existingFlow: FlowRecordDto, newFlow: NodeRecordDto) {
+    const data = {
       ...updatePolicyDto,
-      current_flow: {
-        ...currFlow,
-        policy_flow: newFlow
-      }
-    } as UpdatePolicyDto
+      current_flow: { ...existingFlow, policy_flow: newFlow },
+    } as UpdatePolicyDto;
 
-    return await this.policiesRepository.update(id, data)
+    try {
+      return await this.policiesRepository.update(id, data);
+    } catch (error) {
+      throw new InternalServerErrorException('Error updating policy and policy flow');
+    }
   }
 
   async delete(id: number) {
     const policy = await this.policiesRepository.get('id', id);
-    if(!policy) {
-      throw new Error(`Policy with ID ${id} not found`)
+    if (!policy) {
+      throw new NotFoundException(`Policy with ID ${id} not found.`);
     }
-    if(policy.status === 'active') {
-      return this.setAsDeleted(id)
+
+    if (policy.status === 'active') {
+      return this.setAsDeleted(id);
     }
-    return this.deleteAnyway(id)
+    return this.deleteAnyway(id);
   }
 
-  deleteAnyway(id: number) {
-    return this.policiesRepository.deleteAnyway('id', id)
+  async deleteAnyway(id: number) {
+    try {
+      return await this.policiesRepository.deleteAnyway('id', id);
+    } catch (error) {
+      throw new InternalServerErrorException('Error deleting policy');
+    }
   }
 
-  setAsDeleted(id: number) {
-    return this.policiesRepository.setAsDeleted('id', id)
+  async setAsDeleted(id: number) {
+    try {
+      return await this.policiesRepository.setAsDeleted('id', id);
+    } catch (error) {
+      throw new InternalServerErrorException('Error deleting policy');
+    }
   }
 }
