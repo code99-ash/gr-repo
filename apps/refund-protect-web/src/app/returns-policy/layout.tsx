@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react'
 import { ModeToggle } from '@/components/mode-toggle';
 import SideBar from './side-bar';
 import { useThinNavStore } from '@/store/thin-nav-store';
-
+import { Toaster } from "@/components/ui/toaster"
 
 export default function DashboardLayout({children}: { children: React.ReactNode }) {
     const thinNav = useThinNavStore(state => state.thinNav);
@@ -41,6 +41,7 @@ export default function DashboardLayout({children}: { children: React.ReactNode 
                     </button>
                 </header>
                 <div className='grow py-3'>{children}</div>
+                <Toaster />
             </section>
         </div>
     )

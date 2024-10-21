@@ -5,21 +5,15 @@ import EmptyData from './empty-data';
 import PolicyList from './policy-list';
 import PageHeader from './page-header';
 import axiosInstance from '@/lib/axios';
-
-interface AwaitResponse {
-    loading: boolean;
-    error: any;
-}
+import { useToast } from '@/hooks/use-toast';
 
 export default function ReturnPolicy() {
+    const { toast } = useToast()
     const setPolicies = usePolicyStore(state => state.setPolicies)
     const policies = usePolicyStore(state => state.policies)
     const fetched = usePolicyStore(state => state.fetched)
 
-    const [response, setResponse] = useState<AwaitResponse>({
-        loading: false,
-        error: null
-    })
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         if(fetched) return;
@@ -29,15 +23,24 @@ export default function ReturnPolicy() {
 
     const fetchPolicies = async() => {
         try {
-            setResponse(prev => ({...prev, loading: true}))
+            setLoading(true)
             const resp = await axiosInstance.get('/policies')
-            console.log(resp)
+            // console.log(resp)
             setPolicies(resp.data);
-    
-        }catch(err) {
-            setResponse(prev => ({...prev, error: err}))
+
+            toast({
+                title: "Success Alert",
+                description: "Successfully fetched policies",
+            })
+            
+        }catch(err: any) {
+            toast({
+                variant: "destructive",
+                title: "An error occured",
+                description: err?.response.data ?? 'An error occured, please try again',
+            })
         } finally {
-            setResponse(prev => ({...prev, loading: false}))
+            setLoading(false)
         }
     }
 

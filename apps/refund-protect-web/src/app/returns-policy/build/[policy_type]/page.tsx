@@ -7,7 +7,7 @@ import EdittableTitle from './edittable-title';
 import { Button } from '@/components/ui/button';
 
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
-import { PolicyFlow, PolicyTypes, usePolicyForm } from '@/store/policies/policy-form';
+import { PolicyTypes, usePolicyForm } from '@/store/policies/policy-form';
 import { incompleteNodeDetected } from '@/lib/flow-tree-check'
 
 import '@xyflow/react/dist/style.css';
@@ -15,15 +15,14 @@ import { useParams, useSearchParams } from 'next/navigation';
 import axiosInstance from '@/lib/axios';
 import { usePolicyStore } from '@/store/policies/policy-store';
 import { useRouter } from 'next/navigation';
+import { useToast } from "@/hooks/use-toast"
+
+
 
 const accepted_types: PolicyTypes[] = ['duration', 'order', 'customer', 'product']
 
-interface AwaitResponse {
-  loading: boolean;
-  error: any;
-}
-
 export default function ProductPolicyBuiler() {
+  const { toast } = useToast()
   const params = useParams()
   const router = useRouter()
   const policyForm = usePolicyForm()
@@ -33,14 +32,25 @@ export default function ProductPolicyBuiler() {
   const newPolicy = usePolicyStore(state => state.newPolicy)
   const updatePolicy = usePolicyStore(state => state.updatePolicy)
 
-  const [response, setResponse] = useState<AwaitResponse>({
-    loading: false,
-    error: null,
-  })
+  const [loading, setLoading] = useState(false)
 
   // Modify
   const searchParams = useSearchParams()
   const policyUID = searchParams.get('uid');
+
+  const errorResponse = (props: any) => {
+    toast({
+      variant: "destructive",
+      title: props.title ?? "Error Alert",
+      description: props.description,
+    })
+  }
+  const defaultResponse = (props: any) => {
+    toast({
+      title: props.title ?? "Success Alert",
+      description: props.description,
+    })
+  }
   
   useEffect(() => {
     if(!policyUID) return;
@@ -83,7 +93,7 @@ export default function ProductPolicyBuiler() {
     const request_path = policyUID? `/policies/${policyForm.policy_id}` : '/policies';
 
     try {
-      setResponse((prev) => ({...prev, loading: true}))
+      setLoading(true)
 
       const fd: any = {
         policy_flow: policyForm.policy_flow,
@@ -105,20 +115,28 @@ export default function ProductPolicyBuiler() {
       
       const resp = await axiosInstance[request_method](request_path, JSON.stringify(fd));
 
+      let description;
+
       if(!policyUID) {
+        description = "Successfully created policy"
+
         newPolicy(resp.data)
         router.push(`/build-success?uid=${resp.data.uid}`)
       }else {
+        description = "Successfully updated policy"
+
         updatePolicy(resp.data)
         router.push('/returns-policy')
       }
+
+      defaultResponse({description})
       
       // console.log(resp)
 
-    }catch(error) {
-      setResponse((prev) => ({...prev, error}))
+    }catch(error: any) {
+      errorResponse({description: error.response.data})
     } finally {
-      setResponse((prev) => ({...prev, loading: false}))
+      setLoading(false)
     }
   }
 
@@ -129,12 +147,15 @@ export default function ProductPolicyBuiler() {
     const request_path = policyUID? `/policies/${policyForm.policy_id}` : '/policies';
 
     if(incompleteNodeDetected(policyForm.policy_flow)) {
-      alert('Policy with incomplete nodes cannot be published')
+      errorResponse({
+        title: "Incomplete node(s) detected!",
+        description: 'Policy with incomplete nodes cannot be published'
+      })
       return;
     }
 
     try {
-      setResponse((prev) => ({...prev, loading: true}))
+      setLoading(true)
 
       const fd: any = {
         policy_flow: policyForm.policy_flow,
@@ -154,20 +175,28 @@ export default function ProductPolicyBuiler() {
       
       const resp = await axiosInstance[request_method](request_path, JSON.stringify(fd));
 
+      let description;
+
       if(!policyUID) {
+        description = "Successfully created policy"
+
         newPolicy(resp.data)
         router.push(`/build-success?uid=${resp.data.uid}`)
       }else {
+        description = "Successfully updated policy"
+
         updatePolicy(resp.data)
         router.push('/returns-policy')
       }
+
+      defaultResponse({description})
       
       // console.log(resp)
 
-    }catch(error) {
-      setResponse((prev) => ({...prev, error}))
+    }catch(error: any) {
+      errorResponse({description: error.response.data})
     } finally {
-      setResponse((prev) => ({...prev, loading: false}))
+      setLoading(false)
     }
   }
 
@@ -180,7 +209,7 @@ export default function ProductPolicyBuiler() {
 
         <div className="flex items-center gap-2">
           {
-            !response.loading? 
+            !loading? 
             <>
               <Button 
                 onClick={saveToDraft} 
