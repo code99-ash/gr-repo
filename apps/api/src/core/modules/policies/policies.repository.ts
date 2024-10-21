@@ -3,10 +3,8 @@ import { DBQueryConfig, eq } from 'drizzle-orm';
 import { type Database } from 'src/common/db/db.types';
 import { DB } from 'src/common/db/drizzle.provider';
 import { policies } from './db/policies.db';
-import { CreatePolicyDto, UnprocessedPolicyCreateDto } from './dto/create-policy.dto';
+import { CreatePolicyDto } from './dto/create-policy.dto';
 import { UpdatePolicyDto } from './dto/update-policy.dto';
-import { ActivatePolicyDto } from './dto/activate-policy.dto';
-import { FlowRecordDto } from './dto/policy-flow.dto';
 
 
 @Injectable()
@@ -14,9 +12,9 @@ export class PoliciesRepository {
 
     constructor(@Inject(DB) private db: Database) {}
 
-    private async _get(key: 'id' | 'uid', id: string | number) {
+    private async _get(key: keyof typeof policies._.columns, value: string | number) {
         const user = await this.db.query.policies.findFirst({
-          where: eq(policies[key], id),
+          where: eq(policies[key], value),
         });
     
         return user ?? null;
@@ -26,8 +24,8 @@ export class PoliciesRepository {
         return await this.db.query.policies.findMany(config);
     }
 
-    async get(key: 'id' | 'uid', id: string | number) {
-        return this._get(key, id);
+    async get(key: keyof typeof policies._.columns, value: string | number) {
+        return this._get(key, value);
     }
 
     async saveAs(policySchema: CreatePolicyDto) {
@@ -38,45 +36,38 @@ export class PoliciesRepository {
         return policy;
     }
 
-    async update(id: number, policySchema: UpdatePolicyDto) {
+    async update(uid: string, policySchema: UpdatePolicyDto) {
         
         const [updatedPolicy] = await this.db.update(policies)
                                             .set(policySchema)
-                                            .where(eq(policies.id, id))
+                                            .where(eq(policies.uid, uid))
                                             .returning();
 
         return updatedPolicy;
     }
 
-    async activate(
-        id: number, 
-        activateSchema: ActivatePolicyDto, 
-        current_flow: FlowRecordDto, 
-        user_id: string
-    ) {
-     
+    async activate(uid: string,  user_id: string) {
         const [activated] = await this.db.update(policies).set({
-            status: activateSchema.status,
+            status: 'active',
             activated_at: new Date(),
             activated_by: user_id,
-            current_flow: { ...current_flow, activated_by: user_id }
         })
-        .where(eq(policies.id, id))
+        .where(eq(policies.uid, uid))
         .returning()
 
         return activated;
     }
 
-    async deleteAnyway(key: 'uid'|'id', id: string | number) {
+    async deleteAnyway(uid: string) {
         return await this.db.delete(policies)
-                        .where(eq(policies[key], id));
+                        .where(eq(policies.uid, uid));
     }
 
-    async setAsDeleted(key: 'uid'|'id', id: string | number) {
+    async setAsDeleted(uid: string) {
         return this.db
                     .update(policies)
                     .set({deleted_at: new Date()})
-                    .where(eq(policies[key], id))
-    } 
+                    .where(eq(policies.uid, uid))
+    }
 
 }

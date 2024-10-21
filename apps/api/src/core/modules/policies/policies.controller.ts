@@ -1,8 +1,7 @@
 import { Controller, Get, Param, Patch, Post, Delete, Body } from '@nestjs/common';
 import { PoliciesService } from './policies.service';
-import { UnprocessedPolicyCreateDto } from './dto/create-policy.dto';
-import { NodeRecordDto } from './dto/policy-flow.dto';
 import { UpdatePolicyDto } from './dto/update-policy.dto';
+import { CreatePolicyDto } from './dto/create-policy.dto';
 
 @Controller('policies')
 export class PoliciesController {
@@ -13,30 +12,26 @@ export class PoliciesController {
         return await this.policiesService.findAll()
     }
 
-    @Get(':id')
-    async findOne(@Param('id') id: number) {
-        return await this.policiesService.findOne(Number(id))
+    @Get(':uid')
+    async findOne(@Param('uid') uid: string) {
+        return await this.policiesService.findOne(uid)
     }
 
     @Post()
-    async create(
-        @Body('policy_flow') policy_flow: NodeRecordDto,
-        @Body('data') data: UnprocessedPolicyCreateDto
-    ) {
-        return this.policiesService.create(policy_flow, data)
+    async create(@Body() createPolicyDto: CreatePolicyDto) {
+        return this.policiesService.create(createPolicyDto)
     }
 
-    @Patch(':id')
+    @Patch(':uid')
     async update(
-        @Param('id') id: number, 
-        @Body('data') data: UpdatePolicyDto,
-        @Body('new_flow') new_flow: NodeRecordDto
+        @Param('uid') uid: string, 
+        @Body() updatePolicyDto: UpdatePolicyDto
     ) {
-        return this.policiesService.update(Number(id), data, new_flow)
+        return this.policiesService.update(uid, updatePolicyDto)
     }
 
-    @Delete(':id')
-    async remove(@Param('id') id: number) {
-        return await this.policiesService.delete(Number(id))
+    @Delete(':uid')
+    async remove(@Param('uid') uid: string) {
+        return await this.policiesService.delete(uid)
     }
 }

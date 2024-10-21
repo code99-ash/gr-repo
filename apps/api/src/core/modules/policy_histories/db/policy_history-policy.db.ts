@@ -1,17 +1,12 @@
 import { relations } from 'drizzle-orm';
-import { policies } from './policy_histories.db';
-import { organizations } from '../../organizations/db/organizations.db';
-import { users } from '../../users/db/users.db';
+import { policy_histories } from './policy_histories.db';
+import { policies } from '../../policies/db/policies.db';
 
 
-export const policyRelations = relations(policies, ({one, many}) => ({
-  organization: one(organizations, {
-    fields: [policies.organization_uid],
-    references: [organizations.uid]
-  }),
-
-  activated_by: one(users, {
-    fields: [policies.activated_by],
-    references: [users.uid]
+export const policyHistoryRelations = relations(policy_histories, ({one, many}) => ({
+  policies: one(policies, {
+    fields: [policy_histories.policy_uid],
+    references: [policies.uid]
   })
+
 }))
