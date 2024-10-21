@@ -18,7 +18,7 @@ function formatDate(timestamp: string) {
 export default function PolicyItem({policy}: {policy: PolicyListType}) {
     const router = useRouter()
     // const variantBorder = policy.status === 'draft'? "border-[#2A9E69]" : "border-[#FDB747]"
-    // const variantText = policy.status === 'draft'? "text-[#2A9E69]" : "text-[#FDB747]"
+    const variantText = policy.status === 'draft'? "text-[#2A9E69]" : "text-[#FDB747]"
 
     const date = useMemo(() => formatDate(policy.updated_at), [policy])
 
@@ -32,10 +32,10 @@ export default function PolicyItem({policy}: {policy: PolicyListType}) {
                 <p className="text-foreground text-xs uppercase">{policy.policy_type}</p>
             </section>
             <section className="grid grid-cols-5 gap-3">
-                <div className="flex items-center justify-between col-span-2">
+                <div className="flex items-center justify-around col-span-2">
                     <button className="px-4 py-2 text-foreground bg-accent text-sm rounded">0 items</button>
                     <button 
-                        className={`px-4 py-2 capitalize bg-accent text-foreground text-sm rounded`}
+                        className={`px-4 py-2 capitalize bg-accent text-sm rounded mx-auto ${variantText}`}
                     >{policy.status}</button>
                 </div>
                 <div className="flex items-center justify-between col-span-3">
