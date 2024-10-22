@@ -154,12 +154,12 @@ export class PoliciesService {
     if (policy.status === 'active') {
       return this.setAsDeleted(uid);
     }
-    return this.deleteAnyway(uid);
+    return this.hardDelete(uid);
   }
 
-  async deleteAnyway(uid: string) {
+  async hardDelete(uid: string) {
     try {
-      return await this.policiesRepository.deleteAnyway(uid);
+      return await this.policiesRepository.hardDelete(uid);
     } catch (error) {
       throw new InternalServerErrorException('Error deleting policy');
     }

@@ -58,7 +58,7 @@ export class PoliciesRepository {
         return activated;
     }
 
-    async deleteAnyway(uid: string): Promise<boolean> {
+    async hardDelete(uid: string): Promise<boolean> {
         const deleted = await this.db.delete(policies)
                         .where(eq(policies.uid, uid))
         return (deleted.rowCount ?? 0) > 0
