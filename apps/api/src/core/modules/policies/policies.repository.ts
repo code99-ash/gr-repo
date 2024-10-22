@@ -58,9 +58,10 @@ export class PoliciesRepository {
         return activated;
     }
 
-    async deleteAnyway(uid: string) {
-        return await this.db.delete(policies)
-                        .where(eq(policies.uid, uid));
+    async deleteAnyway(uid: string): Promise<boolean> {
+        const deleted = await this.db.delete(policies)
+                        .where(eq(policies.uid, uid))
+        return (deleted.rowCount ?? 0) > 0
     }
 
     async setAsDeleted(uid: string) {
@@ -68,6 +69,8 @@ export class PoliciesRepository {
                     .update(policies)
                     .set({deleted_at: new Date()})
                     .where(eq(policies.uid, uid))
+                    // .returning();
+                    
     }
 
 }

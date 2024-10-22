@@ -1,5 +1,5 @@
 {
-  "id": "f2793072-38a0-4268-91e0-2d37aabe0caf",
+  "id": "841b5b6b-5bc7-464c-8c15-98a842f3da4a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -702,23 +702,16 @@
         },
         "policy_type": {
           "name": "policy_type",
-          "type": "option_type",
+          "type": "policy_type",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
-        "current_flow": {
-          "name": "current_flow",
+        "policy_flow": {
+          "name": "policy_flow",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": true
-        },
-        "policy_history": {
-          "name": "policy_history",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'[]'::jsonb"
         },
         "status": {
           "name": "status",
@@ -800,6 +793,107 @@
           ]
         }
       }
+    },
+    "public.policy_histories": {
+      "name": "policy_histories",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "policy_uid": {
+          "name": "policy_uid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "policy_name": {
+          "name": "policy_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "policy_type": {
+          "name": "policy_type",
+          "type": "policy_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "policy_flow": {
+          "name": "policy_flow",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "activated_by": {
+          "name": "activated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activated_at": {
+          "name": "activated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "policy_histories_policy_uid_policies_uid_fk": {
+          "name": "policy_histories_policy_uid_policies_uid_fk",
+          "tableFrom": "policy_histories",
+          "tableTo": "policies",
+          "columnsFrom": [
+            "policy_uid"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "policy_histories_activated_by_users_uid_fk": {
+          "name": "policy_histories_activated_by_users_uid_fk",
+          "tableFrom": "policy_histories",
+          "tableTo": "users",
+          "columnsFrom": [
+            "activated_by"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     }
   },
   "enums": {
@@ -823,16 +917,6 @@
         "completed"
       ]
     },
-    "public.option_type": {
-      "name": "option_type",
-      "schema": "public",
-      "values": [
-        "product",
-        "order",
-        "customer",
-        "duration"
-      ]
-    },
     "public.status": {
       "name": "status",
       "schema": "public",
@@ -840,6 +924,16 @@
         "draft",
         "published",
         "active"
+      ]
+    },
+    "public.policy_type": {
+      "name": "policy_type",
+      "schema": "public",
+      "values": [
+        "product",
+        "order",
+        "customer",
+        "duration"
       ]
     }
   },

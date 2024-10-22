@@ -6,7 +6,10 @@ import { policies } from './db/policies.db';
 import { UpdatePolicyDto } from './dto/update-policy.dto';
 import { PolicyFlowDto } from './dto/policy-flow.dto';
 import { PolicyHistoryService } from '../policy_histories/policy_histories.service';
-// import { diff } from 'deep-object-diff';
+
+import { diff } from 'deep-object-diff';
+
+type PolicyType = 'product' | 'order' | 'customer' | 'duration';
 
 @Injectable()
 export class PoliciesService {
@@ -16,19 +19,29 @@ export class PoliciesService {
   ) {}
 
 
-  private _flowIsComplete(policy_flow: PolicyFlowDto): boolean {
+  private _flowIsComplete(policy_flow: PolicyFlowDto, policy_type: PolicyType): boolean {
     
-    if(!policy_flow) return false;
-    // console.log('checking complete flow on', policy_flow)
+    if(!(policy_flow && policy_flow.head)) return false;
 
-    const head = Object.values(policy_flow).find(each => each.id === 'head');
-    if(!head) return false;
+    const head = policy_flow.head;
 
-    return head.branches.length > 0 && !this._incompleteUserInputs(policy_flow);
+    return head.branches.length > 0 && 
+          !this._incompleteUserInputs(policy_flow) && 
+          !this._productConditionIncomplete(policy_flow, policy_type);
+  }
+
+  private _productConditionIncomplete(policy_flow: PolicyFlowDto, policy_type: PolicyType): boolean {
+    const head = policy_flow.head;
+
+    const incomplete = policy_type === 'product' && (
+      head.branches.length < 1 || head.data.list.length < 1
+    );
+    return incomplete;
   }
 
   private _incompleteUserInputs(policy_flow: PolicyFlowDto): boolean {
     const nodes = Object.values(policy_flow);
+  
     const incomplete = nodes.some(each => each.node_type === 'user-input' && (
                                           (each.data.input_type === 'upload' && each.branches.length < 1) ||
                                           (each.data.input_type === 'question' && each.branches.length < 2)
@@ -36,14 +49,14 @@ export class PoliciesService {
     return incomplete;
   }
 
-  // private _flowChanged(original: PolicyFlowDto, current: PolicyFlowDto) {
-  //   return Object.keys(diff(original, current)).length > 0
-  // }
+  private _flowChanged(original: PolicyFlowDto, current: PolicyFlowDto) {
+    return Object.keys(diff(original, current)).length > 0
+  }
 
   async create(createPolicyDto: CreatePolicyDto) {
-    const { status, policy_flow } = createPolicyDto;
+    const { status, policy_flow, policy_type } = createPolicyDto;
     // Prevent Save for non-draft status if flow is incomplete
-    if(status && status !== 'draft' && !this._flowIsComplete(policy_flow)) {
+    if(status && status !== 'draft' && !this._flowIsComplete(policy_flow, policy_type)) {
       throw new BadRequestException(`Incomplete flow cannot be ${status}`);
     }
 
@@ -74,9 +87,7 @@ export class PoliciesService {
   }
 
   async update(uid: string, updatePolicyDto: UpdatePolicyDto) {
-    if(updatePolicyDto.status === 'active') { // Cant activate on this end;
-      throw new BadRequestException(`Policy status can either be draft or published`);
-    }
+
     // find policy;
     const existingPolicy = await this.findOne(uid);
     // console.log('existingPolicy', existingPolicy);
@@ -86,26 +97,36 @@ export class PoliciesService {
     }
 
     const statusInUse = updatePolicyDto.status ?? existingPolicy.status;
-    
-    // In case, new_flow is not intended to be updated
-    const policy_flow = updatePolicyDto.policy_flow ?? existingPolicy.policy_flow
-    const flowChanged = this._flowIsComplete(policy_flow);
 
-    if(statusInUse !== 'draft' && !flowChanged) {
+    if(existingPolicy.status === 'active' && statusInUse !== 'active') {
+      throw new BadRequestException(`Sorry you cannot downgrade the status of an active policy`);
+    }
+
+
+    
+    // In case, new_flow is not intended to be updated, old flow represents it
+    const policy_flow = updatePolicyDto.policy_flow ?? existingPolicy.policy_flow
+    const flowIsComplete = this._flowIsComplete(policy_flow, existingPolicy.policy_type);
+
+    if(statusInUse !== 'draft' && !flowIsComplete) {
       throw new BadRequestException(`Incomplete flow cannot be ${statusInUse}`);
     }
 
     try {
 
-      // If policy was active & flowChanges
-      if(existingPolicy.status === 'active' && flowChanged) { 
+      // republishing && flowWasActive && flowIsComplete && flowChanged
+      if(
+        statusInUse !== 'draft' && 
+        existingPolicy.status === 'active' && 
+        flowIsComplete && this._flowChanged(existingPolicy.policy_flow, policy_flow)
+      ) { 
 
         // Add previous policy to policy_histores
         await this.historyService.create({
           policy_uid: existingPolicy.uid,
           policy_name: existingPolicy.policy_name,
           policy_type: existingPolicy.policy_type,
-          status: existingPolicy.status,
+          status: 'active', // new policy_history implies current version is active
           policy_flow: existingPolicy.policy_flow,
           activated_at: existingPolicy.activated_at,
           activated_by: existingPolicy.activated_by
@@ -129,6 +150,7 @@ export class PoliciesService {
       throw new NotFoundException(`Policy with UID ${uid} not found.`);
     }
 
+    console.log('policy status', policy.status)
     if (policy.status === 'active') {
       return this.setAsDeleted(uid);
     }
