@@ -4,7 +4,7 @@ import { organizations } from '../../organizations/db/organizations.db';
 import { users } from '../../users/db/users.db';
 
 
-export const policyRelations = relations(policies, ({one, many}) => ({
+export const policyRelations = relations(policies, ({one}) => ({
   organization: one(organizations, {
     fields: [policies.organization_uid],
     references: [organizations.uid]
