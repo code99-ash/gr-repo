@@ -13,11 +13,11 @@ export class PoliciesRepository {
     constructor(@Inject(DB) private db: Database) {}
 
     private async _get(key: keyof typeof policies._.columns, value: string | number) {
-        const user = await this.db.query.policies.findFirst({
+        const data = await this.db.query.policies.findFirst({
           where: eq(policies[key], value),
         });
     
-        return user ?? null;
+        return data ?? null;
     }
 
     async list(config: DBQueryConfig) {
