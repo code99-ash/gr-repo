@@ -28,7 +28,7 @@ export class PoliciesRepository {
         return this._get(key, value);
     }
 
-    async saveAs(policySchema: CreatePolicyDto) {
+    async create(policySchema: CreatePolicyDto) {
         const [policy] = await this.db.insert(policies)
                                     .values(policySchema)
                                     .returning();

@@ -61,7 +61,7 @@ export class PoliciesService {
     }
 
     try {
-      return await this.policiesRepository.saveAs(createPolicyDto);
+      return await this.policiesRepository.create(createPolicyDto);
     } catch (error) {
       throw new InternalServerErrorException('Error saving policy');
     }
