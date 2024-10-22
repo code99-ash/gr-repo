@@ -64,7 +64,7 @@ export class PoliciesRepository {
         return (deleted.rowCount ?? 0) > 0
     }
 
-    async setAsDeleted(uid: string) {
+    async softDelete(uid: string) {
         return this.db
                     .update(policies)
                     .set({deleted_at: new Date()})

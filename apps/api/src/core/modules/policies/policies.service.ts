@@ -152,7 +152,7 @@ export class PoliciesService {
 
     console.log('policy status', policy.status)
     if (policy.status === 'active') {
-      return this.setAsDeleted(uid);
+      return this.softDelete(uid);
     }
     return this.hardDelete(uid);
   }
@@ -165,9 +165,9 @@ export class PoliciesService {
     }
   }
 
-  async setAsDeleted(uid: string) {
+  async softDelete(uid: string) {
     try {
-      return await this.policiesRepository.setAsDeleted(uid);
+      return await this.policiesRepository.softDelete(uid);
     } catch (error) {
       throw new InternalServerErrorException('Error deleting policy');
     }
