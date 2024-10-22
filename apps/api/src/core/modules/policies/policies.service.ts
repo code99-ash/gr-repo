@@ -1,13 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException, HttpException, HttpStatus } from '@nestjs/common';
 import { PoliciesRepository } from './policies.repository';
 import { CreatePolicyDto } from './dto/create-policy.dto';
-import { isNull, eq, and } from 'drizzle-orm'; // Ensure eq is imported
+import { isNull, and } from 'drizzle-orm';
 import { policies } from './db/policies.db';
 import { UpdatePolicyDto } from './dto/update-policy.dto';
 import { PolicyFlowDto } from './dto/policy-flow.dto';
 import { PolicyHistoryService } from '../policy_histories/policy_histories.service';
 
 import { diff } from 'deep-object-diff';
+import { UpdatePolicyStatusDto } from './dto/update-policy-status.dto';
+import { ProductPolicyValidator } from './validators/product-policy-validator';
 
 type PolicyType = 'product' | 'order' | 'customer' | 'duration';
 
@@ -54,14 +56,11 @@ export class PoliciesService {
   }
 
   async create(createPolicyDto: CreatePolicyDto) {
-    const { status, policy_flow, policy_type } = createPolicyDto;
-    // Prevent Save for non-draft status if flow is incomplete
-    if(status && status !== 'draft' && !this._flowIsComplete(policy_flow, policy_type)) {
-      throw new BadRequestException(`Incomplete flow cannot be ${status}`);
-    }
-
     try {
-      return await this.policiesRepository.create(createPolicyDto);
+      return await this.policiesRepository.create({
+        ...createPolicyDto,
+        status: 'draft'
+      });
     } catch (error) {
       throw new InternalServerErrorException('Error saving policy');
     }
@@ -88,38 +87,28 @@ export class PoliciesService {
 
   async update(uid: string, updatePolicyDto: UpdatePolicyDto) {
 
-    // find policy;
+
     const existingPolicy = await this.findOne(uid);
-    // console.log('existingPolicy', existingPolicy);
 
     if(!existingPolicy) {
       throw new NotFoundException(`Policy with UID ${uid} not found.`);
     }
 
-    const statusInUse = updatePolicyDto.status ?? existingPolicy.status;
+    const isActive = existingPolicy.status === 'active';
 
-    if(existingPolicy.status === 'active' && statusInUse !== 'active') {
-      throw new BadRequestException(`Sorry you cannot downgrade the status of an active policy`);
-    }
-
-
-    
     // In case, new_flow is not intended to be updated, old flow represents it
     const policy_flow = updatePolicyDto.policy_flow ?? existingPolicy.policy_flow
     const flowIsComplete = this._flowIsComplete(policy_flow, existingPolicy.policy_type);
+    const flowChanged = this._flowChanged(existingPolicy.policy_flow, policy_flow);
 
-    if(statusInUse !== 'draft' && !flowIsComplete) {
-      throw new BadRequestException(`Incomplete flow cannot be ${statusInUse}`);
+    if(isActive && !flowIsComplete) {
+      throw new BadRequestException(`An active status cannot be published with incomplete flow`);
     }
 
     try {
 
       // republishing && flowWasActive && flowIsComplete && flowChanged
-      if(
-        statusInUse !== 'draft' && 
-        existingPolicy.status === 'active' && 
-        flowIsComplete && this._flowChanged(existingPolicy.policy_flow, policy_flow)
-      ) { 
+      if(isActive && flowIsComplete && flowChanged) { 
 
         // Add previous policy to policy_histores
         await this.historyService.create({
@@ -132,10 +121,8 @@ export class PoliciesService {
           activated_by: existingPolicy.activated_by
         })
 
-        // Create a new version as below
       }
-      
-      // Update Policy 
+ 
       return await this.policiesRepository.update(uid, updatePolicyDto)
 
     }catch(error) {
@@ -144,13 +131,51 @@ export class PoliciesService {
     
   }
 
+  async updateStatus(uid: string, updatePolicyStatusDto: UpdatePolicyStatusDto) {
+    const { status } = updatePolicyStatusDto;
+
+    const policy = await this.findOne(uid);
+    if(!policy) {
+      throw new NotFoundException(`Policy with UID ${uid} not found.`);
+    }
+
+    if(policy.status === status) {
+      throw new BadRequestException(`Policy is already ${status}`);
+    }
+
+    if(policy.status !== 'active') {
+
+      if(status !== 'draft') {
+        try {
+
+          ProductPolicyValidator.parse(policy.policy_flow);
+
+        } catch (error) {
+          
+          throw new BadRequestException(`Invalid policy flow, make sure it is complete and valid`);
+        }
+      }
+
+      return await this.policiesRepository.updateStatus(uid, updatePolicyStatusDto);
+      
+    } else {
+
+      // Check if policy has been assigned to any products
+      // Policy with no products assigned to it can be downgraded to draft/published
+
+      // Policy with products assigned to it cannot be downgraded to draft/published
+      throw new BadRequestException(`Sorry you cannot downgrade the status of an active policy`);
+
+    }
+  
+  }
+
   async delete(uid: string) {
     const policy = await this.policiesRepository.get('uid', uid);
     if (!policy) {
       throw new NotFoundException(`Policy with UID ${uid} not found.`);
     }
 
-    console.log('policy status', policy.status)
     if (policy.status === 'active') {
       return this.softDelete(uid);
     }

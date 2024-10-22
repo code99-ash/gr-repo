@@ -5,6 +5,7 @@ import { DB } from 'src/common/db/drizzle.provider';
 import { policies } from './db/policies.db';
 import { CreatePolicyDto } from './dto/create-policy.dto';
 import { UpdatePolicyDto } from './dto/update-policy.dto';
+import { UpdatePolicyStatusDto } from './dto/update-policy-status.dto';
 
 
 @Injectable()
@@ -46,6 +47,13 @@ export class PoliciesRepository {
         return updatedPolicy;
     }
 
+    async updateStatus(uid: string, updatePolicyStatusDto: UpdatePolicyStatusDto) {
+        return await this.db.update(policies)
+                            .set(updatePolicyStatusDto)
+                            .where(eq(policies.uid, uid))
+                            .returning();
+    }
+
     async activate(uid: string,  user_id: string) {
         const [activated] = await this.db.update(policies).set({
             status: 'active',
@@ -69,7 +77,7 @@ export class PoliciesRepository {
                     .update(policies)
                     .set({deleted_at: new Date()})
                     .where(eq(policies.uid, uid))
-                    // .returning();
+                    .returning();
                     
     }
 

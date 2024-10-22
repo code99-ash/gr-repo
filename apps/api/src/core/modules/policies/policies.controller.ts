@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Patch, Post, Delete, Body } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Post, Delete, Body, Put } from '@nestjs/common';
 import { PoliciesService } from './policies.service';
 import { UpdatePolicyDto } from './dto/update-policy.dto';
 import { CreatePolicyDto } from './dto/create-policy.dto';
+import { UpdatePolicyStatusDto } from './dto/update-policy-status.dto';
 
 @Controller('policies')
 export class PoliciesController {
@@ -20,6 +21,14 @@ export class PoliciesController {
     @Post()
     async create(@Body() createPolicyDto: CreatePolicyDto) {
         return this.policiesService.create(createPolicyDto)
+    }
+
+    @Put(':uid/status')
+    async updateStatus(
+        @Param('uid') uid: string, 
+        @Body() updatePolicyStatusDto: UpdatePolicyStatusDto
+    ) {
+        return this.policiesService.updateStatus(uid, updatePolicyStatusDto)
     }
 
     @Patch(':uid')

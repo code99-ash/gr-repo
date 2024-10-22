@@ -57,8 +57,10 @@ export const CreatePolicy = createInsertSchema(policies, {
     policy_flow: PolicyFlowSchema
 })
 
+
 export const UpdatePolicy = CreatePolicy.omit({
     uid: true,
+    status: true,
     organization_uid: true,
     policy_type: true,
     deleted_at: true,
@@ -73,6 +75,10 @@ export const ActivatePolicy = CreatePolicy.pick({
     status: true,
     activated_at: true,
     activated_by: true
+})
+
+export const UpdatePolicyStatus = CreatePolicy.pick({
+    status: true
 })
 
 export const DeletePolicy = CreatePolicy.pick({
