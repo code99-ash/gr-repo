@@ -50,25 +50,6 @@ export class PoliciesService {
     return isValid;
   }
 
-  private _productConditionIncomplete(policy_flow: PolicyFlowDto, policy_type: PolicyType): boolean {
-    const head = policy_flow.head;
-
-    const incomplete = policy_type === 'product' && (
-      head.branches.length < 1 || head.data.list.length < 1
-    );
-    return incomplete;
-  }
-
-  private _incompleteUserInputs(policy_flow: PolicyFlowDto): boolean {
-    const nodes = Object.values(policy_flow);
-  
-    const incomplete = nodes.some(each => each.node_type === 'user-input' && (
-                                          (each.data.input_type === 'upload' && each.branches.length < 1) ||
-                                          (each.data.input_type === 'question' && each.branches.length < 2)
-                                        ))
-    return incomplete;
-  }
-
   private _flowChanged(original: PolicyFlowDto, current: PolicyFlowDto) {
     return Object.keys(diff(original, current)).length > 0
   }
