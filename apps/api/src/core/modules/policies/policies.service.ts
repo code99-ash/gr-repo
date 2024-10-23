@@ -10,6 +10,9 @@ import { PolicyHistoryService } from '../policy_histories/policy_histories.servi
 import { diff } from 'deep-object-diff';
 import { UpdatePolicyStatusDto } from './dto/update-policy-status.dto';
 import { ProductPolicyValidator } from './validators/product-policy-validator';
+import { DurationPolicyValidator } from './validators/duration-policy-validator';
+import { CustomerPolicyValidator } from './validators/customer-policy-validator';
+import { OrderPolicyValidator } from './validators/order-policy-validator';
 
 type PolicyType = 'product' | 'order' | 'customer' | 'duration';
 
@@ -21,15 +24,30 @@ export class PoliciesService {
   ) {}
 
 
-  private _flowIsComplete(policy_flow: PolicyFlowDto, policy_type: PolicyType): boolean {
-    
-    if(!(policy_flow && policy_flow.head)) return false;
+  private _flowIsComplete(policy_flow: PolicyFlowDto, policy_type: PolicyType) {
+    let isValid = true;
+    try {
 
-    const head = policy_flow.head;
+      switch (policy_type) { 
+        case 'order':
+          OrderPolicyValidator.parse(policy_flow);
+          break;
+        case 'customer':
+          CustomerPolicyValidator.parse(policy_flow);
+          break;
+        case 'duration':
+          DurationPolicyValidator.parse(policy_flow);
+          break;
+        default:
+          ProductPolicyValidator.parse(policy_flow);
+      }
 
-    return head.branches.length > 0 && 
-          !this._incompleteUserInputs(policy_flow) && 
-          !this._productConditionIncomplete(policy_flow, policy_type);
+    } catch (error) {
+      
+      isValid = false;
+    }
+
+    return isValid;
   }
 
   private _productConditionIncomplete(policy_flow: PolicyFlowDto, policy_type: PolicyType): boolean {
@@ -134,40 +152,28 @@ export class PoliciesService {
   async updateStatus(uid: string, updatePolicyStatusDto: UpdatePolicyStatusDto) {
     const { status } = updatePolicyStatusDto;
 
-    const policy = await this.findOne(uid);
-    if(!policy) {
+    const existingPolicy = await this.findOne(uid);
+    if(!existingPolicy) {
       throw new NotFoundException(`Policy with UID ${uid} not found.`);
     }
 
-    if(policy.status === status) {
+    if(existingPolicy.status === status) {
       throw new BadRequestException(`Policy is already ${status}`);
     }
-
-    if(policy.status !== 'active') {
-
-      if(status !== 'draft') {
-        try {
-
-          ProductPolicyValidator.parse(policy.policy_flow);
-
-        } catch (error) {
-          
-          throw new BadRequestException(`Invalid policy flow, make sure it is complete and valid`);
-        }
-      }
-
-      return await this.policiesRepository.updateStatus(uid, updatePolicyStatusDto);
-      
-    } else {
-
-      // Check if policy has been assigned to any products
-      // Policy with no products assigned to it can be downgraded to draft/published
-
-      // Policy with products assigned to it cannot be downgraded to draft/published
+    
+    if(existingPolicy.status === 'active' && status !== 'active') {
+      // this concerns product assignments
       throw new BadRequestException(`Sorry you cannot downgrade the status of an active policy`);
-
     }
-  
+
+    const flowIsValid = this._flowIsComplete(existingPolicy.policy_flow, existingPolicy.policy_type);
+
+    if(status !== 'draft' && !flowIsValid) {
+      throw new BadRequestException(`Invalid policy flow, make sure it is complete and valid`);
+    }
+
+    return await this.policiesRepository.updateStatus(uid, updatePolicyStatusDto);
+    
   }
 
   async delete(uid: string) {

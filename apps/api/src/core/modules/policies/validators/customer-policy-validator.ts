@@ -1,14 +1,25 @@
 import { z } from 'zod';
 
-// Define the valid node types
-const NodeTypeEnum = z.enum(['conditions', 'user-input', 'action']);
-const ACTIONS = [
+
+const OPERATOR_LIST = ['is less than'] as const;
+const PERIODS = [
+    'Hours',
+    'Days',
+    'Weeks',
+    'Months',
+    'Years',
+] as const;
+const CUSTOMER_ACTIONS = [
     'Accept Exchange',
     'Accept Refund',
-    'Manual Review',
-    // 'AI Review',
     'Decline'
 ] as const;
+
+// Define the valid node types
+const NodeTypeEnum = z.enum(['conditions', 'action'] as const);
+const PeriodEnum = z.enum(PERIODS);
+const OperatorEnum = z.enum(OPERATOR_LIST);
+
 
 // Define the schema for branches
 const BranchSchema = z.object({
@@ -17,16 +28,18 @@ const BranchSchema = z.object({
 }).nullable()
 
 
-export const ProductPolicyValidator = z.record(
+export const CustomerPolicyValidator = z.record(
     z.object({
         node_type: NodeTypeEnum,
         branches: z.array(BranchSchema),
         data: z.object({
-            input_type: z.enum(['question', 'upload']).optional(),
+            action_type: z.enum(CUSTOMER_ACTIONS).optional(),
             message: z.string().optional(),
-            list: z.array(z.string()).min(1).optional(),
-            ruling: z.enum(['any', 'all']).optional(),
-            action_type: z.enum(ACTIONS).optional(),
+
+            expectedPeriod: z.number().optional(),
+            operator: OperatorEnum.optional(),
+            period: PeriodEnum.optional(),
+            periodValue: z.number().optional(),
         })
     }).refine((node) => {
         const { node_type, branches, data } = node;
@@ -34,28 +47,20 @@ export const ProductPolicyValidator = z.record(
         if (node_type === 'conditions') {
             if (branches.length < 1) return false;
 
-            const ruling = data?.ruling ?? 'any';
-            if (!data?.list || data.list.length < 1 || !['any', 'all'].includes(ruling)) {
+            
+            if (!data?.expectedPeriod || !data?.operator || !data?.period || !data?.periodValue) {
                 return false;
             }
-        }
-
-        if (node_type === 'user-input' && data?.input_type === 'question') {
-            if (branches.length !== 2 || !data?.message) return false;
-        }
-
-        if (node_type === 'user-input' && data?.input_type === 'upload') {
-            if (branches.length !== 1 || !data?.message) return false;
         }
 
         if (node_type === 'action' && !data?.action_type) {
             return false;
         }
 
-
+        
         return true;
     }, {
-        message: 'Invalid branches or data based on node_type and input_type',
+        message: 'Invalid branches or data based on node_type and action_type',
         path: ['branches', 'data'],
     })
 ).transform((data) => {
