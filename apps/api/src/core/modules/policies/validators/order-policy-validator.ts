@@ -2,6 +2,14 @@ import { z } from 'zod';
 
 const CATEGORY_LIST = ['Discounted orders', 'Orders without discounts', 'Order value'] as const;
 const OPERATOR_LIST = ['is less than', 'is greater than'] as const;
+const ACTIONS = [
+    'Accept Exchange',
+    'Accept Refund',
+    'Manual Review',
+    // 'AI Review',
+    'Decline'
+] as const;
+
 
 // Define the valid node types
 const NodeTypeEnum = z.enum(['conditions', 'action'] as const);
@@ -21,9 +29,9 @@ export const OrderPolicyValidator = z.record(
         node_type: NodeTypeEnum,
         branches: z.array(BranchSchema),
         data: z.object({
-            action_type: z.enum(['Decline', 'Approve']).optional(),
+            action_type: z.enum(ACTIONS).optional(),
             message: z.string().optional(),
-            
+
             category: OrderCategoryEnum.optional(),
             operator: OperatorEnum.optional(),
             value: z.number().optional(),
@@ -40,10 +48,8 @@ export const OrderPolicyValidator = z.record(
             }
         }
 
-        if (node_type === 'action') {
-            if (!data?.action_type) {
-                return false;
-            }
+        if (node_type === 'action' && !data?.action_type) {
+            return false;
         }
 
         

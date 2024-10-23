@@ -80,7 +80,3 @@ export const ActivatePolicy = CreatePolicy.pick({
 export const UpdatePolicyStatus = CreatePolicy.pick({
     status: true
 })
-
-export const DeletePolicy = CreatePolicy.pick({
-    deleted_at: true
-}).partial() // Might want to delete anyway
