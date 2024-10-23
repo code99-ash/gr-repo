@@ -171,7 +171,8 @@ export class PoliciesService {
 
   async hardDelete(uid: string) {
     try {
-      return await this.policiesRepository.hardDelete(uid);
+      await this.policiesRepository.hardDelete(uid);
+      return true;
     } catch (error) {
       throw new InternalServerErrorException('Error deleting policy');
     }
