@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException, InternalServerError
 import { PoliciesRepository } from './policies.repository';
 import { CreatePolicyDto } from './dto/create-policy.dto';
 import { isNull, and } from 'drizzle-orm';
-import { policies } from './db/policies.db';
+import { policies, policy_status } from './db/policies.db';
 import { UpdatePolicyDto } from './dto/update-policy.dto';
 import { PolicyFlowDto } from './dto/policy-flow.dto';
 import { PolicyHistoryService } from '../policy_histories/policy_histories.service';
@@ -13,6 +13,7 @@ import { ProductPolicyValidator } from './validators/product-policy-validator';
 import { DurationPolicyValidator } from './validators/duration-policy-validator';
 import { CustomerPolicyValidator } from './validators/customer-policy-validator';
 import { OrderPolicyValidator } from './validators/order-policy-validator';
+import { SelectPolicyDto } from './dto/select-policy.dto';
 
 type PolicyType = 'product' | 'order' | 'customer' | 'duration';
 
@@ -43,7 +44,6 @@ export class PoliciesService {
       }
 
     } catch (error) {
-      
       isValid = false;
     }
 
@@ -81,49 +81,67 @@ export class PoliciesService {
     return policy;
   }
 
-  async update(uid: string, updatePolicyDto: UpdatePolicyDto) {
-
-
-    const existingPolicy = await this.findOne(uid);
-
-    if(!existingPolicy) {
-      throw new NotFoundException(`Policy with UID ${uid} not found.`);
-    }
-
-    const isActive = existingPolicy.policy_status === 'active';
-
-    // In case, new_flow is not intended to be updated, old flow represents it
-    const policy_flow = updatePolicyDto.policy_flow ?? existingPolicy.policy_flow
-    const flowIsComplete = this._flowIsComplete(policy_flow, existingPolicy.policy_type);
-    const flowChanged = this._flowChanged(existingPolicy.policy_flow, policy_flow);
-
-    if(isActive && !flowIsComplete) {
-      throw new BadRequestException(`An active status cannot be published with incomplete flow`);
-    }
-
+  private async _updateActivePolicy(
+    updatePolicyDto: UpdatePolicyDto,
+    existing_policy: SelectPolicyDto
+) {
     try {
+        const flow_to_update = updatePolicyDto.policy_flow;
 
-      // republishing && flowWasActive && flowIsComplete && flowChanged
-      if(isActive && flowIsComplete && flowChanged) { 
-
-        // Add previous policy to policy_histores
-        await this.historyService.create({
-          policy_uid: existingPolicy.uid,
-          policy_name: existingPolicy.policy_name,
-          policy_type: existingPolicy.policy_type,
-          policy_status: 'active', // new policy_history implies current version is active
-          policy_flow: existingPolicy.policy_flow,
-          activated_at: existingPolicy.activated_at,
-          activated_by: existingPolicy.activated_by
-        })
-
-      }
- 
-      return await this.policiesRepository.update(uid, updatePolicyDto)
+        if(flow_to_update && this._flowChanged(existing_policy.policy_flow, flow_to_update)) {
+          await this._createHistory(existing_policy);
+        }   
 
     }catch(error) {
       throw new InternalServerErrorException('Error updating policy');
     }
+  }
+
+  private async _createHistory(currentPolicy: SelectPolicyDto) {
+    try {
+        return await this.historyService.create({
+            policy_uid: currentPolicy.uid,
+            policy_name: currentPolicy.policy_name,
+            policy_type: currentPolicy.policy_type,
+            policy_status: 'active',
+            policy_flow: currentPolicy.policy_flow,
+            activated_at: currentPolicy.activated_at,
+            activated_by: currentPolicy.activated_by
+        })
+    }catch(error) {
+      throw new InternalServerErrorException('Error creating policy history');
+    }
+  }
+
+  private _isEqual(status: any, value: any) {
+    return status === value;
+  }
+
+  async update(uid: string, updatePolicyDto: UpdatePolicyDto) {
+
+    const existing_policy = await this.findOne(uid);
+    if(!existing_policy) {
+      throw new NotFoundException(`Policy with UID ${uid} not found.`);
+    }
+
+    const flow_to_update = updatePolicyDto.policy_flow;
+
+
+    // Either the policy was published or active (but not in draft)
+    if(!this._isEqual(existing_policy.policy_status, 'draft') && flow_to_update) {
+
+        if(!this._flowIsComplete(flow_to_update, existing_policy.policy_type)) {
+          throw new BadRequestException(`An published status cannot be with incomplete flow`);
+        }
+
+    }
+
+    if(this._isEqual(existing_policy.policy_status, 'active')) {
+      await this._updateActivePolicy(updatePolicyDto, existing_policy);
+    }
+
+ 
+    return await this.policiesRepository.update(uid, updatePolicyDto)   
     
   }
 
@@ -150,7 +168,18 @@ export class PoliciesService {
       throw new BadRequestException(`Invalid policy flow, make sure it is complete and valid`);
     }
 
-    return await this.policiesRepository.updateStatus(uid, updatePolicyStatusDto);
+    try {
+
+      if(policy_status === 'active') {
+        // // Authorized user_uid is required
+        // return await this.policiesRepository.activate(uid, 'authorized_user_uid');
+      }else {
+        return await this.policiesRepository.updateStatus(uid, updatePolicyStatusDto);
+      }
+
+    } catch (error) {
+      throw new InternalServerErrorException('Error updating policy status');
+    }
     
   }
 
@@ -160,26 +189,11 @@ export class PoliciesService {
       throw new NotFoundException(`Policy with UID ${uid} not found.`);
     }
 
-    if (policy.policy_status === 'active') {
-      return this.softDelete(uid);
-    }
-    return this.hardDelete(uid);
-  }
-
-  async hardDelete(uid: string) {
     try {
-      await this.policiesRepository.hardDelete(uid);
-      return 'ok';
+        return await this.policiesRepository.softDelete(uid);
     } catch (error) {
       throw new InternalServerErrorException('Error deleting policy');
     }
   }
 
-  async softDelete(uid: string) {
-    try {
-      return await this.policiesRepository.softDelete(uid);
-    } catch (error) {
-      throw new InternalServerErrorException('Error deleting policy');
-    }
-  }
 }

@@ -28,14 +28,13 @@ const product_types = [
     'duration'
 ] as const;
 
-const policy_statuses = ['draft', 'published', 'active'] as const;
-  
-const NodeTypeEnum = z.enum(node_types);
+export const policy_statuses = ['draft', 'published', 'active'] as const;
+
 
 export const PolicyFlowSchema = z.record(z.object({
     id: z.string(),
     parent: z.string().nullable(),
-    node_type: NodeTypeEnum,
+    node_type: z.enum(node_types),
     data: z.any(),
     branches: z.array(
         z.object({

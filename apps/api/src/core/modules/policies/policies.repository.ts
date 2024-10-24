@@ -56,21 +56,20 @@ export class PoliciesRepository {
                             .returning();
     }
 
-    async activate(uid: string,  user_id: string) {
+    async activate(uid: string,  user_uid: string) {
         const [activated] = await this.db.update(policies).set({
             policy_status: 'active',
             activated_at: new Date(),
-            activated_by: user_id,
+            activated_by: user_uid,
         })
-        .where(eq(policies.uid, uid))
+        .where(and(
+            isNull(policies.deleted_at), 
+            eq(policies.uid, uid),
+            eq(policies.policy_status, 'published')
+        ))
         .returning()
 
         return activated;
-    }
-
-    async hardDelete(uid: string) {
-        return await this.db.delete(policies)
-                        .where(eq(policies.uid, uid))
     }
 
     async softDelete(uid: string) {
