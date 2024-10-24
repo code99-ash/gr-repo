@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { condition_operators, node_types, order_category } from './constants';
 
 const CATEGORY_LIST = ['Discounted orders', 'Orders without discounts', 'Order value'] as const;
 const OPERATOR_LIST = ['is less than', 'is greater than'] as const;
@@ -12,9 +13,9 @@ const ACTIONS = [
 
 
 // Define the valid node types
-const NodeTypeEnum = z.enum(['conditions', 'action'] as const);
-const OrderCategoryEnum = z.enum(CATEGORY_LIST);
-const OperatorEnum = z.enum(OPERATOR_LIST);
+const NodeTypeEnum = z.enum(node_types);
+const OrderCategoryEnum = z.enum(order_category);
+const OperatorEnum = z.enum(condition_operators.order);
 
 
 // Define the schema for branches

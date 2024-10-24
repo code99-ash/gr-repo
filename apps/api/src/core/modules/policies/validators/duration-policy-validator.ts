@@ -1,11 +1,9 @@
 import { z } from 'zod';
-
-const PERIODS = ['Hours', 'Days', 'Weeks', 'Months', 'Years'] as const;
-const ACTIONS = ['Decline'] as const;
+import { action_types, node_types, periods } from './constants';
 
 // Define the valid node types
-const NodeTypeEnum = z.enum(['conditions', 'action'] as const);
-const PeriodEnum = z.enum(PERIODS);
+const NodeTypeEnum = z.enum(node_types);
+const PeriodEnum = z.enum(periods);
 
 
 // Define the schema for branches
@@ -20,11 +18,11 @@ export const DurationPolicyValidator = z.record(
         node_type: NodeTypeEnum,
         branches: z.array(BranchSchema),
         data: z.object({
-            action_type: z.enum(ACTIONS).optional(),
+            action_type: z.enum(action_types).optional(),
             message: z.string().optional(),
 
             period: PeriodEnum.optional(),
-            periodValue: z.number().optional(),
+            period_value: z.number().optional(),
         })
     }).refine((node) => {
         const { node_type, branches, data } = node;
@@ -33,7 +31,7 @@ export const DurationPolicyValidator = z.record(
             if (branches.length < 1) return false;
 
             
-            if (!data?.period || !data?.periodValue) {
+            if (!data?.period || !data?.period_value) {
                 return false;
             }
         }

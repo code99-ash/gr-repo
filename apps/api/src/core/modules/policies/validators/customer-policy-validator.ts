@@ -1,24 +1,13 @@
 import { z } from 'zod';
+import { action_types, condition_operators, node_types, periods } from './constants';
 
 
-const OPERATOR_LIST = ['is less than'] as const;
-const PERIODS = [
-    'Hours',
-    'Days',
-    'Weeks',
-    'Months',
-    'Years',
-] as const;
-const CUSTOMER_ACTIONS = [
-    'Accept Exchange',
-    'Accept Refund',
-    'Decline'
-] as const;
+
 
 // Define the valid node types
-const NodeTypeEnum = z.enum(['conditions', 'action'] as const);
-const PeriodEnum = z.enum(PERIODS);
-const OperatorEnum = z.enum(OPERATOR_LIST);
+const NodeTypeEnum = z.enum(node_types);
+const PeriodEnum = z.enum(periods);
+const OperatorEnum = z.enum(condition_operators.customer);
 
 
 // Define the schema for branches
@@ -33,13 +22,13 @@ export const CustomerPolicyValidator = z.record(
         node_type: NodeTypeEnum,
         branches: z.array(BranchSchema),
         data: z.object({
-            action_type: z.enum(CUSTOMER_ACTIONS).optional(),
+            action_type: z.enum(action_types).optional(),
             message: z.string().optional(),
 
-            expectedPeriod: z.number().optional(),
+            expected_period: z.number().optional(),
             operator: OperatorEnum.optional(),
             period: PeriodEnum.optional(),
-            periodValue: z.number().optional(),
+            period_value: z.number().optional(),
         })
     }).refine((node) => {
         const { node_type, branches, data } = node;
@@ -48,7 +37,7 @@ export const CustomerPolicyValidator = z.record(
             if (branches.length < 1) return false;
 
             
-            if (!data?.expectedPeriod || !data?.operator || !data?.period || !data?.periodValue) {
+            if (!data?.expected_period || !data?.operator || !data?.period || !data?.period_value) {
                 return false;
             }
         }

@@ -1,16 +1,10 @@
 import { z } from 'zod';
+import { action_types, product_node_types } from './constants';
 
-const INPUT_TYPES = ['yes_no_question', 'multiple_choice_question', 'upload'] as const;
 
 // Define the valid node types
-const NodeTypeEnum = z.enum(['conditions', 'user-input', 'action']);
-const ACTIONS = [
-    'Accept Exchange',
-    'Accept Refund',
-    'Manual Review',
-    // 'AI Review',
-    'Decline'
-] as const;
+const NodeTypeEnum = z.enum(product_node_types);
+
 
 // Define the schema for branches
 const BranchSchema = z.object({
@@ -24,11 +18,10 @@ export const ProductPolicyValidator = z.record(
         node_type: NodeTypeEnum,
         branches: z.array(BranchSchema),
         data: z.object({
-            input_type: z.enum(INPUT_TYPES).optional(),
             message: z.string().optional(),
             list: z.array(z.string()).min(1).optional(),
             ruling: z.enum(['any', 'all']).optional(),
-            action_type: z.enum(ACTIONS).optional(),
+            action_type: z.enum(action_types).optional(),
         })
     }).refine((node) => {
         const { node_type, branches, data } = node;
@@ -43,15 +36,13 @@ export const ProductPolicyValidator = z.record(
             }
         }
 
-        if(!data.input_type) return false;
-
-        if (node_type === 'user-input' && INPUT_TYPES.includes(data.input_type)) {
+        if (node_type === 'yes_no_question' || node_type === 'multiple_choice_question') {
             if (branches.length !== 2 || !data?.message) return false;
         }
 
       
-        if (node_type === 'user-input' && data?.input_type === 'upload') {
-            if (branches.length !== 1 || !data?.message) return false;
+        if (node_type === 'asset_upload' && !data?.message) {
+            if (branches.length !== 1) return false;
         }
 
         if (node_type === 'action' && !data?.action_type) {
