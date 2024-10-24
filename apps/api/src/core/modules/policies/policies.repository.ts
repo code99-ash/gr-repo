@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DBQueryConfig, eq } from 'drizzle-orm';
+import { and, DBQueryConfig, eq, isNull } from 'drizzle-orm';
 import { type Database } from 'src/common/db/db.types';
 import { DB } from 'src/common/db/drizzle.provider';
 import { policies } from './db/policies.db';
@@ -15,14 +15,16 @@ export class PoliciesRepository {
 
     private async _get(key: keyof typeof policies._.columns, value: string | number) {
         const data = await this.db.query.policies.findFirst({
-          where: eq(policies[key], value),
+          where: and(isNull(policies.deleted_at), eq(policies[key], value)),
         });
     
         return data ?? null;
     }
 
-    async list(config: DBQueryConfig) {
-        return await this.db.query.policies.findMany(config);
+    async list() {
+        return await this.db.query.policies.findMany({
+            where: isNull(policies.deleted_at)
+        });
     }
 
     async get(key: keyof typeof policies._.columns, value: string | number) {
@@ -66,14 +68,13 @@ export class PoliciesRepository {
         return activated;
     }
 
-    async hardDelete(uid: string): Promise<boolean> {
-        const deleted = await this.db.delete(policies)
+    async hardDelete(uid: string) {
+        return await this.db.delete(policies)
                         .where(eq(policies.uid, uid))
-        return (deleted.rowCount ?? 0) > 0
     }
 
     async softDelete(uid: string) {
-        return this.db
+        return await this.db
                     .update(policies)
                     .set({deleted_at: new Date()})
                     .where(eq(policies.uid, uid))

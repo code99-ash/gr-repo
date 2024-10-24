@@ -9,7 +9,7 @@ export const action_types = [
     'accept_exchange',
     'accept_refund',
     'manual_review',
-    'accept_refund_and_exchange'
+    'accept_exchange_or_refund'
 ] as const;
 
 export const node_types = [

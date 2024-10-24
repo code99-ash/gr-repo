@@ -67,10 +67,7 @@ export class PoliciesService {
 
   async findAll(organization_uid?: string) {
     try {
-      return await this.policiesRepository.list({
-        where: and(isNull(policies.deleted_at)),
-        // eq(policies.organization_uid, organization_uid)
-      });
+      return await this.policiesRepository.list();
     } catch (error) {
       throw new InternalServerErrorException('Error fetching policies');
     }
@@ -172,7 +169,7 @@ export class PoliciesService {
   async hardDelete(uid: string) {
     try {
       await this.policiesRepository.hardDelete(uid);
-      return true;
+      return 'ok';
     } catch (error) {
       throw new InternalServerErrorException('Error deleting policy');
     }
