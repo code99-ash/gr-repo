@@ -1,8 +1,6 @@
-import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PoliciesRepository } from './policies.repository';
 import { CreatePolicyDto } from './dto/create-policy.dto';
-import { isNull, and } from 'drizzle-orm';
-import { policies, policy_status } from './db/policies.db';
 import { UpdatePolicyDto } from './dto/update-policy.dto';
 import { PolicyFlowDto } from './dto/policy-flow.dto';
 import { PolicyHistoryService } from '../policy_histories/policy_histories.service';
@@ -148,21 +146,21 @@ export class PoliciesService {
   async updateStatus(uid: string, updatePolicyStatusDto: UpdatePolicyStatusDto) {
     const { policy_status } = updatePolicyStatusDto;
 
-    const existingPolicy = await this.findOne(uid);
-    if(!existingPolicy) {
+    const existing_policy = await this.findOne(uid);
+    if(!existing_policy) {
       throw new NotFoundException(`Policy with UID ${uid} not found.`);
     }
 
-    if(existingPolicy.policy_status === policy_status) {
+    if(existing_policy.policy_status === policy_status) {
       throw new BadRequestException(`Policy is already ${policy_status}`);
     }
     
-    if(existingPolicy.policy_status === 'active' && policy_status !== 'active') {
+    if(existing_policy.policy_status === 'active' && policy_status !== 'active') {
       // this concerns product assignments
       throw new BadRequestException(`Sorry you cannot downgrade the status of an active policy`);
     }
 
-    const flowIsValid = this._flowIsComplete(existingPolicy.policy_flow, existingPolicy.policy_type);
+    const flowIsValid = this._flowIsComplete(existing_policy.policy_flow, existing_policy.policy_type);
 
     if(policy_status !== 'draft' && !flowIsValid) {
       throw new BadRequestException(`Invalid policy flow, make sure it is complete and valid`);
