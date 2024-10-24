@@ -58,7 +58,7 @@ export class PoliciesService {
     try {
       return await this.policiesRepository.create({
         ...createPolicyDto,
-        status: 'draft'
+        policy_status: 'draft'
       });
     } catch (error) {
       throw new InternalServerErrorException('Error saving policy');
@@ -93,7 +93,7 @@ export class PoliciesService {
       throw new NotFoundException(`Policy with UID ${uid} not found.`);
     }
 
-    const isActive = existingPolicy.status === 'active';
+    const isActive = existingPolicy.policy_status === 'active';
 
     // In case, new_flow is not intended to be updated, old flow represents it
     const policy_flow = updatePolicyDto.policy_flow ?? existingPolicy.policy_flow
@@ -114,7 +114,7 @@ export class PoliciesService {
           policy_uid: existingPolicy.uid,
           policy_name: existingPolicy.policy_name,
           policy_type: existingPolicy.policy_type,
-          status: 'active', // new policy_history implies current version is active
+          policy_status: 'active', // new policy_history implies current version is active
           policy_flow: existingPolicy.policy_flow,
           activated_at: existingPolicy.activated_at,
           activated_by: existingPolicy.activated_by
@@ -131,25 +131,25 @@ export class PoliciesService {
   }
 
   async updateStatus(uid: string, updatePolicyStatusDto: UpdatePolicyStatusDto) {
-    const { status } = updatePolicyStatusDto;
+    const { policy_status } = updatePolicyStatusDto;
 
     const existingPolicy = await this.findOne(uid);
     if(!existingPolicy) {
       throw new NotFoundException(`Policy with UID ${uid} not found.`);
     }
 
-    if(existingPolicy.status === status) {
-      throw new BadRequestException(`Policy is already ${status}`);
+    if(existingPolicy.policy_status === policy_status) {
+      throw new BadRequestException(`Policy is already ${policy_status}`);
     }
     
-    if(existingPolicy.status === 'active' && status !== 'active') {
+    if(existingPolicy.policy_status === 'active' && policy_status !== 'active') {
       // this concerns product assignments
       throw new BadRequestException(`Sorry you cannot downgrade the status of an active policy`);
     }
 
     const flowIsValid = this._flowIsComplete(existingPolicy.policy_flow, existingPolicy.policy_type);
 
-    if(status !== 'draft' && !flowIsValid) {
+    if(policy_status !== 'draft' && !flowIsValid) {
       throw new BadRequestException(`Invalid policy flow, make sure it is complete and valid`);
     }
 
@@ -163,7 +163,7 @@ export class PoliciesService {
       throw new NotFoundException(`Policy with UID ${uid} not found.`);
     }
 
-    if (policy.status === 'active') {
+    if (policy.policy_status === 'active') {
       return this.softDelete(uid);
     }
     return this.hardDelete(uid);

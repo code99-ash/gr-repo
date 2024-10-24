@@ -12,8 +12,25 @@ import { organizations } from '../../organizations/db/organizations.db'
 import { users } from '../../users/db/users.db';
 import { z } from 'zod';
 import { createId } from '@paralleldrive/cuid2';
+
+const node_types = [
+    'conditions', 
+    'yes-no-question', 
+    'multiple-choice-question', 
+    'asset-upload', 
+    'action'
+] as const;
+
+const product_types = [
+    'product', 
+    'order', 
+    'customer', 
+    'duration'
+] as const;
+
+const policy_statuses = ['draft', 'published', 'active'] as const;
   
-const NodeTypeEnum = z.enum(['conditions', 'user-input', 'action']);
+const NodeTypeEnum = z.enum(node_types);
 
 export const PolicyFlowSchema = z.record(z.object({
     id: z.string(),
@@ -28,8 +45,8 @@ export const PolicyFlowSchema = z.record(z.object({
     ),
 }))
 
-export const policy_type = pgEnum('policy_type', ['product', 'order', 'customer', 'duration']);
-export const policy_status = pgEnum('status', ['draft', 'published', 'active']);
+export const policy_type = pgEnum('policy_type', product_types);
+export const policy_status = pgEnum('policy_status', policy_statuses);
 
   
 export const policies = pgTable('policies', {
@@ -41,7 +58,7 @@ export const policies = pgTable('policies', {
     policy_flow: jsonb('policy_flow')
                     .$type<z.infer<typeof PolicyFlowSchema>>()
                     .notNull(),
-    status: policy_status('status').default('draft').notNull(),
+    policy_status: policy_status('policy_status').default('draft').notNull(),
     activated_by: text('activated_by').references(() => users.uid),
     activated_at: timestamp('activated_at'),
     deleted_at: timestamp('deleted_at'),
@@ -60,7 +77,7 @@ export const CreatePolicy = createInsertSchema(policies, {
 
 export const UpdatePolicy = CreatePolicy.omit({
     uid: true,
-    status: true,
+    policy_status: true,
     organization_uid: true,
     policy_type: true,
     deleted_at: true,
@@ -72,11 +89,11 @@ export const UpdatePolicy = CreatePolicy.omit({
 });
   
 export const ActivatePolicy = CreatePolicy.pick({
-    status: true,
+    policy_status: true,
     activated_at: true,
     activated_by: true
 })
 
 export const UpdatePolicyStatus = CreatePolicy.pick({
-    status: true
+    policy_status: true
 })

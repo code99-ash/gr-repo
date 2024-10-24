@@ -56,7 +56,7 @@ export class PoliciesRepository {
 
     async activate(uid: string,  user_id: string) {
         const [activated] = await this.db.update(policies).set({
-            status: 'active',
+            policy_status: 'active',
             activated_at: new Date(),
             activated_by: user_id,
         })
