@@ -1,72 +1,18 @@
 import { z } from 'zod';
-import { condition_operators, node_types, order_category } from './constants';
-
-const CATEGORY_LIST = ['Discounted orders', 'Orders without discounts', 'Order value'] as const;
-const OPERATOR_LIST = ['is less than', 'is greater than'] as const;
-const ACTIONS = [
-    'Accept Exchange',
-    'Accept Refund',
-    'Manual Review',
-    // 'AI Review',
-    'Decline'
-] as const;
-
-
-// Define the valid node types
-const NodeTypeEnum = z.enum(node_types);
-const OrderCategoryEnum = z.enum(order_category);
-const OperatorEnum = z.enum(condition_operators.order);
-
-
-// Define the schema for branches
-const BranchSchema = z.object({
-    node_id: z.any(),
-    label: z.any().nullable(),
-}).nullable()
+import { node_types } from './constants';
+import { BranchSchema as branch_schema } from './schemas/branch-schema';
+import { transformUndefinedValues, validateConditionBranch } from './schemas/common';
+import { ActionValidator } from './schemas/action-schema';
+import { OrderConditionValidator } from './schemas/order-schema';
 
 
 export const OrderPolicyValidator = z.record(
     z.object({
-        node_type: NodeTypeEnum,
-        branches: z.array(BranchSchema),
-        data: z.object({
-            action_type: z.enum(ACTIONS).optional(),
-            message: z.string().optional(),
-
-            category: OrderCategoryEnum.optional(),
-            operator: OperatorEnum.optional(),
-            value: z.number().optional(),
-        })
-    }).refine((node) => {
-        const { node_type, branches, data } = node;
-
-        if (node_type === 'conditions') {
-            if (branches.length < 1) return false;
-
-            
-            if (!data?.category || !data?.operator || !data?.value) {
-                return false;
-            }
-        }
-
-        if (node_type === 'action' && !data?.action_type) {
-            return false;
-        }
-
-        
-        return true;
-    }, {
-        message: 'Invalid branches or message based on node_type and action_type',
-        path: ['branches', 'data'],
-    })
-).transform((data) => {
-    // Strip properties with undefined values
-    return Object.fromEntries(
-        Object.entries(data).map(([key, value]) => {
-            if (typeof value === 'object' && value !== null) {
-                return [key, Object.fromEntries(Object.entries(value).filter(([, v]) => v !== undefined))];
-            }
-            return [key, value];
-        })
-    );
-});
+        node_type: z.enum(node_types),
+        branches: z.array(branch_schema),
+        data: z.union([
+            OrderConditionValidator,
+            ActionValidator
+        ])
+    }).refine(validateConditionBranch)
+).transform(transformUndefinedValues);

@@ -1,65 +1,21 @@
 import { z } from 'zod';
-import { action_types, condition_operators, node_types, periods } from './constants';
+import { node_types } from './constants';
+import { CustomerConditionValidator } from './schemas/customer-schema';
+import { ActionValidator } from './schemas/action-schema';
+import { transformUndefinedValues, validateConditionBranch } from './schemas/common';
+import { BranchSchema as branch_schema } from './schemas/branch-schema';
 
 
-
-
-// Define the valid node types
-const NodeTypeEnum = z.enum(node_types);
-const PeriodEnum = z.enum(periods);
-const OperatorEnum = z.enum(condition_operators.customer);
-
-
-// Define the schema for branches
-const BranchSchema = z.object({
-    node_id: z.any(),
-    label: z.any().nullable(),
-}).nullable()
-
-
+// Define the main schema
 export const CustomerPolicyValidator = z.record(
+
     z.object({
-        node_type: NodeTypeEnum,
-        branches: z.array(BranchSchema),
-        data: z.object({
-            action_type: z.enum(action_types).optional(),
-            message: z.string().optional(),
+        node_type: z.enum(node_types),
+        branches: z.array(branch_schema),
+        data: z.union([
+            CustomerConditionValidator,
+            ActionValidator
+        ]),
+    }).refine(validateConditionBranch)
 
-            expected_period: z.number().optional(),
-            operator: OperatorEnum.optional(),
-            period: PeriodEnum.optional(),
-            period_value: z.number().optional(),
-        })
-    }).refine((node) => {
-        const { node_type, branches, data } = node;
-
-        if (node_type === 'conditions') {
-            if (branches.length < 1) return false;
-
-            
-            if (!data?.expected_period || !data?.operator || !data?.period || !data?.period_value) {
-                return false;
-            }
-        }
-
-        if (node_type === 'action' && !data?.action_type) {
-            return false;
-        }
-
-        
-        return true;
-    }, {
-        message: 'Invalid branches or data based on node_type and action_type',
-        path: ['branches', 'data'],
-    })
-).transform((data) => {
-    // Strip properties with undefined values
-    return Object.fromEntries(
-        Object.entries(data).map(([key, value]) => {
-            if (typeof value === 'object' && value !== null) {
-                return [key, Object.fromEntries(Object.entries(value).filter(([, v]) => v !== undefined))];
-            }
-            return [key, value];
-        })
-    );
-});
+).transform(transformUndefinedValues);
