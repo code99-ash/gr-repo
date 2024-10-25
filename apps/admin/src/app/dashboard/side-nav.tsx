@@ -102,7 +102,6 @@ export default function SideNav() {
                                             href={item.href}
                                             className={`w-full py-[25px] border-l-2  ${pathname===item.href? 'text-primary border-primary':'border-background'}`}
                                         >
-                                            {/* <item.icon /> */}
                                             <item.icon />
                                             <span>{item.title}</span>
                                         </Link>

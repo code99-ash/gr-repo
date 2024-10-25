@@ -1,7 +1,6 @@
 'use client';
 import Image from 'next/image';
 import React from 'react'
-import { Button } from './ui/button';
 
 import { LogOut } from "lucide-react"
 import { SidebarMenuButton, SidebarMenuItem } from './ui/sidebar';
