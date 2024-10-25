@@ -1,46 +1,25 @@
 'use client';
-import React, { useMemo, useState } from 'react'
-import SideNav from './side-nav';
+import React from 'react'
+import AppSideNav from './side-nav';
 import { ModeToggle } from '@/components/mode-toggle';
-import { useThinNavStore } from '@/store/thin-nav-store';
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 
 
 export default function DashboardLayout({children}: Readonly<{ children: React.ReactNode }>) {
-    const thinNav = useThinNavStore(state => state.thinNav);
-    const toggleThinNav = useThinNavStore(state => state.toggleThinNav);
     
-    const [mobileOpen, setMobileOpen] = useState(false);
-
-    const manageClass = useMemo(() => {
-        if(mobileOpen) { // top priority: thin nav will be overlooked if mobileNav is opened
-            return 'w-[220px] fixed top-0 left-0 shadow-xl md:relative top-auto left-auto shadow-none'
-        }else {
-            if(thinNav) {
-                return 'w-0 md:w-14 thin-nav'
-            }else {
-                return 'w-0 md:w-[220px] relative'
-            }
-        }
-
-    }, [thinNav, mobileOpen])
 
     return (
-        <div className='flex h-[100vh]'>
-            <div className={`transition-all overflow-hidden flex flex-col gap-2 h-full bg-background ${manageClass}`}>
-                <SideNav />
+        <SidebarProvider>
+            <div className='w-full flex h-[100vh]'>
+                <AppSideNav />
+                <section className='flex flex-col grow bg-accent p-1'>
+                    <header className="flex-none h-[45px] flex items-center justify-between">
+                        <SidebarTrigger />
+                        <ModeToggle />
+                    </header>
+                    <div className='grow py-3'>{children}</div>
+                </section>
             </div>
-            <section className='flex flex-col grow bg-accent p-1'>
-                <header className="flex-none h-[45px] flex items-center justify-between">
-                    <button className="hidden md:inline" onClick={toggleThinNav}>
-                        <span className="material-symbols-outlined">menu_open</span>
-                    </button>
-                    <ModeToggle />
-                    <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
-                        <span className="material-symbols-outlined md:hidden">menu</span>
-                    </button>
-                </header>
-                <div className='grow py-3'>{children}</div>
-            </section>
-        </div>
+        </SidebarProvider>
     )
 }

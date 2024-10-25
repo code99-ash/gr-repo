@@ -1,4 +1,3 @@
-import { FlowTreeType } from '@/interfaces/common.interface'
 import React from 'react'
 import PolicyItem from './policy-item'
 import { PolicyListType } from '@/store/policies/policy-store'

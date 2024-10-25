@@ -2,32 +2,34 @@
 import Image from 'next/image';
 import React from 'react'
 import { Button } from './ui/button';
-import { useThinNavStore } from '@/store/thin-nav-store';
+
+import { LogOut } from "lucide-react"
+import { SidebarMenuButton, SidebarMenuItem } from './ui/sidebar';
+import { Card } from './ui/card';
+
 
 export default function UserLogoutCard() {
-    const thinNav = useThinNavStore(state => state.thinNav)
   return (
-    <div className={
-        `flex items-center justify-between py-2 px-2 gap-2 border-border rounded-xl
-        ${thinNav?'':'border'}`
-    }>
-        {!thinNav && <>
-                <Image 
-                    src="/images/avatar.png" 
-                    alt="" 
-                    width={30} 
-                    height={30} 
-                    className='rounded-full'
-                />
-                <div className='text-foreground'>
-                    <p className='text-sm satoshi-medium'>Vee Adams</p>
-                    <p className='opacity-70 text-xs'>Admin</p>
+    <SidebarMenuItem>
+        <SidebarMenuButton asChild>
+            <Card className="flex items-center justify-between py-7 px-4 rounded-full border hover:border-destructive">
+                <div className="flex items-center gap-2">
+                    <Image 
+                        src="/images/avatar.png" 
+                        alt="" 
+                        width={30} 
+                        height={30} 
+                        className='rounded-full'
+                    />
+                    <div className='text-foreground'>
+                        <p className='text-sm satoshi-medium'>Vee Adams</p>
+                        <p className='opacity-70 text-xs'>Admin</p>
+                    </div>
                 </div>
-            </>
-        }
-        <Button variant={thinNav? "destructive":"ghost"}>
-            <span className="material-symbols-outlined text-sm">logout</span>
-        </Button>
-    </div>
+                
+                <LogOut size={33} />
+            </Card>
+        </SidebarMenuButton>
+    </SidebarMenuItem>
   )
 }

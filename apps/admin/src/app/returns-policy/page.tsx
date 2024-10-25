@@ -1,9 +1,9 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { usePolicyStore } from '@/store/policies/policy-store';
-import EmptyData from './empty-data';
-import PolicyList from './policy-list';
-import PageHeader from './page-header';
+import EmptyData from './components/empty-data';
+import PolicyList from './components/policy-list';
+import PageHeader from './components/page-header';
 import axiosInstance from '@/lib/axios';
 import { useToast } from '@/hooks/use-toast';
 
@@ -37,7 +37,7 @@ export default function ReturnPolicy() {
             toast({
                 variant: "destructive",
                 title: "An error occured",
-                description: err?.response.data ?? 'An error occured, please try again',
+                description: err?.response?.data ?? 'An error occured, please try again',
             })
         } finally {
             setLoading(false)

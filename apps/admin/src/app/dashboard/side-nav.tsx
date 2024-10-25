@@ -2,88 +2,119 @@
 import React from 'react'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation';
-import { Button } from "@/components/ui/button"
 import Link from 'next/link';
-import './layout.css';
 import UserLogoutCard from '@/components/user-logout-card';
+
+import { LayoutDashboard, RefreshCw, ShoppingBag, HandHelping, UserCog } from "lucide-react"
+
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+} from "@/components/ui/sidebar"
+import './layout.css';
 
 const top_navs = [
     {
-        label: 'Dashboard', 
+        title: 'Dashboard', 
         href: '/dashboard', 
-        icon: 'grid_view'
+        icon: LayoutDashboard
     },
     {
-        label: 'Requests', 
+        title: 'Requests', 
         href: '/dashboard/requests', 
-        icon: 'description'
+        icon: HandHelping
     },
     {
-        label: 'Returns Policy', 
+        title: 'Returns Policy', 
         href: '/returns-policy', 
-        icon: 'autorenew'
+        icon: RefreshCw
     },
     {
-        label: 'My Products', 
+        title: 'My Products', 
         href: '/dashboard/products', 
-        icon: 'local_mall'
+        icon: ShoppingBag
     },
 ]
 const btm_navs = [
     {
-        label: 'Account', 
+        title: 'Account', 
         href: '/dashboard/account', 
-        icon: 'person'
+        icon: UserCog
     },
     {
-        label: 'Support', 
+        title: 'Support', 
         href: '/dashboard/support', 
-        icon: 'help'
+        icon: RefreshCw
     },
 ]
 
 export default function SideNav() {
     const pathname = usePathname();
     return <>
-        <div className='p-3'>
-            <Image
-                alt="client-logo"
-                className='mx-auto'
-                src="/images/client-logo.png"
-                width={160}
-                height={60}
-            />
-        </div>
-        <section className="grow flex flex-col justify-between gap-1">
-            <nav className="flex flex-col gap-y-1 mt-2 text-foreground">
-                {
-                    top_navs.map((nav, i) => (
-                        <Link
-                            key={i}
-                            href={nav.href}
-                            className={`side-link ${pathname===nav.href? 'active':''}`}
-                        >
-                            <span className="material-symbols-outlined">{nav.icon}</span>
-                            <span>{nav.label}</span>
-                        </Link>
-                    ))
-                }
-            </nav>
-            <nav className="flex flex-col gap-y-1 mt-2 text-foreground pb-2">
-                {
-                    btm_navs.map((nav, i) => (
-                        <Link
-                            key={i}
-                            href={nav.href}
-                            className={`side-link bottom ${pathname===nav.href? 'active':''}`}
-                        >
-                            <span className="material-symbols-outlined">{nav.icon}</span>
-                            <span>{nav.label}</span>
-                        </Link>
-                    ))
-                }
-                <UserLogoutCard />
-            </nav>
-        </section>
+        <Sidebar variant='sidebar' collapsible='icon'>
+            <SidebarHeader>
+                <Image
+                    alt="client-logo"
+                    className='mx-auto'
+                    src="/images/client-logo.png"
+                    width={160}
+                    height={60}
+                />
+            </SidebarHeader>
+            <SidebarContent>
+                <SidebarGroup className='px-0 pt-5'>
+                <SidebarGroupContent>
+                    <SidebarMenu>
+                        {top_navs.map((item) => (
+                            <SidebarMenuItem key={item.title}>
+                                <SidebarMenuButton asChild>
+                                    <Link
+                                        href={item.href}
+                                        className={`w-full py-[25px] border-l-2  ${pathname===item.href? 'text-primary border-primary':'border-background'}`}
+                                    >
+                                        <item.icon />
+                                        <span>{item.title}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))}
+                    </SidebarMenu>
+                </SidebarGroupContent>
+                </SidebarGroup>
+            </SidebarContent>
+            <SidebarFooter className='px-1'>
+                <SidebarContent>
+                    <SidebarGroup className='px-0'>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            {btm_navs.map((item) => (
+                                <SidebarMenuItem key={item.title}>
+                                    <SidebarMenuButton asChild>
+                                        <Link
+                                            href={item.href}
+                                            className={`w-full py-[25px] border-l-2  ${pathname===item.href? 'text-primary border-primary':'border-background'}`}
+                                        >
+                                            {/* <item.icon /> */}
+                                            <item.icon />
+                                            <span>{item.title}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
+                            <UserLogoutCard />
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                    </SidebarGroup>
+                </SidebarContent>
+            </SidebarFooter>
+        </Sidebar>
     </>
 }
