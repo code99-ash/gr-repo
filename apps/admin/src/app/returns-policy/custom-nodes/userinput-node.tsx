@@ -29,6 +29,15 @@ export default function UserInputNode({ data }: { data: any }) {
     const flowNode = useMemo(() => policy_flow[data.node_id], [policy_flow, data.node_id]) as ProductDataType
 
     const helper = useMemo(() => {
+        if(!flowNode) {
+            return {
+                isQuestion: false,
+                branchLength: 0,
+                expectedLength: 0,
+                isConnectable: false
+            };
+        }
+
         const question_types = ['yes_no_question', 'multiple_choice_question'];
 
         const isQuestion = question_types.includes(flowNode.node_type)
@@ -42,7 +51,6 @@ export default function UserInputNode({ data }: { data: any }) {
     }, [flowNode])
 
     useEffect(() => {
-        if (!flowNode) return;
 
         const { isQuestion, branchLength, expectedLength } = helper;
         const alreadyIdle = incomplete_nodes.includes(data.node_id);
@@ -58,7 +66,7 @@ export default function UserInputNode({ data }: { data: any }) {
                 updateIncomplete(incomplete_nodes.filter(node => node !== data.node_id));
             }
         }
-    }, [flowNode, incomplete_nodes, updateIncomplete, data.node_id]);
+    }, [helper, incomplete_nodes, updateIncomplete, data.node_id]);
 
     return (
         <NodeWrapper node_id={data.node_id}>
@@ -81,7 +89,9 @@ export default function UserInputNode({ data }: { data: any }) {
                     >
                         help
                     </span>
-                    {nodeTypeMap[flowNode.node_type as keyof typeof nodeTypeMap]}
+                    {
+                        flowNode? nodeTypeMap[flowNode.node_type as keyof typeof nodeTypeMap] : 'User Input'
+                    }
                 </header>
                 <p className="text-[7px]">{data.message || 'Please type in a message'}</p>
             </div>
