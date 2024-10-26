@@ -2,14 +2,8 @@ import { z } from 'zod';
 import { node_types } from './constants';
 import { DurationConditionValidator } from './schemas/duration-schema';
 import { BranchSchema as branch_schema } from './schemas/branch-schema';
-import { transformUndefinedValues, validateConditionBranch } from './schemas/common';
+import { NodeType, transformUndefinedValues, validateConditionBranch } from './schemas/common';
 import { ActionValidator } from './schemas/action-schema';
-
-type NodeType = {
-    node_type: typeof node_types[number];
-    branches: Array<{ node_id: string }>;
-    data: any;
-};
 
 const validatorMap = {
     conditions: DurationConditionValidator,
