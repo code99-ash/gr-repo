@@ -13,8 +13,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-const constraints: string[] = [
-  'is less than'
+const constraints = [
+  {
+    value: 'is_less_than',
+    label: 'is less than'
+  }
 ]
 
 const periods: string[] = [
@@ -91,7 +94,7 @@ export default function CustomerConditionPanel() {
                 <SelectContent>
                   {
                     constraints.map((constraint, i) => (
-                      <SelectItem value={constraint} key={i}>{constraint}</SelectItem>
+                      <SelectItem value={constraint.value} key={i}>{constraint.label}</SelectItem>
                     ))
                   }
                 </SelectContent>
@@ -133,7 +136,7 @@ export default function CustomerConditionPanel() {
                 <SelectContent>
                   {
                     periods.map((period, i) => (
-                      <SelectItem value={period} key={i}>{period}</SelectItem>
+                      <SelectItem value={period.toLowerCase()} key={i}>{period}</SelectItem>
                     ))
                   }
                 </SelectContent>

@@ -28,7 +28,7 @@ export default function ActionNode({data}: { data: any }) {
                     className="material-symbols-outlined"
                     style={{fontSize: '8px'}}    
                 >autorenew</span>
-                {data.action_type}
+                <span className="capitalize">{data.action_type.replace('_', ' ')}</span>
             </header>
             <p className="text-[7px]">{data.message}</p>
         </div>

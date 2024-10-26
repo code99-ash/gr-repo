@@ -6,7 +6,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -16,22 +15,45 @@ import { usePolicyForm } from '@/store/policies/policy-form';
 import { UpdateNodeCtx } from './selected-panel';
 
 
-const baseActions: string[] = [
-  'Accept Exchange',
-  'Accept Refund',
-  'Manual Review',
-  // 'AI Review',
-  'Decline'
+const baseActions = [
+  {
+    value: 'accept_exchange',
+    label: 'Accept Exchange'
+  },
+  {
+    value: 'accept_refund',
+    label: 'Accept Refund'
+  },
+  {
+    value: 'manual_review',
+    label: 'Manual Review'
+  },
+  {
+    value: 'decline',
+    label: 'Decline'
+  }
 ];
 
-const customerActions: string[] = [
-  'Accept Exchange',
-  'Accept Refund',
-  'Decline'
+const customerActions = [
+  {
+    value: 'accept_exchange',
+    label: 'Accept Exchange'
+  },
+  {
+    value: 'accept_refund',
+    label: 'Accept Refund'
+  },
+  {
+    value: 'decline',
+    label: 'Decline'
+  }
 ]
 
-const durationActions: string[] = [
-  'Decline'
+const durationActions = [
+  {
+    value: 'decline',
+    label: 'Decline'
+  }
 ]
 
 export default function ActionPanel() {
@@ -125,9 +147,9 @@ export default function ActionPanel() {
                 <SelectGroup>
                 {actions.map(action => (
                   <SelectItem 
-                    value={action}
+                    value={action.value}
                   >
-                    {action}
+                    {action.label}
                   </SelectItem>
                 ))} 
                 </SelectGroup>
