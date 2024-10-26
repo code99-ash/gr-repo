@@ -30,6 +30,7 @@ export default function UserInputNode({ data }: { data: any }) {
 
     const helper = useMemo(() => {
         if(!flowNode) {
+            console.log('No flow node found')
             return {
                 isQuestion: false,
                 branchLength: 0,
@@ -44,11 +45,13 @@ export default function UserInputNode({ data }: { data: any }) {
         const branchLength = flowNode.branches.length;
         const expectedLength = !isQuestion ? 1 : 2;
 
-        const isConnectable = flowNode.node_type !== question_types[1]? branchLength < expectedLength : true;
+        const edgeCount = edges.filter(each => each.source === data.node_id).length;
+
+        const isConnectable = flowNode.node_type !== 'multiple_choice_question'? edgeCount < expectedLength : true;
 
         return { isQuestion, branchLength, expectedLength, isConnectable }
 
-    }, [flowNode])
+    }, [flowNode, edges, data.node_id])
 
     useEffect(() => {
 
@@ -66,7 +69,8 @@ export default function UserInputNode({ data }: { data: any }) {
                 updateIncomplete(incomplete_nodes.filter(node => node !== data.node_id));
             }
         }
-    }, [helper, incomplete_nodes, updateIncomplete, data.node_id]);
+
+    }, [flowNode, incomplete_nodes, updateIncomplete, data.node_id]);
 
     return (
         <NodeWrapper node_id={data.node_id}>

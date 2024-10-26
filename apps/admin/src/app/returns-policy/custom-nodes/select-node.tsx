@@ -5,6 +5,20 @@ import { Button } from '@/components/ui/button';
 import { usePolicyForm } from '@/store/policies/policy-form';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
 
+const generateUniqueLabel = (existing_labels: string[], length = 6) => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let label;
+  
+    // Generate a unique label not in the existing labels
+    do {
+      label = Array.from({ length }, () =>
+        characters.charAt(Math.floor(Math.random() * characters.length))
+      ).join('');
+    } while (existing_labels.includes(label));
+  
+    return {label, updated: [...existing_labels, label]};
+};
+
 export default function SelectNode({ data }: { data: any }) {
     const policy_flow = usePolicyForm(state => state.policy_flow)
     const policy_type = usePolicyForm(state => state.policy_type)
@@ -47,8 +61,9 @@ export default function SelectNode({ data }: { data: any }) {
         const node_type = parent_node.node_type;
         const isYesNoQuestion = node_type === 'yes_no_question';
         const isUpload = node_type === 'asset_upload';
+        const isMultipleChoice = node_type === 'multiple_choice_question';
 
-        return { isYesNoQuestion, isUpload, node_type, parent_node };
+        return { isYesNoQuestion, isUpload, node_type, parent_node, isMultipleChoice };
 
     }, [data])
 
@@ -58,13 +73,21 @@ export default function SelectNode({ data }: { data: any }) {
 
         if(!helper) return edgeLabel;
 
-        const { isYesNoQuestion } = helper;
+        const { isYesNoQuestion, isMultipleChoice } = helper;
  
         
         if(isYesNoQuestion) {
             edgeLabel = getYesNoQuestionLabel(data.parentId);
         }
 
+        if(isMultipleChoice) {
+            const existing_labels = edges.filter(edge => edge.source === data.parentId)
+                                        .map(edge => edge.label)
+                                        .filter(label => label !== null) as string[];
+
+            const { label } = generateUniqueLabel(existing_labels)
+            edgeLabel = label;
+        }
 
         const newEdgeRender = edges.map(each => {
             if(each.source === data.parentId && each.target === data.node_id) {
