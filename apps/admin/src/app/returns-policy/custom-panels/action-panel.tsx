@@ -1,5 +1,4 @@
 'use client';
-import { ActionType } from '@/interfaces/common.interface';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Select,
@@ -61,7 +60,7 @@ export default function ActionPanel() {
   const policy_type = usePolicyForm(state => state.policy_type)
   const [action, setAction] = useState('Decline')
   const [message, setMessage] = useState('')
-  const selectedNode = usePolicyForm(state => state.selectedNode) as ActionType
+  const selectedNode = usePolicyForm(state => state.selectedNode) as any
   const selectNode = usePolicyForm(state => state.selectNode)
 
   const removeNode = usePolicyForm(state => state.removeNode);
