@@ -77,7 +77,6 @@ export default function ProductPolicyBuiler() {
     if(!policyUID) {
       initializePage()
     }
-    // console.log('policy_flow', pol/icy_flow)
 
     // initializeGraph(policy_flow)
   }, [initializeGraph])

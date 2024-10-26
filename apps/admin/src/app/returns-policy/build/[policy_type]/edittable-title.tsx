@@ -9,12 +9,9 @@ export default function EdittableTitle() {
     const policy_name = usePolicyForm(state => state.policy_name)
     const policies = usePolicyStore(state => state.policies)
     const setPolicyName = usePolicyForm(state => state.setPolicyName)
-    const setPolicyType = usePolicyForm(state => state.setPolicyType)
-
-    const initialName = useRef(policy_name).current // Initial name is preserved using useRef
     const [name, setName] = useState(policy_name)
     const [edit, setEdit] = useState(false)
-    const inputRef = useRef(null)
+    const inputRef = useRef<HTMLInputElement>(null)
     const searchParams = useSearchParams()
 
 
