@@ -42,8 +42,6 @@ const validateOption = (label_in_use: string[], label: string = 'Yes') => {
   }
 
   label_in_use.push(label_to_use);
-  console.log('label_to_use', label_to_use)
-  console.log('label_in_use', label_in_use)
 
   return { current: label_to_use, labels: label_in_use };
 }
@@ -127,8 +125,7 @@ export default function UserInputPanel() {
       const newEdges = getYesNoUpdatedEdges(renderedEdges)
       const branches = getYesNoUpdatedBranches(selectedNode.branches)
       
-      modifyNodeBranches(selectedNode.id, branches, newEdges)
-
+      modifyNodeBranches(selectedNode.id, branches, newEdges, true)
     }
 
     else if(new_type === 'multiple_choice_question') {
@@ -144,7 +141,6 @@ export default function UserInputPanel() {
           data: { label: `Option ${index + 1}` }
         }
       })
-
 
       modifyNodeBranches(selectedNode.id, branches, newEdges)
     }

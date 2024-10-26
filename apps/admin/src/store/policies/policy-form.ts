@@ -40,7 +40,7 @@ interface PolicyFormType {
     setPolicyFlow: (type: PolicyFlow) => void;
     addNewNode: (node_id: string, node_type: NodeTypes, parent_id: string, label: any) => void;
     modifyNode: (node_id: string, data: any, node_type?: NodeTypes) => void;
-    modifyNodeBranches: (node_id: string, branches: BranchType[], edges: Edge[]) => void;
+    modifyNodeBranches: (node_id: string, branches: BranchType[], edges: Edge[], isYesNo?: boolean) => void;
     removeNode: (node_id: string) => void;
     clearUploadChildren: (node_id: string) => void;
     getConditionData: (policy_type: PolicyTypes) => any;
@@ -239,7 +239,9 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
         }));
     },
 
-    modifyNodeBranches: (node_id: string, branches: BranchType[], edges: Edge[]) => {
+    modifyNodeBranches: (node_id: string, branches: BranchType[], edges: Edge[], isYesNo?: boolean) => {
+        const yesNo = isYesNo ?? false;
+
         set((state: PolicyState) => ({
             policy_flow: {
                 ...state.policy_flow,
@@ -258,19 +260,24 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
             edgeMap[edge.id] = edge;
         })
 
-        const new_edges = current_edges.map((edge) => {
+        let new_edges = current_edges.map((edge) => {
             if(edgeMap.hasOwnProperty(edge.id)) {
                 edge = edgeMap[edge.id]
             }
             return edge;
         })
 
+        if(yesNo) {
+            new_edges = new_edges.filter(each => !(each.source === node_id && !['Yes', 'No'].includes(each.label as string)))
+  
+        }
+
         useReactflowStore.getState().setEdges(new_edges)
         
     },
 
     removeNode: (node_id: string) => {
-        if (node_id === 'head') return; // Prevent removal of the "head" node
+        if (node_id === 'head') return;
         
         set((state: PolicyState) => {
             const { [node_id]: nodeToRemove, ...rest } = state.policy_flow;
