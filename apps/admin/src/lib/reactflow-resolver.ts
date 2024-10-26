@@ -10,7 +10,9 @@ export const Y_spacing = 100;  // Vertical spacing
 
 export const nodeTypeMatch: any = {
     'conditions': 'conditionNode',
-    'user-input': 'userInputNode',
+    'yes_no_question': 'userInputNode',
+    'multiple_choice_question': 'userInputNode',
+    'asset_upload': 'userInputNode',
     'action'    : 'actionNode',
     'select'    : 'selectNode'
 }
@@ -28,15 +30,14 @@ export const getNodeDataProps = (node_type: string) => {
       list: []
     }
   }
-  else if(node_type === 'user-input') {
+  else if(node_type === 'action') {
     return {
-      input_type: 'question',
-      message: '',
+      action_type: 'decline',
+      message: ''
     }
   }
   else {
     return {
-      action_type: 'Decline',
       message: ''
     }
   }
@@ -49,7 +50,7 @@ function calculateNodePositions(
   flow: any, 
   node: any, 
   parentPosition: CoordinateType, 
-  positions: any, 
+  positions: Record<string, CoordinateType>, // Add this type
   level: number
 ) {
   if (!node) return;
@@ -58,8 +59,10 @@ function calculateNodePositions(
   const positionX = parentPosition.x + X_spacing;
   let positionY = parentPosition.y;
 
+  const user_input_types = ['yes_no_question', 'multiple_choice_question', 'asset_upload']
+
   // For user-input nodes with two branches, space them vertically
-  if (node.node_type === 'user-input' && node.branches.length === 2) {
+  if (user_input_types.includes(node.node_type) && node.branches.length > 1) {
 
     // First branch (Yes) goes up by Y_spacing, second branch (No) goes down
     node.branches.forEach((branch: BranchType, index: number) => {
@@ -93,12 +96,12 @@ export const createNode = (id: string, node_type: string, parentId: string) => {
       parent: parentId,
       node_type,
       data: {...dataProps},
-      branches: [] // Initialize with empty branches; you can modify this as needed
+      branches: []
   };
 };
 
 export const transformNodes = (flow: any) => {
-  const positions = {};
+  const positions: Record<string, CoordinateType> = {}; // Add this type
 
   // Initial position for the head node (root)
   const initialPosition = { x: 20, y: window.innerHeight / 2 };
@@ -118,7 +121,7 @@ export const transformNodes = (flow: any) => {
         ...node.data,
         parent: node.parent,
       },
-      position: positions[node.id], // Use the dynamically calculated position
+      position: positions[node.id] as CoordinateType, // Use the dynamically calculated position
     };
   });
 

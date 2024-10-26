@@ -2,7 +2,7 @@
 import { getNodeDataProps, nodeTypeMatch, nodeTypes } from '@/lib/reactflow-resolver';
 import { Background, ConnectionState, Controls, EdgeTypes, FinalConnectionState, MarkerType, OnConnectEnd, ReactFlow, useReactFlow } from '@xyflow/react';
 import React, { useCallback } from 'react'
-import { usePolicyForm } from '@/store/policies/policy-form';
+import { NodeTypes, usePolicyForm } from '@/store/policies/policy-form';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
 import CustomNodeEdge from '../custom-node-edge'
 
@@ -26,10 +26,10 @@ export default function BuildOption() {
 
     const onCreateNode = (
         node_id: string, 
-        newType: 'user-input' | 'action' | 'conditions', 
+        newType: NodeTypes, 
         position: any, 
         parent_id: string,
-        label: 'Yes' | 'No' | null
+        label: any
     ) => {
         const nodeDataProps = getNodeDataProps(newType);
 
@@ -49,7 +49,6 @@ export default function BuildOption() {
 
         // Add node to original form;
         addNewNode(node_id, newType, parent_id, label)
-        // console.log(node_id)
     }
 
     const onConnectEnd: OnConnectEnd = useCallback(

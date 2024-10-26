@@ -4,6 +4,13 @@ import { Handle, Position } from '@xyflow/react';
 import NodeWrapper from './node-wrapper';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
 import { usePolicyForm } from '@/store/policies/policy-form';
+import { ProductDataType } from '@/interfaces/product.interface';
+
+const nodeTypeMap = {
+    'yes_no_question': 'Yes/No Question',
+    'multiple_choice_question': 'Multiple Choice Question',
+    'asset_upload': 'Asset Upload'
+}
 
 export default function UserInputNode({ data }: { data: any }) {
     const edges = useReactflowStore(state => state.edges);
@@ -11,28 +18,42 @@ export default function UserInputNode({ data }: { data: any }) {
     const updateIncomplete = usePolicyForm(state => state.updateIncomplete);
     const incomplete_nodes = usePolicyForm(state => state.incomplete_nodes);
 
-    // Memoize filtered edges for the node to avoid unnecessary recalculations
-    const nodeEdges = useMemo(() => edges.filter(each => each.source === data.node_id), [edges, data.node_id]);
+    const nodeEdge = useMemo(() => {
+        const findAll = edges.filter(each => each.source === data.node_id);
+        const findEdge = findAll.find(edge => edge.source === data.node_id);
 
-    const nodeEdge = useMemo(() => nodeEdges.find(edge => edge.source === data.node_id), [nodeEdges]);
+        return findEdge;
+    }, [edges, data.node_id])
 
-    const flowNode = useMemo(() => policy_flow[data.node_id], [policy_flow, data.node_id]);
+    
+    const flowNode = useMemo(() => policy_flow[data.node_id], [policy_flow, data.node_id]) as ProductDataType
+
+    const helper = useMemo(() => {
+        const question_types = ['yes_no_question', 'multiple_choice_question'];
+
+        const isQuestion = question_types.includes(flowNode.node_type)
+        const branchLength = flowNode.branches.length;
+        const expectedLength = !isQuestion ? 1 : 2;
+
+        const isConnectable = flowNode.node_type !== question_types[1]? branchLength < expectedLength : true;
+
+        return { isQuestion, branchLength, expectedLength, isConnectable }
+
+    }, [flowNode])
 
     useEffect(() => {
         if (!flowNode) return;
 
-        const isQuestion = flowNode.data.input_type === 'question'
-        const branchLength = flowNode.branches.length;
-        const expectedLength = !isQuestion ? 1 : 2;
+        const { isQuestion, branchLength, expectedLength } = helper;
         const alreadyIdle = incomplete_nodes.includes(data.node_id);
 
-        // Update incomplete nodes if branch length is less than expected
+        
         if (branchLength < expectedLength || (isQuestion && !flowNode.data.message?.trim())) {
             if (!alreadyIdle) {
                 updateIncomplete([...incomplete_nodes, data.node_id]);
             }
         } else {
-            // Remove node from incomplete nodes if branch length is sufficient
+           
             if (alreadyIdle) {
                 updateIncomplete(incomplete_nodes.filter(node => node !== data.node_id));
             }
@@ -41,7 +62,7 @@ export default function UserInputNode({ data }: { data: any }) {
 
     return (
         <NodeWrapper node_id={data.node_id}>
-            {/* Target Handle */}
+          
             <Handle 
                 position={Position.Left} 
                 type="target"
@@ -50,7 +71,7 @@ export default function UserInputNode({ data }: { data: any }) {
                 isConnectableStart={false}
             />
     
-            {/* Node Content */}
+ 
             <h1 className="text-primary text-[10px] satoshi-bold capitalize">User Input</h1>
             <div className="w-full grow border rounded p-2 space-y-1">
                 <header className="flex items-center gap-1 capitalize text-[7px]">
@@ -60,17 +81,17 @@ export default function UserInputNode({ data }: { data: any }) {
                     >
                         help
                     </span>
-                    {data.input_type}
+                    {nodeTypeMap[flowNode.node_type as keyof typeof nodeTypeMap]}
                 </header>
                 <p className="text-[7px]">{data.message || 'Please type in a message'}</p>
             </div>
     
-            {/* Source Handle */}
+
             <Handle 
                 position={Position.Right} 
                 type="source"
                 id={`${data.node_id}-right`}
-                isConnectable={nodeEdges?.length < 2}
+                isConnectable={helper.isConnectable}
                 isConnectableStart={true}
                 isConnectableEnd={false}
             />

@@ -1,15 +1,10 @@
 import { ActionTypeEnum, BaseNodeType } from "./common.interface";
 
-export type ProductFlowType = ProductConditionType | UserInputType | ProductActionType
-
-enum InputType {
-    Question = 'question',
-    Upload = 'upload',
-}
+export type ProductFlowType = ProductConditionType | ProductDataType | ProductActionType
 
 enum AssetActionTypeEnum {
-    AIReview = 'AI Review',
-    ManualReview = 'Manual Review',
+    AIReview = 'ai_review',
+    ManualReview = 'manual_review',
 }
 
 export interface ProductConditionData {
@@ -21,9 +16,8 @@ export interface ProductConditionType extends BaseNodeType {
     data: ProductConditionData
 }
 
-export interface UserInputType extends BaseNodeType {
+export interface ProductDataType extends BaseNodeType {
     data: {
-        input_type: InputType;
         message: string;
     };
 }

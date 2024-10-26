@@ -2,10 +2,10 @@ import { BaseNodeType } from "./common.interface";
 
 export interface CustomerConditionData {
     expectedPeriod: number;
-    operator: 'is less than';
+    operator: 'is_less_than';
 
     // Dont think this is necessary
-    period: 'Hours' | 'Days' | 'Weeks' | 'Months' | 'Years'
+    period: 'hours' | 'days' | 'weeks' | 'months' | 'years'
     periodValue: number
 }
 
@@ -14,9 +14,9 @@ export interface CustomerConditionType extends BaseNodeType {
 }
 
 enum CustomerActionTypeEnum {
-    AcceptRefund = 'Accept Refund',
-    AcceptExchange = 'Accept Exchange',
-    Decline = 'Decline',
+    AcceptRefund = 'accept_refund',
+    AcceptExchange = 'accept_exchange',
+    Decline = 'decline',
 }
 
 export interface CustomerActionType extends BaseNodeType {

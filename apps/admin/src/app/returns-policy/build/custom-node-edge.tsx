@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import React, { useMemo, type FC } from 'react';
 import {
   getBezierPath,
   EdgeLabelRenderer,
@@ -27,6 +27,17 @@ const CustomEdge: FC<EdgeProps<Edge<{ label: string }>>> = ({
     targetPosition,
   });
 
+  const label_bg = useMemo(() => {
+    switch(data?.label) {
+      case 'Yes': 
+        return 'bg-primary';
+      case 'No': 
+        return 'bg-destructive';
+      default: 
+        return 'bg-background border border-border';
+    }
+  }, [data?.label])
+
   return (
     <>
       {/* Base Edge */}
@@ -43,7 +54,7 @@ const CustomEdge: FC<EdgeProps<Edge<{ label: string }>>> = ({
               fontSize: 10,
               fontWeight: 700,
             }}
-            className={`nodrag nopan px-2 py-1 ${data.label === 'Yes' ? 'bg-primary' : 'bg-destructive'}`}
+            className={`nodrag nopan px-2 py-1 ${label_bg}`}
           >
             {data.label}
           </div>

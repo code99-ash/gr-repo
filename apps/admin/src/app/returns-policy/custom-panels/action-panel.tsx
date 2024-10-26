@@ -1,5 +1,5 @@
 'use client';
-import { ActionType } from '@/interfaces/policies.types';
+import { ActionType } from '@/interfaces/common.interface';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Select,

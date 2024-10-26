@@ -4,7 +4,7 @@ export interface BaseNodeType {
     id: string;
     parent: string;
     position?: { x: number, y: number };
-    node_type: 'user-input' | 'action' | 'conditions';
+    node_type: 'yes_no_question' | 'multiple_choice_question' | 'asset_upload' | 'action' | 'conditions';
     branches: BranchType[];
 }
 
@@ -18,15 +18,15 @@ export interface FlowTreeType {
     policy_name: string;
     policy_type: FlowTypes;
     incomplete_nodes: string[];
-    policy_flow: any
+    policy_flow: {
+        [key: string]: BaseNodeType;
+    }
 }
 
-// export 
-
 export enum ActionTypeEnum {
-    Decline = 'Decline',
-    AIReview = 'AI Review',
-    ManualReview = 'Manual Review',
-    AcceptRefund = 'Accept Refund',
-    AcceptExchange = 'Accept Exchange',
+    Decline = 'decline',
+    AIReview = 'ai_review',
+    ManualReview = 'manual_review',
+    AcceptRefund = 'accept_refund',
+    AcceptExchange = 'accept_exchange',
 }

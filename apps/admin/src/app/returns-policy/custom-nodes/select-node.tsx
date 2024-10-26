@@ -8,10 +8,26 @@ import { useReactflowStore } from '@/store/react-flow/reactflow-store';
 export default function SelectNode({ data }: { data: any }) {
     const policy_flow = usePolicyForm(state => state.policy_flow)
     const policy_type = usePolicyForm(state => state.policy_type)
-
-    const nodes = useReactflowStore(state => state.nodes)
     const edges = useReactflowStore(state => state.edges)
     const setEdges = useReactflowStore(state => state.setEdges)
+
+
+    const getYesNoQuestionLabel = (parent_id: string) => {
+
+        const parent_edges = edges.filter(edge => edge.source === parent_id);
+
+ 
+        const getOppositeOption = (option: string) => {
+            return (!option || option === 'No')? 'Yes' : 'No';
+        }
+
+        if(parent_edges.length <= 1) {
+            return 'Yes';
+        }else {
+            return getOppositeOption(parent_edges[0].label as string);
+        }
+
+    }
 
     const handleReplaceNode = useCallback((newType: string, label: string |null) => {
 
@@ -24,22 +40,31 @@ export default function SelectNode({ data }: { data: any }) {
         );
     }, [data, policy_flow]);
 
-    const label = useMemo(() => {
-        console.log(data.parentId)
+    const helper = useMemo(() => {
+        if(!data.parentId) return;
+
         const parent_node = policy_flow[data.parentId];
-        let edgeLabel = 'Yes';
+        const node_type = parent_node.node_type;
+        const isYesNoQuestion = node_type === 'yes_no_question';
+        const isUpload = node_type === 'asset_upload';
 
-        if(!(parent_node.node_type === 'user-input' && parent_node.data.input_type === 'question')) {
-            return null;
+        return { isYesNoQuestion, isUpload, node_type, parent_node };
+
+    }, [data])
+
+    const label = useMemo(() => {
+
+        let edgeLabel = null;
+
+        if(!helper) return edgeLabel;
+
+        const { isYesNoQuestion } = helper;
+ 
+        
+        if(isYesNoQuestion) {
+            edgeLabel = getYesNoQuestionLabel(data.parentId);
         }
 
-        // get edges connected to this parent in reactflow-render-store
-        const parent_edges = edges.filter(edge => edge.source === data.parentId);
-        console.log(parent_edges);
-
-        if(parent_edges.length > 1) { // If there is an edge already, its predicted label is Yes
-            edgeLabel = 'No'
-        }
 
         const newEdgeRender = edges.map(each => {
             if(each.source === data.parentId && each.target === data.node_id) {
@@ -59,14 +84,6 @@ export default function SelectNode({ data }: { data: any }) {
 
     }, [data])
 
-    // User input (Upload) can only have action
-    const isUpload = useMemo(() => {
-        if(!data.parentId) return;
-
-        const node = policy_flow[data.parentId];
-        return node.node_type === 'user-input' && node.data?.input_type === 'upload';
-    }, [data])
-
 
     return (
         <NodeWrapper muted={true}>
@@ -76,14 +93,14 @@ export default function SelectNode({ data }: { data: any }) {
                 id={`${data.node_id}-a`}
             />
             
-            {/* <h1 className="text-green text-[10px] satoshi-bold capitalize">Select Option</h1> */}
+            
             <div className="w-full flex flex-col">
                 {
                     policy_type === 'product' && (
                         <Button variant='outline'
-                            className={`text-sm ${isUpload? 'opacity-20':''}`}
-                            onClick={() => handleReplaceNode('user-input', label)}
-                            disabled={isUpload}
+                            className={`text-sm ${helper?.isUpload? 'opacity-20':''}`}
+                            onClick={() => handleReplaceNode('yes_no_question', label)}
+                            disabled={helper?.isUpload}
                         >
                             User Input
                         </Button>

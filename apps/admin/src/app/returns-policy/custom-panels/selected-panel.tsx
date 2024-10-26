@@ -3,7 +3,7 @@ import RootConditionPanel from './condition-panel/root-cond-panel';
 import UserInputPanel from './userinput-panel';
 import ActionPanel from './action-panel';
 import { Button } from '@/components/ui/button';
-import { usePolicyForm } from '@/store/policies/policy-form';
+import { NodeTypes, usePolicyForm } from '@/store/policies/policy-form';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
 
 // Define the type for updateNode function
@@ -14,6 +14,7 @@ interface UpdateNodeContextType {
 // Define the type for updatedNode
 interface UpdatedNodeType {
     id: string;
+    node_type?: NodeTypes;
     data: any; // You can replace `any` with the specific type if you have a defined shape for node data
 }
 
@@ -39,12 +40,14 @@ export default function SelectedPanel() {
         });
 
         // Update original data
-        modifyNode(updatedNode.id, updatedNode.data);
+        modifyNode(updatedNode.id, updatedNode.data, updatedNode.node_type);
     }
 
     const activePanel = useMemo(() => {
         switch (selectedNode?.node_type) {
-            case 'user-input':
+            case 'yes_no_question':
+            case 'multiple_choice_question':
+            case 'asset_upload':
                 return <UserInputPanel />;
             case 'action':
                 return <ActionPanel />;

@@ -1,7 +1,7 @@
 import { ActionTypeEnum, BaseNodeType } from "./common.interface";
 
-export type OrderCategoryType = 'Discounted orders' | 'Orders without discounts' | 'Order value';
-export type OrderConstraint = 'is less than' | 'is greater than'
+export type OrderCategoryType = 'discounted_orders' | 'orders_without_discounts' | 'order_value';
+export type OrderConstraint = 'is_less_than' | 'is_greater_than'
 
 export interface OrderConditionData  {
     category: OrderCategoryType;

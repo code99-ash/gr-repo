@@ -14,12 +14,13 @@ export const useReactflowStore = create<AppState>((set, get) => ({
     edges: [],
     viewport: {x: 0, y: 0, zoom: 1.5},
     initializeGraph: (option_flow) => {
-        // console.log('initialize graph', option_flow)
-        set({ nodes: getInitialNodes(option_flow), edges: getInitialEdges(option_flow) });
+        set({ 
+            nodes: getInitialNodes(option_flow), 
+            edges: getInitialEdges(option_flow) 
+        });
     },
 
     onNodesChange: (changes: any) => {
-        // console.log('node changed', changes)
 
         const lastChange = changes[changes.length - 1];
         if(lastChange.type === "select") return;
@@ -48,19 +49,19 @@ export const useReactflowStore = create<AppState>((set, get) => ({
             });
         }
  
-        get().layoutGraph(); // Re-layout graph after adding a connection
+        get().layoutGraph();
     },
 
     setNodes: (nodes: any[]) => {
         set({ nodes });
  
-        get().layoutGraph(); // Re-layout after setting nodes manually
+        get().layoutGraph();
     },
 
     setEdges: (edges: any[]) => {
         set({ edges });
  
-        get().layoutGraph(); // Re-layout after setting edges manually
+        get().layoutGraph();
     },
 
     showSelectionNode: (newNode) => {
@@ -70,7 +71,7 @@ export const useReactflowStore = create<AppState>((set, get) => ({
             };
         });
 
-        get().layoutGraph(); // Re-layout after adding new node
+        get().layoutGraph();
     },
 
     setViewport: (viewport) => {
@@ -87,7 +88,7 @@ export const useReactflowStore = create<AppState>((set, get) => ({
             });
         }
  
-        get().layoutGraph(); // Re-layout after adding new edge
+        get().layoutGraph();
     },
 
     updateNode: (updatedNode: any) => {
@@ -112,7 +113,7 @@ export const useReactflowStore = create<AppState>((set, get) => ({
             )
         })
 
-        get().layoutGraph(); // Re-layout after updating node
+        get().layoutGraph();
     },
 
     // Dagre layoutGraph function
@@ -140,7 +141,6 @@ export const useReactflowStore = create<AppState>((set, get) => ({
                     x: dagreNode.x,
                     y: dagreNode.y
                 },
-                // Optionally, you can mark the node as positioned (if you use such a flag)
             };
         });
 

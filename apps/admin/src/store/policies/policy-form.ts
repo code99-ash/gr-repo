@@ -6,8 +6,9 @@ import { OrderConditionData } from "@/interfaces/order.interface";
 import { DurationConditionData } from "@/interfaces/duration.interface";
 import { CustomerConditionData } from "@/interfaces/customer.interface";
 import { ProductConditionData } from "@/interfaces/product.interface";
+import { Edge } from "@xyflow/react";
 
-export interface MyNodeType {
+export interface NodeObjectType {
     id: string;
     parent: string | null;
     node_type: NodeTypes;
@@ -16,11 +17,16 @@ export interface MyNodeType {
     position?: { x: number; y: number };
 }
 
-type NodeTypes = 'user-input' | 'action' | 'conditions';
+export type NodeTypes =    'yes_no_question' | 
+                    'multiple_choice_question' | 
+                    'asset_upload' | 
+                    'action' | 
+                    'conditions';
+
 export type PolicyTypes = 'product' | 'duration' | 'customer' | 'order';
 
 export interface PolicyFlow {
-    [key: string]: MyNodeType;
+    [key: string]: NodeObjectType;
 }
 
 interface PolicyFormType {
@@ -33,10 +39,11 @@ interface PolicyFormType {
     setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => void;
     setPolicyFlow: (type: PolicyFlow) => void;
     addNewNode: (node_id: string, node_type: NodeTypes, parent_id: string, label: any) => void;
-    modifyNode: (node_id: string, data: any) => void;
+    modifyNode: (node_id: string, data: any, node_type?: NodeTypes) => void;
+    modifyNodeBranches: (node_id: string, branches: BranchType[], edges: Edge[]) => void;
     removeNode: (node_id: string) => void;
-    clearUploadChildren?: (node_id: string) => void;
-    getConditionData: (policy_type: PolicyTypes) => void;
+    clearUploadChildren: (node_id: string) => void;
+    getConditionData: (policy_type: PolicyTypes) => any;
     defaultOrderCondition: () => OrderConditionData;
     defaultCustomerCondition: () => CustomerConditionData;
     defaultProductCondition: () => ProductConditionData;
@@ -45,12 +52,14 @@ interface PolicyFormType {
 
 interface PolicyBuildHelper {
     incomplete_nodes: string[];
-    selectedNode: MyNodeType | null;
+    selectedNode: NodeObjectType | null;
     updateIncomplete: (node_ids: string[]) => void;
-    selectNode: (node: MyNodeType | null) => void;
+    selectNode: (node: NodeObjectType | null) => void;
 }
 
-export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, get) => ({
+type PolicyState = PolicyFormType & PolicyBuildHelper
+
+export const usePolicyForm = create<PolicyState>((set, get) => ({
     selectedNode: null,
     incomplete_nodes: [],
     policy_name: 'Returns policy builder',
@@ -65,7 +74,7 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
         }
     },
 
-    getConditionData(policy_type) {
+    getConditionData(policy_type: PolicyTypes): any {
         switch (policy_type) {
             case 'order':
                 return get().defaultOrderCondition()
@@ -80,15 +89,15 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
 
     defaultOrderCondition(): OrderConditionData {
         return {
-            category: 'Discounted orders',
-            operator: 'is less than',
+            category: 'discounted_orders',
+            operator: 'is_less_than',
             value: 10000
         }
     },
 
     defaultDurationCondition(): DurationConditionData {
         return {
-            period: 'Hours',
+            period: 'hours',
             periodValue: 1
         }
     },
@@ -96,8 +105,8 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
     defaultCustomerCondition(): CustomerConditionData {
         return {
             expectedPeriod: 10,
-            operator: 'is less than',
-            period: 'Days',
+            operator: 'is_less_than',
+            period: 'days',
             periodValue: 2
         }
     },
@@ -109,26 +118,25 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
         }
     },
 
-    updateIncomplete(incomplete_nodes) {
+    updateIncomplete(incomplete_nodes: string[]) {
         set({ incomplete_nodes })
     },
-    setPolicyId: (policy_id) => {
+    setPolicyId: (policy_id: number) => {
         set({ policy_id })
     },
-    setPolicyFlow: (policy_flow) => {
+    setPolicyFlow: (policy_flow: PolicyFlow) => {
         set({ policy_flow })
     },
-    setPolicyName: (name) => {
+    setPolicyName: (name: string) => {
         set({ policy_name: name })
     },
-    setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => { // resetting policy type means refreshing data
+    setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => {
 
         // Refresh react-flow rendered nodes & edges
         useReactflowStore.getState().setNodes([])
         useReactflowStore.getState().setEdges([])
 
         const data = get().getConditionData(type);
-        // console.log('policy_type', type)
 
         let policy_flow = existing_flow;
 
@@ -146,12 +154,12 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
             if(type === "duration") { // Add decline action by Default
     
                 const uid = new Date().getTime().toString();
-                const actionNode: MyNodeType = {
+                const actionNode: NodeObjectType = {
                     id: uid,
                     parent: 'head',
                     node_type: "action",
                     data: {
-                        action_type: "Decline",
+                        action_type: "decline",
                         message: ""
                     },
                     branches: []
@@ -166,8 +174,6 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
             }
         }
 
-        // console.log('Before Set', policy_flow)
-
         set({
             selectedNode: null,
             incomplete_nodes: [],
@@ -176,23 +182,16 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
             policy_flow: policy_flow,
         })
 
-        // console.log('After Set', policy_flow)
-
-
         useReactflowStore.getState().initializeGraph(get().policy_flow)
-
-        // useReactflowStore.getState().layoutGraph()
-
-        
     },
 
-    selectNode: (node) => {
+    selectNode: (node: NodeObjectType | null) => {
         set({ selectedNode: node })
     },
     
-    addNewNode: (node_id, node_type, parent_id, label) => {
+    addNewNode: (node_id: string, node_type: NodeTypes, parent_id: string, label: any) => {
 
-        set((state) => {
+        set((state: PolicyState) => {
             let updated = {
                 ...state.policy_flow,
                 [node_id]: {
@@ -224,25 +223,56 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
         });
     },
 
-    modifyNode: (node_id, data) => {
-        set((state) => ({
+    modifyNode: (node_id: string, data: any, node_type?: NodeTypes) => {
+        set((state: PolicyState) => ({
             policy_flow: {
                 ...state.policy_flow,
                 [node_id]: {
                     ...state.policy_flow[node_id],
+                    node_type: node_type ?? state.policy_flow[node_id].node_type,
                     data: {
                         ...state.policy_flow[node_id].data,
                         ...data
-                    }
+                    },
                 }
             }
         }));
     },
 
-    removeNode: (node_id) => {
+    modifyNodeBranches: (node_id: string, branches: BranchType[], edges: Edge[]) => {
+        set((state: PolicyState) => ({
+            policy_flow: {
+                ...state.policy_flow,
+                [node_id]: { 
+                    ...state.policy_flow[node_id], 
+                    branches: branches
+                }
+            }
+        }));
+
+        const current_edges = useReactflowStore.getState().edges;
+
+        const edgeMap: { [key: string]: Edge } = {};
+
+        edges.forEach((edge) => {
+            edgeMap[edge.id] = edge;
+        })
+
+        const new_edges = current_edges.map((edge) => {
+            if(edgeMap.hasOwnProperty(edge.id)) {
+                edge = edgeMap[edge.id]
+            }
+            return edge;
+        })
+
+        useReactflowStore.getState().setEdges(new_edges)
+        
+    },
+
+    removeNode: (node_id: string) => {
         if (node_id === 'head') return; // Prevent removal of the "head" node
         
-        set((state) => {
+        set((state: PolicyState) => {
             const { [node_id]: nodeToRemove, ...rest } = state.policy_flow;
             const nodeParentId = nodeToRemove.parent;
 
@@ -294,8 +324,8 @@ export const usePolicyForm = create<PolicyFormType & PolicyBuildHelper>((set, ge
         });
 
     },
-    clearUploadChildren: (node_id) => {
-        set((state) => {
+    clearUploadChildren: (node_id: string) => {
+        set((state: PolicyState) => {
             const policy_flow = state.policy_flow
             const node = policy_flow[node_id];
 
