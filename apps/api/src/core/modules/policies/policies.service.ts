@@ -42,6 +42,7 @@ export class PoliciesService {
       }
 
     } catch (error) {
+      console.log(error)
       isValid = false;
     }
 

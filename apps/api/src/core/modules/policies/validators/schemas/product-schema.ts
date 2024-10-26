@@ -21,12 +21,12 @@ const refineQuestionSchema = (schema: z.ZodType<any, z.ZodTypeDef, any>) => sche
 });
 
 export const ProductConditionValidator = refineProductConditionSchema(z.object({
-    list: z.array(z.string()).min(1),
+    list: z.array(z.string()).min(1, { message: 'List must contain at least one item' }),
     ruling: z.enum(['any', 'all']),
 }));
 
 export const QuestionValidator = refineQuestionSchema(z.object({
-    message: z.string(),
+    message: z.string().min(1, { message: 'Message is required' }),
 }));
 
 export const AssetUploadSchema = z.object({
