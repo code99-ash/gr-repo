@@ -11,7 +11,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "public"."status" AS ENUM('draft', 'published', 'active');
+ CREATE TYPE "public"."policy_status" AS ENUM('draft', 'published', 'active');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS "policies" (
 	"policy_name" text NOT NULL,
 	"policy_type" "policy_type" NOT NULL,
 	"policy_flow" jsonb NOT NULL,
-	"status" "status" DEFAULT 'draft' NOT NULL,
+	"policy_status" "policy_status" DEFAULT 'draft' NOT NULL,
 	"activated_by" text,
 	"activated_at" timestamp,
 	"deleted_at" timestamp,
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS "policy_histories" (
 	"policy_name" text NOT NULL,
 	"policy_type" "policy_type" NOT NULL,
 	"policy_flow" jsonb NOT NULL,
-	"status" "status" NOT NULL,
+	"policy_status" "policy_status" NOT NULL,
 	"activated_by" text,
 	"activated_at" timestamp,
 	"created_at" timestamp DEFAULT now(),
