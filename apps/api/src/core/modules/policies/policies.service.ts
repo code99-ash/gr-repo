@@ -42,6 +42,7 @@ export class PoliciesService {
       }
 
     } catch (error) {
+      console.log(error)
       isValid = false;
     }
 
@@ -115,7 +116,14 @@ export class PoliciesService {
     return status === value;
   }
 
-  async update(uid: string, updatePolicyDto: UpdatePolicyDto) {
+  private filterOut(object: { [key: string]: any }, key: string) {
+    const { [key]: __, ...rest } = object;
+    return rest;
+  }
+
+  async update(uid: string, updateData: UpdatePolicyDto) {
+
+    const updatePolicyDto = this.filterOut(updateData, 'policy_status');
 
     const existing_policy = await this.findOne(uid);
     if(!existing_policy) {
@@ -123,6 +131,7 @@ export class PoliciesService {
     }
 
     const flow_to_update = updatePolicyDto.policy_flow;
+
 
 
     // Either the policy was published or active (but not in draft)

@@ -31,18 +31,21 @@ const product_types = [
 export const policy_statuses = ['draft', 'published', 'active'] as const;
 
 
-export const PolicyFlowSchema = z.record(z.object({
-    id: z.string(),
-    parent: z.string().nullable(),
-    node_type: z.enum(node_types),
-    data: z.any(),
-    branches: z.array(
-        z.object({
-            node_id: z.any(),
-            label: z.string().nullable()
-        })
-    ),
-}))
+export const PolicyFlowSchema = z.record(
+    z.string(),
+    z.object({
+        id: z.string(),
+        parent: z.string().nullable(),
+        node_type: z.enum(node_types),
+        data: z.any(),
+        branches: z.array(
+            z.object({
+                node_id: z.any(),
+                label: z.string().nullable()
+            })
+        ),
+    })
+)
 
 export const policy_type = pgEnum('policy_type', product_types);
 export const policy_status = pgEnum('policy_status', policy_statuses);

@@ -1,5 +1,5 @@
 {
-  "id": "841b5b6b-5bc7-464c-8c15-98a842f3da4a",
+  "id": "d63a89fe-f816-40ab-af6a-e3bcb8c5fd3a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -713,9 +713,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "status": {
-          "name": "status",
-          "type": "status",
+        "policy_status": {
+          "name": "policy_status",
+          "type": "policy_status",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
@@ -829,9 +829,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "status": {
-          "name": "status",
-          "type": "status",
+        "policy_status": {
+          "name": "policy_status",
+          "type": "policy_status",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
@@ -917,8 +917,8 @@
         "completed"
       ]
     },
-    "public.status": {
-      "name": "status",
+    "public.policy_status": {
+      "name": "policy_status",
       "schema": "public",
       "values": [
         "draft",
