@@ -64,6 +64,7 @@ export class AuthService {
     const payload: JWTPayload = {
       username: '',
       sub: account.uid,
+      organization_uid: account.organization_uid,
       type: account.type,
       permissions: account.permissions,
     };
