@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Handle, Position } from '@xyflow/react'
 import { useReactflowStore } from '@/store/react-flow/reactflow-store'
-import { usePolicyForm } from '@/store/policies/policy-form'
+import { PolicyTypes, usePolicyForm } from '@/store/policies/policy-form'
 import ProductConditionNode from './product-cond-node'
 import OrderConditionNode from './order-cond-node'
 import CustomerConditionNode from './customer-cond-node'
@@ -13,20 +13,17 @@ export default function RootConditionNode({data}: { data: any }) {
     const edges = useReactflowStore(state => state.edges)
     const policy_type = usePolicyForm(state => state.policy_type)
   
-    const nodeEdge = useMemo(() => edges.find(edge => edge.source === data.node_id), [edges, data.node_id])
+    const nodeEdge = edges.find(edge => edge.source === data.node_id)
 
-    const conditionData = useMemo(() => {
-        switch (policy_type) {
-            case 'order':
-                return <OrderConditionNode data={data} />        
-            case 'customer':
-                return <CustomerConditionNode data={data} />        
-            case 'duration':
-                return <DurationConditionNode data={data} />        
-            default:
-                return <ProductConditionNode data={data} />  ;
-        }
-    }, [policy_type, data])
+    const conditionData = {
+
+        product: <ProductConditionNode data={data} />,
+        order: <OrderConditionNode data={data} />,
+        customer: <CustomerConditionNode data={data} />,
+        duration: <DurationConditionNode data={data} />
+
+    }[policy_type as PolicyTypes]                 
+
 
     return (
         <NodeWrapper node_id={data.node_id ?? 'head'}>
@@ -34,7 +31,6 @@ export default function RootConditionNode({data}: { data: any }) {
             <Handle 
                 position={Position.Right} 
                 type="source"
-                target={nodeEdge?.target || null}
                 isConnectableStart={!nodeEdge}
                 isConnectableEnd={false}
             />

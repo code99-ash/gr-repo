@@ -35,7 +35,7 @@ interface PolicyFormType {
     addNewNode: (node_id: string, node_type: INodeTypes, parent_id: string, label: any) => void;
     modifyNode: (node_id: string, data: any) => void;
     removeNode: (node_id: string) => void;
-    clearUploadChildren?: (node_id: string) => void;
+    clearUploadChildren: (node_id: string) => void;
     getConditionData: (policy_type: PolicyTypes) => void;
     defaultOrderCondition: () => OrderConditionData;
     defaultCustomerCondition: () => CustomerConditionData;

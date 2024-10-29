@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import NodeWrapper from './node-wrapper';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
@@ -11,23 +11,20 @@ export default function UserInputNode({ data }: { data: any }) {
     const updateIncomplete = usePolicyForm(state => state.updateIncomplete);
     const incomplete_nodes = usePolicyForm(state => state.incomplete_nodes);
 
-    // Memoize filtered edges for the node to avoid unnecessary recalculations
-    const nodeEdges = useMemo(() => edges.filter(each => each.source === data.node_id), [edges, data.node_id]);
-
-    const nodeEdge = useMemo(() => nodeEdges.find(edge => edge.source === data.node_id), [nodeEdges]);
-
-    const flowNode = useMemo(() => policy_flow[data.node_id], [policy_flow, data.node_id]);
+    const flow_node = policy_flow[data.node_id];
+    const nodeEdges = edges.filter(each => each.source === data.node_id)
+    const nodeEdge = nodeEdges.find(edge => edge.source === data.node_id)
 
     useEffect(() => {
-        if (!flowNode) return;
+        if (!flow_node) return;
 
-        const isQuestion = flowNode.data.input_type === 'question'
-        const branchLength = flowNode.branches.length;
+        const isQuestion = flow_node.data.input_type === 'question'
+        const branchLength = flow_node.branches.length;
         const expectedLength = !isQuestion ? 1 : 2;
         const alreadyIdle = incomplete_nodes.includes(data.node_id);
 
         // Update incomplete nodes if branch length is less than expected
-        if (branchLength < expectedLength || (isQuestion && !flowNode.data.message?.trim())) {
+        if (branchLength < expectedLength || (isQuestion && !flow_node.data.message?.trim())) {
             if (!alreadyIdle) {
                 updateIncomplete([...incomplete_nodes, data.node_id]);
             }
@@ -37,11 +34,10 @@ export default function UserInputNode({ data }: { data: any }) {
                 updateIncomplete(incomplete_nodes.filter(node => node !== data.node_id));
             }
         }
-    }, [flowNode, incomplete_nodes, updateIncomplete, data.node_id]);
+    }, [flow_node, incomplete_nodes, updateIncomplete, data.node_id]);
 
     return (
         <NodeWrapper node_id={data.node_id}>
-            {/* Target Handle */}
             <Handle 
                 position={Position.Left} 
                 type="target"
@@ -50,7 +46,7 @@ export default function UserInputNode({ data }: { data: any }) {
                 isConnectableStart={false}
             />
     
-            {/* Node Content */}
+     
             <h1 className="text-primary text-[10px] satoshi-bold capitalize">User Input</h1>
             <div className="w-full grow border rounded p-2 space-y-1">
                 <header className="flex items-center gap-1 capitalize text-[7px]">
@@ -65,7 +61,7 @@ export default function UserInputNode({ data }: { data: any }) {
                 <p className="text-[7px]">{data.message || 'Please type in a message'}</p>
             </div>
     
-            {/* Source Handle */}
+         
             <Handle 
                 position={Position.Right} 
                 type="source"

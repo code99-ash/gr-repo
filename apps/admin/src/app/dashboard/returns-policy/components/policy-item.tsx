@@ -2,22 +2,11 @@
 import { PolicyListType } from '@/store/policies/policy-store';
 import { useRouter } from 'next/navigation';
 import React, { useMemo } from 'react'
-
-function formatDate(timestamp: string) {
-    const date = new Date(timestamp);
-  
-    const options: {[key: string]: string} = { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    };
-  
-    return date.toLocaleDateString('en-US', options).replace(',', '.');
-}
+import { formatDate } from '@/lib/utils'
 
 export default function PolicyItem({policy}: {policy: PolicyListType}) {
     const router = useRouter()
-    // const variantBorder = policy.status === 'draft'? "border-[#2A9E69]" : "border-[#FDB747]"
+    
     const variantText = policy.status === 'draft'? "text-[#2A9E69]" : "text-[#FDB747]"
 
     const date = useMemo(() => formatDate(policy.updated_at), [policy])

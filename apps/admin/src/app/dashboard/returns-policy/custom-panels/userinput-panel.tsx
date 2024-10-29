@@ -5,12 +5,10 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
 import DeleteNodeConfirm from './delete-node-confirm';
 import { UserInputType } from '@/interfaces/product.interface';
 import { usePolicyForm } from '@/store/policies/policy-form';
@@ -53,7 +51,7 @@ export default function UserInputPanel() {
     if(form.input_type === 'upload') {
       clearUploadChildren(selectedNode.id)
 
-      // since it will have no branch, add to incomplete nodes
+    
       updateIncomplete([...incomplete_nodes, selectedNode.id]);
     }
   }, [form.input_type])

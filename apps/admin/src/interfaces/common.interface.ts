@@ -30,3 +30,5 @@ export enum ActionTypeEnum {
     AcceptRefund = 'Accept Refund',
     AcceptExchange = 'Accept Exchange',
 }
+
+export type ActionType = 'Decline' | 'AI Review' | 'Manual Review' | 'Accept Refund' | 'Accept Exchange'

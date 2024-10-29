@@ -35,7 +35,6 @@ export default function SelectNode({ data }: { data: any }) {
             return null;
         }
 
-        // get edges connected to this parent in reactflow-render-store
         const parent_edges = edges.filter(edge => edge.source === data.parentId);
 
 
@@ -62,12 +61,8 @@ export default function SelectNode({ data }: { data: any }) {
     }, [data])
 
 
-    const isUpload = useMemo(() => {
-        if(!data.parentId) return;
-
-        const node = policy_flow[data.parentId];
-        return node.node_type === 'user-input' && node.data?.input_type === 'upload';
-    }, [data])
+    const node = policy_flow[data.parentId];
+    const isUpload =  node.node_type === 'user-input' && node.data?.input_type === 'upload';
 
 
     return (

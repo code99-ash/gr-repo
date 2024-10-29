@@ -7,16 +7,14 @@ import { useReactflowStore } from '@/store/react-flow/reactflow-store'
 export default function ActionNode({data}: { data: any }) {
     const edges = useReactflowStore(state => state.edges)
     
-    const nodeEdge = useMemo(() => edges.find(edge => edge.source === data.node_id), [edges, data.node_id])
+    const nodeEdge = edges.find(edge => edge.source === data.node_id)
 
-    // console.log('action node data', data)
 
     return (
       <NodeWrapper node_id={data.node_id}>
         <Handle 
             position={Position.Left} 
             type="target"
-            source={nodeEdge?.source || null}
             isConnectableStart={false}
             isConnectableEnd={true}
         />
