@@ -73,19 +73,17 @@ export default function ProductPolicyBuiler() {
 
 
   useEffect(() => {
-    // get policy type
     if(!policyUID) {
       initializePage()
     }
 
-    // initializeGraph(policy_flow)
   }, [initializeGraph])
 
   const initializePage = () => {
     const param_type = params.policy_type as PolicyTypes
     const policy_type = accepted_types.includes(param_type)? param_type : 'product'
 
-    setPolicyType(policy_type) // policy_flow will be refreshed
+    setPolicyType(policy_type)
   }
 
   const saveToDraft = async() => {

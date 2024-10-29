@@ -5,7 +5,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -101,7 +100,7 @@ export default function UserInputPanel() {
     if(node_type === 'asset_upload') {
       clearUploadChildren(selectedNode.id)
 
-      // since it will have no branch, add to incomplete nodes
+    
       updateIncomplete([...incomplete_nodes, selectedNode.id]);
     }
 

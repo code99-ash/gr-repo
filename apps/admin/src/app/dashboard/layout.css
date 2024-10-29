@@ -7,3 +7,16 @@
 .\[\&\>span\:last-child\]\:truncate > span:last-child {
     @apply text-base;
 }
+
+.policy-dropdown > div:nth-child(3) > div{
+    @apply w-[160px] mx-0 shadow-none !important;
+}
+
+.react-flow__controls-button {
+    @apply bg-card text-foreground border-border !important;
+}
+
+.select-node-btn {
+    @apply shadow-none h-[30px] flex items-center justify-start gap-x-3 text-xs
+    text-foreground hover:bg-primary hover:text-white;
+}

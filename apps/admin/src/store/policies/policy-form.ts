@@ -11,13 +11,13 @@ import { Edge } from "@xyflow/react";
 export interface NodeObjectType {
     id: string;
     parent: string | null;
-    node_type: NodeTypes;
+    node_type: INodeTypes;
     data: any;
     branches: BranchType[];
     position?: { x: number; y: number };
 }
 
-export type NodeTypes =    'yes_no_question' | 
+export type INodeTypes =    'yes_no_question' | 
                     'multiple_choice_question' | 
                     'asset_upload' | 
                     'action' | 
@@ -38,8 +38,8 @@ interface PolicyFormType {
     setPolicyName: (name: string) => void;
     setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => void;
     setPolicyFlow: (type: PolicyFlow) => void;
-    addNewNode: (node_id: string, node_type: NodeTypes, parent_id: string, label: any) => void;
-    modifyNode: (node_id: string, data: any, node_type?: NodeTypes) => void;
+    addNewNode: (node_id: string, node_type: INodeTypes, parent_id: string, label: any) => void;
+    modifyNode: (node_id: string, data: any, node_type?: INodeTypes) => void;
     modifyNodeBranches: (node_id: string, branches: BranchType[], edges: Edge[], isYesNo?: boolean) => void;
     removeNode: (node_id: string) => void;
     clearUploadChildren: (node_id: string) => void;
@@ -189,7 +189,7 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
         set({ selectedNode: node })
     },
     
-    addNewNode: (node_id: string, node_type: NodeTypes, parent_id: string, label: any) => {
+    addNewNode: (node_id: string, node_type: INodeTypes, parent_id: string, label: any) => {
 
         set((state: PolicyState) => {
             let updated = {
@@ -223,7 +223,7 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
         });
     },
 
-    modifyNode: (node_id: string, data: any, node_type?: NodeTypes) => {
+    modifyNode: (node_id: string, data: any, node_type?: INodeTypes) => {
         set((state: PolicyState) => ({
             policy_flow: {
                 ...state.policy_flow,

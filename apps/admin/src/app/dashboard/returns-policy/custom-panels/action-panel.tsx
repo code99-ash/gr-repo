@@ -1,5 +1,6 @@
 'use client';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -10,7 +11,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import DeleteNodeConfirm from './delete-node-confirm';
-import { usePolicyForm } from '@/store/policies/policy-form';
+import { usePolicyForm, NodeObjectType } from '@/store/policies/policy-form';
 import { UpdateNodeCtx } from './selected-panel';
 
 
@@ -60,22 +61,18 @@ export default function ActionPanel() {
   const policy_type = usePolicyForm(state => state.policy_type)
   const [action, setAction] = useState('Decline')
   const [message, setMessage] = useState('')
-  const selectedNode = usePolicyForm(state => state.selectedNode) as any
+  const selectedNode = usePolicyForm(state => state.selectedNode) as NodeObjectType;
   const selectNode = usePolicyForm(state => state.selectNode)
 
   const removeNode = usePolicyForm(state => state.removeNode);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const actions = useMemo(() => {
-    switch (policy_type) {
-      case 'duration':
-        return durationActions;
-      case 'customer':
-        return customerActions
-      default:
-        return baseActions
-    }
-  }, [policy_type])
+  const actions = {
+    duration: durationActions,
+    customer: customerActions,
+    order:    baseActions,
+    product:  baseActions
+  }[policy_type]
 
   useEffect(() => {
     setAction(selectedNode.data.action_type)
@@ -120,7 +117,7 @@ export default function ActionPanel() {
       </header>
 
       {
-        policy_type !== "duration" && ( // No node can be deleted on duration flow
+        policy_type !== "duration" && (
           <DeleteNodeConfirm
             confirmDelete={confirmDelete}
             setConfirmDelete={setConfirmDelete}

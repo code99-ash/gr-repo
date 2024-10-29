@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import NodeWrapper from './node-wrapper';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
@@ -18,6 +18,8 @@ export default function UserInputNode({ data }: { data: any }) {
     const updateIncomplete = usePolicyForm(state => state.updateIncomplete);
     const incomplete_nodes = usePolicyForm(state => state.incomplete_nodes);
 
+    const flowNode = policy_flow[data.node_id] as ProductDataType
+    
     const nodeEdge = useMemo(() => {
         const findAll = edges.filter(each => each.source === data.node_id);
         const findEdge = findAll.find(edge => edge.source === data.node_id);
@@ -26,7 +28,6 @@ export default function UserInputNode({ data }: { data: any }) {
     }, [edges, data.node_id])
 
     
-    const flowNode = useMemo(() => policy_flow[data.node_id], [policy_flow, data.node_id]) as ProductDataType
 
     const helper = useMemo(() => {
         if(!flowNode) {
@@ -100,7 +101,6 @@ export default function UserInputNode({ data }: { data: any }) {
                 <p className="text-[7px]">{data.message || 'Please type in a message'}</p>
             </div>
     
-
             <Handle 
                 position={Position.Right} 
                 type="source"

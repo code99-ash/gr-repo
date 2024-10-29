@@ -4,7 +4,6 @@ import NodeWrapper from './node-wrapper'
 
 
 export default function ActionNode({data}: { data: any }) {
-
     return (
       <NodeWrapper node_id={data.node_id}>
         <Handle 

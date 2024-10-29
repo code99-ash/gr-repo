@@ -1,30 +1,13 @@
-import ActionNode from '@/app/returns-policy/custom-nodes/action-node';
-import SelectNode from '@/app/returns-policy/custom-nodes/select-node';
-import UserInputNode from '@/app/returns-policy/custom-nodes/userinput-node';
-import RootConditionNode from '@/app/returns-policy/custom-nodes/condition-node/root-cond-node';
 import { BranchType } from '@/interfaces/common.interface';
 import { MarkerType } from '@xyflow/react';
+import { INodeTypes } from '@/store/policies/policy-form';
+import { NODE_TYPE_MATCH } from '@/app/dashboard/returns-policy/build/[policy_type]/utils';
 
 export const X_spacing = 300;  // Horizontal spacing
 export const Y_spacing = 100;  // Vertical spacing
 
-export const nodeTypeMatch: any = {
-    'conditions': 'conditionNode',
-    'yes_no_question': 'userInputNode',
-    'multiple_choice_question': 'userInputNode',
-    'asset_upload': 'userInputNode',
-    'action'    : 'actionNode',
-    'select'    : 'selectNode'
-}
 
-export const nodeTypes = { 
-  conditionNode: RootConditionNode,
-  userInputNode: UserInputNode,
-  actionNode: ActionNode,
-  selectNode: SelectNode
-}
-
-export const getNodeDataProps = (node_type: string) => {
+export const getNodeDataProps = (node_type: INodeTypes) => {
   if(node_type === 'conditions') {
     return {
       list: []
@@ -44,51 +27,48 @@ export const getNodeDataProps = (node_type: string) => {
   
 }
 
-type CoordinateType = {x: number, y: number}
+export type CoordinateType = {x: number, y: number}
 
 function calculateNodePositions(
   flow: any, 
   node: any, 
   parentPosition: CoordinateType, 
-  positions: Record<string, CoordinateType>, // Add this type
+  positions: Record<string, CoordinateType>,
   level: number
 ) {
   if (!node) return;
 
-  // Set the base position based on the parent
+ 
   const positionX = parentPosition.x + X_spacing;
   let positionY = parentPosition.y;
 
   const user_input_types = ['yes_no_question', 'multiple_choice_question', 'asset_upload']
 
-  // For user-input nodes with two branches, space them vertically
   if (user_input_types.includes(node.node_type) && node.branches.length > 1) {
 
-    // First branch (Yes) goes up by Y_spacing, second branch (No) goes down
+    
     node.branches.forEach((branch: BranchType, index: number) => {
-      const childNode = flow[branch.node_id]; // Access child node by id
+      const childNode = flow[branch.node_id];
       const childPositionY = positionY + (index === 0 ? -Y_spacing : Y_spacing);
       
-      // Recursively calculate the child node's position
       calculateNodePositions(flow, childNode, { x: positionX, y: childPositionY }, positions, level + 1);
     });
 
   } else {
-    // For all other node types, including user-input with 1 branch
+  
     node.branches.forEach((branch: BranchType, index: number) => {
-      const childNode = flow[branch.node_id]; // Access child node by id
-      const childPositionY = positionY + index * Y_spacing; // Default vertical spacing for other nodes
+      const childNode = flow[branch.node_id];
+      const childPositionY = positionY + index * Y_spacing;
 
-      // Recursively calculate the child node's position
+      
       calculateNodePositions(flow, childNode, { x: positionX, y: childPositionY }, positions, level + 1);
     });
   }
 
-  // Store the calculated position for this node
   positions[node.id] = { x: positionX, y: positionY };
 }
 
-export const createNode = (id: string, node_type: string, parentId: string) => {
+export const createNode = (id: string, node_type: INodeTypes, parentId: string) => {
   const dataProps = getNodeDataProps(node_type);
 
   return {
@@ -101,27 +81,26 @@ export const createNode = (id: string, node_type: string, parentId: string) => {
 };
 
 export const transformNodes = (flow: any) => {
-  const positions: Record<string, CoordinateType> = {}; // Add this type
+  const positions: Record<string, CoordinateType> = {}; 
 
-  // Initial position for the head node (root)
+ 
   const initialPosition = { x: 20, y: window.innerHeight / 2 };
 
-  // Start positioning from the 'head' node
+  
   calculateNodePositions(flow, flow['head'], initialPosition, positions, 0);
 
-  // Map the flow into React Flow nodes (without position stored in the flow)
   const nodes = Object.keys(flow).map((key) => {
     const node = flow[key];
     return {
       id: node.id,
-      type: nodeTypeMatch[node.node_type],
+      type: NODE_TYPE_MATCH[node.node_type],
       draggable: false,
       data: {
         node_id: node.id,
         ...node.data,
         parent: node.parent,
       },
-      position: positions[node.id] as CoordinateType, // Use the dynamically calculated position
+      position: positions[node.id] as CoordinateType,
     };
   });
 

@@ -2,14 +2,14 @@ import React, { useCallback, useMemo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import NodeWrapper from './node-wrapper';
 import { Button } from '@/components/ui/button';
-import { usePolicyForm } from '@/store/policies/policy-form';
+import { INodeTypes, usePolicyForm } from '@/store/policies/policy-form';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
+import { SwitchNodeCtx } from '../build/[policy_type]/build-option';
 
 const generateUniqueLabel = (existing_labels: string[], length = 6) => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let label;
   
-    // Generate a unique label not in the existing labels
     do {
       label = Array.from({ length }, () =>
         characters.charAt(Math.floor(Math.random() * characters.length))
@@ -20,6 +20,7 @@ const generateUniqueLabel = (existing_labels: string[], length = 6) => {
 };
 
 export default function SelectNode({ data }: { data: any }) {
+    const { onCreateNode } = React.useContext(SwitchNodeCtx)
     const policy_flow = usePolicyForm(state => state.policy_flow)
     const policy_type = usePolicyForm(state => state.policy_type)
     const edges = useReactflowStore(state => state.edges)
@@ -43,22 +44,26 @@ export default function SelectNode({ data }: { data: any }) {
 
     }
 
-    const handleReplaceNode = useCallback((newType: string, label: string |null) => {
+   
 
-        data.onCreateNode(
-            data.node_id,
-            newType, 
-            data.position, 
-            data.parentId,
-            label
-        );
-    }, [data, policy_flow]);
+    const handleReplaceNode = useCallback((new_type: INodeTypes, label: string |null) => {
+        
+        const { node_id, position, parentId: parent_id } = data;
+        onCreateNode({ 
+            node_id, 
+            new_type, 
+            position, 
+            parent_id, 
+            label 
+        });
+
+    }, [data, onCreateNode]);
+
+    const parent_node = policy_flow[data.parentId];
+    const node_type = parent_node.node_type;
 
     const helper = useMemo(() => {
-        if(!data.parentId) return;
 
-        const parent_node = policy_flow[data.parentId];
-        const node_type = parent_node.node_type;
         const isYesNoQuestion = node_type === 'yes_no_question';
         const isUpload = node_type === 'asset_upload';
         const isMultipleChoice = node_type === 'multiple_choice_question';
@@ -125,14 +130,17 @@ export default function SelectNode({ data }: { data: any }) {
                             onClick={() => handleReplaceNode('yes_no_question', label)}
                             disabled={helper?.isUpload}
                         >
-                            User Input
+                            <span className="material-symbols-outlined" style={{fontSize: '13px'}}>
+                                help
+                            </span> User Input
                         </Button>
                     )
                 }
                 <Button variant='outline'
-                    className="text-sm"
+                    className="select-node-btn"
                     onClick={() => handleReplaceNode('action', label)}
                 >
+                    <span className="material-symbols-outlined" style={{fontSize: '13px'}}>autorenew</span>
                     Action
                 </Button>
             </div>

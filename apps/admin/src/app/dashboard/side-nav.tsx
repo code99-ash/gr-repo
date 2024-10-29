@@ -34,7 +34,7 @@ const top_navs = [
     },
     {
         title: 'Returns Policy', 
-        href: '/returns-policy', 
+        href: '/dashboard/returns-policy', 
         icon: RefreshCw
     },
     {
@@ -62,15 +62,15 @@ export default function SideNav() {
         <Sidebar variant='sidebar' collapsible='icon'>
             <SidebarHeader>
                 <Image
-                    alt="client-logo"
-                    className='mx-auto'
-                    src="/images/client-logo.png"
+                    alt="logo"
+                    className='-ml-1'
+                    src="/images/logo.svg"
                     width={160}
                     height={60}
                 />
             </SidebarHeader>
             <SidebarContent>
-                <SidebarGroup className='px-0 pt-5'>
+                <SidebarGroup className='px-0 pt-1'>
                 <SidebarGroupContent>
                     <SidebarMenu>
                         {top_navs.map((item) => (
