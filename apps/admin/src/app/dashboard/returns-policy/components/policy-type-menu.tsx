@@ -15,22 +15,22 @@ const policyOptions = [
     {
         icon: 'local_mall',
         label: 'Product',
-        href: '/returns-policy/build/product',
+        href: '/dashboard/returns-policy/build/product',
     },
     {
         icon: 'schedule',
         label: 'Duration',
-        href: '/returns-policy/build/duration',
+        href: '/dashboard/returns-policy/build/duration',
     },
     {
         icon: 'group',
         label: 'Customer',
-        href: '/returns-policy/build/customer',
+        href: '/dashboard/returns-policy/build/customer',
     },
     {
         icon: 'shopping_cart',
         label: 'Order',
-        href: '/returns-policy/build/order',
+        href: '/dashboard/returns-policy/build/order',
     },
 ];
 

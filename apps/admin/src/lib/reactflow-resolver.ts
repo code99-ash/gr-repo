@@ -1,28 +1,14 @@
-import ActionNode from '@/app/returns-policy/custom-nodes/action-node';
-import SelectNode from '@/app/returns-policy/custom-nodes/select-node';
-import UserInputNode from '@/app/returns-policy/custom-nodes/userinput-node';
-import RootConditionNode from '@/app/returns-policy/custom-nodes/condition-node/root-cond-node';
 import { BranchType } from '@/interfaces/common.interface';
 import { MarkerType } from '@xyflow/react';
+import { INodeTypes } from '@/store/policies/policy-form';
+import { NODE_TYPE_MATCH } from '@/app/dashboard/returns-policy/build/[policy_type]/utils';
 
 export const X_spacing = 300;  // Horizontal spacing
 export const Y_spacing = 100;  // Vertical spacing
 
-export const nodeTypeMatch: any = {
-    'conditions': 'conditionNode',
-    'user-input': 'userInputNode',
-    'action'    : 'actionNode',
-    'select'    : 'selectNode'
-}
 
-export const nodeTypes = { 
-  conditionNode: RootConditionNode,
-  userInputNode: UserInputNode,
-  actionNode: ActionNode,
-  selectNode: SelectNode
-}
 
-export const getNodeDataProps = (node_type: string) => {
+export const getNodeDataProps = (node_type: INodeTypes) => {
   if(node_type === 'conditions') {
     return {
       list: []
@@ -43,7 +29,7 @@ export const getNodeDataProps = (node_type: string) => {
   
 }
 
-type CoordinateType = {x: number, y: number}
+export type CoordinateType = {x: number, y: number}
 
 function calculateNodePositions(
   flow: any, 
@@ -85,7 +71,7 @@ function calculateNodePositions(
   positions[node.id] = { x: positionX, y: positionY };
 }
 
-export const createNode = (id: string, node_type: string, parentId: string) => {
+export const createNode = (id: string, node_type: INodeTypes, parentId: string) => {
   const dataProps = getNodeDataProps(node_type);
 
   return {
@@ -98,7 +84,7 @@ export const createNode = (id: string, node_type: string, parentId: string) => {
 };
 
 export const transformNodes = (flow: any) => {
-  const positions = {};
+  const positions: Record<string, CoordinateType> = {};
 
   // Initial position for the head node (root)
   const initialPosition = { x: 20, y: window.innerHeight / 2 };
@@ -111,7 +97,7 @@ export const transformNodes = (flow: any) => {
     const node = flow[key];
     return {
       id: node.id,
-      type: nodeTypeMatch[node.node_type],
+      type: NODE_TYPE_MATCH[node.node_type],
       draggable: false,
       data: {
         node_id: node.id,

@@ -2,30 +2,32 @@ import React, { useCallback, useMemo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import NodeWrapper from './node-wrapper';
 import { Button } from '@/components/ui/button';
-import { usePolicyForm } from '@/store/policies/policy-form';
+import { INodeTypes, usePolicyForm } from '@/store/policies/policy-form';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
+import { SwitchNodeCtx } from '../build/[policy_type]/build-option';
 
 export default function SelectNode({ data }: { data: any }) {
-    const policy_flow = usePolicyForm(state => state.policy_flow)
-    const policy_type = usePolicyForm(state => state.policy_type)
+    const { onCreateNode } = React.useContext(SwitchNodeCtx)
 
-    const nodes = useReactflowStore(state => state.nodes)
-    const edges = useReactflowStore(state => state.edges)
-    const setEdges = useReactflowStore(state => state.setEdges)
+    const { policy_type, policy_flow } = usePolicyForm()
 
-    const handleReplaceNode = useCallback((newType: string, label: string |null) => {
+    const { edges, setEdges } = useReactflowStore()
 
-        data.onCreateNode(
-            data.node_id,
-            newType, 
-            data.position, 
-            data.parentId,
-            label
-        );
-    }, [data, policy_flow]);
+    const handleReplaceNode = useCallback((new_type: INodeTypes, label: string |null) => {
+        
+        const { node_id, position, parentId: parent_id } = data;
+        onCreateNode({ 
+            node_id, 
+            new_type, 
+            position, 
+            parent_id, 
+            label 
+        });
+
+    }, [data, onCreateNode]);
 
     const label = useMemo(() => {
-        console.log(data.parentId)
+     
         const parent_node = policy_flow[data.parentId];
         let edgeLabel = 'Yes';
 
@@ -35,9 +37,9 @@ export default function SelectNode({ data }: { data: any }) {
 
         // get edges connected to this parent in reactflow-render-store
         const parent_edges = edges.filter(edge => edge.source === data.parentId);
-        console.log(parent_edges);
 
-        if(parent_edges.length > 1) { // If there is an edge already, its predicted label is Yes
+
+        if(parent_edges.length > 1) {
             edgeLabel = 'No'
         }
 
@@ -59,7 +61,7 @@ export default function SelectNode({ data }: { data: any }) {
 
     }, [data])
 
-    // User input (Upload) can only have action
+
     const isUpload = useMemo(() => {
         if(!data.parentId) return;
 
@@ -76,23 +78,26 @@ export default function SelectNode({ data }: { data: any }) {
                 id={`${data.node_id}-a`}
             />
             
-            {/* <h1 className="text-green text-[10px] satoshi-bold capitalize">Select Option</h1> */}
-            <div className="w-full flex flex-col">
+            <h1 className="text-green text-[10px] satoshi-bold capitalize">Select Option</h1>
+            <div className="w-full flex flex-col gap-y-1">
                 {
                     policy_type === 'product' && (
                         <Button variant='outline'
-                            className={`text-sm ${isUpload? 'opacity-20':''}`}
+                            className={`select-node-btn ${isUpload? 'opacity-20':''}`}
                             onClick={() => handleReplaceNode('user-input', label)}
                             disabled={isUpload}
                         >
-                            User Input
+                            <span className="material-symbols-outlined" style={{fontSize: '13px'}}>
+                                help
+                            </span> User Input
                         </Button>
                     )
                 }
                 <Button variant='outline'
-                    className="text-sm"
+                    className="select-node-btn"
                     onClick={() => handleReplaceNode('action', label)}
                 >
+                    <span className="material-symbols-outlined" style={{fontSize: '13px'}}>autorenew</span>
                     Action
                 </Button>
             </div>

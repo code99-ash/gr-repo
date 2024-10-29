@@ -34,7 +34,7 @@ const top_navs = [
     },
     {
         title: 'Returns Policy', 
-        href: '/returns-policy', 
+        href: '/dashboard/returns-policy', 
         icon: RefreshCw
     },
     {

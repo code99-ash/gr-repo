@@ -10,13 +10,13 @@ import { ProductConditionData } from "@/interfaces/product.interface";
 export interface MyNodeType {
     id: string;
     parent: string | null;
-    node_type: NodeTypes;
+    node_type: INodeTypes;
     data: any;
     branches: BranchType[];
     position?: { x: number; y: number };
 }
 
-type NodeTypes = 'user-input' | 'action' | 'conditions';
+export type INodeTypes = 'user-input' | 'action' | 'conditions';
 export type PolicyTypes = 'product' | 'duration' | 'customer' | 'order';
 
 export interface PolicyFlow {
@@ -32,7 +32,7 @@ interface PolicyFormType {
     setPolicyName: (name: string) => void;
     setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => void;
     setPolicyFlow: (type: PolicyFlow) => void;
-    addNewNode: (node_id: string, node_type: NodeTypes, parent_id: string, label: any) => void;
+    addNewNode: (node_id: string, node_type: INodeTypes, parent_id: string, label: any) => void;
     modifyNode: (node_id: string, data: any) => void;
     removeNode: (node_id: string) => void;
     clearUploadChildren?: (node_id: string) => void;

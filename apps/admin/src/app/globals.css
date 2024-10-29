@@ -133,8 +133,9 @@
 
 .node-wrapper {
   @apply space-y-1 w-[165px] h-[100px] bg-card text-foreground p-2 rounded-xl border 
-  hover:shadow flex flex-col justify-around gap-1;
+  hover:shadow flex flex-col justify-around;
 }
+
 
 .node-wrapper-option {
   @apply flex items-center justify-end absolute top-3 right-2 text-foreground
