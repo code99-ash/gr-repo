@@ -19,7 +19,7 @@ export const NODE_TYPES = {
 export const NODE_TYPE_MATCH: Record<string, string> = {
    'conditions': 'conditionNode',
     'yes_no_question': 'userInputNode',
-    'multiple_choice_question': 's',
+    'multiple_choice_question': 'userInputNode',
     'asset_upload': 'userInputNode',
     'action'    : 'actionNode',
     'select'    : 'selectNode'

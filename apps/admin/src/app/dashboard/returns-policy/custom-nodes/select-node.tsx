@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo } from 'react';
-import { Handle, Position } from '@xyflow/react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Edge, Handle, Position } from '@xyflow/react';
 import NodeWrapper from './node-wrapper';
 import { Button } from '@/components/ui/button';
 import { INodeTypes, usePolicyForm } from '@/store/policies/policy-form';
@@ -19,6 +19,23 @@ const generateUniqueLabel = (existing_labels: string[], length = 6) => {
     return {label, updated: [...existing_labels, label]};
 };
 
+const getYesNoQuestionLabel = (parent_id: string, edges: Edge[]) => {
+
+    const parent_edges = edges.filter(edge => edge.source === parent_id);
+
+
+    const getOppositeOption = (option: string) => {
+        return (!option || option === 'No')? 'Yes' : 'No';
+    }
+
+    if(parent_edges.length <= 1) {
+        return 'Yes';
+    }else {
+        return getOppositeOption(parent_edges[0].label as string);
+    }
+
+}
+
 export default function SelectNode({ data }: { data: any }) {
     const { onCreateNode } = React.useContext(SwitchNodeCtx)
     const policy_flow = usePolicyForm(state => state.policy_flow)
@@ -26,23 +43,14 @@ export default function SelectNode({ data }: { data: any }) {
     const edges = useReactflowStore(state => state.edges)
     const setEdges = useReactflowStore(state => state.setEdges)
 
+    const [is_upload, setIsUpload] = useState(false);
 
-    const getYesNoQuestionLabel = (parent_id: string) => {
+    useEffect(() => {
 
-        const parent_edges = edges.filter(edge => edge.source === parent_id);
-
- 
-        const getOppositeOption = (option: string) => {
-            return (!option || option === 'No')? 'Yes' : 'No';
-        }
-
-        if(parent_edges.length <= 1) {
-            return 'Yes';
-        }else {
-            return getOppositeOption(parent_edges[0].label as string);
-        }
-
-    }
+        const parent_node = policy_flow[data.parentId];
+        setIsUpload(parent_node?.node_type === 'asset_upload')
+        
+    }, [policy_flow, data])
 
    
 
@@ -59,33 +67,21 @@ export default function SelectNode({ data }: { data: any }) {
 
     }, [data, onCreateNode]);
 
-    const parent_node = policy_flow[data.parentId];
-    const node_type = parent_node.node_type;
-
-    const helper = useMemo(() => {
-
-        const isYesNoQuestion = node_type === 'yes_no_question';
-        const isUpload = node_type === 'asset_upload';
-        const isMultipleChoice = node_type === 'multiple_choice_question';
-
-        return { isYesNoQuestion, isUpload, node_type, parent_node, isMultipleChoice };
-
-    }, [data])
-
+      
     const label = useMemo(() => {
+        const parent_node = policy_flow[data.parentId];
 
-        let edgeLabel = null;
+        if(!parent_node) return null
 
-        if(!helper) return edgeLabel;
+        const node_type = parent_node.node_type;
 
-        const { isYesNoQuestion, isMultipleChoice } = helper;
- 
+        let edgeLabel = null; 
         
-        if(isYesNoQuestion) {
-            edgeLabel = getYesNoQuestionLabel(data.parentId);
+        if(node_type === 'yes_no_question') {
+            edgeLabel = getYesNoQuestionLabel(data.parentId, edges);
         }
 
-        if(isMultipleChoice) {
+        if(node_type === 'multiple_choice_question') {
             const existing_labels = edges.filter(edge => edge.source === data.parentId)
                                         .map(edge => edge.label)
                                         .filter(label => label !== null) as string[];
@@ -110,7 +106,7 @@ export default function SelectNode({ data }: { data: any }) {
 
         return edgeLabel;
 
-    }, [data])
+    }, [policy_flow, data])
 
 
     return (
@@ -121,14 +117,14 @@ export default function SelectNode({ data }: { data: any }) {
                 id={`${data.node_id}-a`}
             />
             
-            
-            <div className="w-full flex flex-col">
+            <h1 className="text-xs text-primary satoshi-medium">Select Node</h1>
+            <div className="w-full flex flex-col gap-y-1">
                 {
                     policy_type === 'product' && (
                         <Button variant='outline'
-                            className={`text-sm ${helper?.isUpload? 'opacity-20':''}`}
+                            className={`select-node-btn ${is_upload? 'opacity-20':''}`}
                             onClick={() => handleReplaceNode('yes_no_question', label)}
-                            disabled={helper?.isUpload}
+                            disabled={is_upload}
                         >
                             <span className="material-symbols-outlined" style={{fontSize: '13px'}}>
                                 help

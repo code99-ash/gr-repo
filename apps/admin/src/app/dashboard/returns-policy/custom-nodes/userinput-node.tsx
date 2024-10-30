@@ -6,11 +6,13 @@ import { useReactflowStore } from '@/store/react-flow/reactflow-store';
 import { usePolicyForm } from '@/store/policies/policy-form';
 import { ProductDataType } from '@/interfaces/product.interface';
 
-const nodeTypeMap = {
+const node_type_map = {
     'yes_no_question': 'Yes/No Question',
     'multiple_choice_question': 'Multiple Choice Question',
     'asset_upload': 'Asset Upload'
 }
+
+const question_types = ['yes_no_question', 'multiple_choice_question'];
 
 export default function UserInputNode({ data }: { data: any }) {
     const edges = useReactflowStore(state => state.edges);
@@ -19,7 +21,15 @@ export default function UserInputNode({ data }: { data: any }) {
     const incomplete_nodes = usePolicyForm(state => state.incomplete_nodes);
 
     const flowNode = policy_flow[data.node_id] as ProductDataType
-    
+
+    const [helper, setHelper] = useState({
+        isQuestion: false,
+        branchLength: 0,
+        expectedLength: 0,
+        isConnectable: false
+    })
+
+    // fetching everytime there is a slight change in the flow, useMemo is necessary
     const nodeEdge = useMemo(() => {
         const findAll = edges.filter(each => each.source === data.node_id);
         const findEdge = findAll.find(edge => edge.source === data.node_id);
@@ -27,20 +37,8 @@ export default function UserInputNode({ data }: { data: any }) {
         return findEdge;
     }, [edges, data.node_id])
 
-    
-
-    const helper = useMemo(() => {
-        if(!flowNode) {
-            console.log('No flow node found')
-            return {
-                isQuestion: false,
-                branchLength: 0,
-                expectedLength: 0,
-                isConnectable: false
-            };
-        }
-
-        const question_types = ['yes_no_question', 'multiple_choice_question'];
+    useEffect(() => {
+        if(!flowNode) return;
 
         const isQuestion = question_types.includes(flowNode.node_type)
         const branchLength = flowNode.branches.length;
@@ -50,12 +48,18 @@ export default function UserInputNode({ data }: { data: any }) {
 
         const isConnectable = flowNode.node_type !== 'multiple_choice_question'? edgeCount < expectedLength : true;
 
-        return { isQuestion, branchLength, expectedLength, isConnectable }
-
+        setHelper({
+            isQuestion,
+            branchLength,
+            expectedLength,
+            isConnectable
+        })
+        
     }, [flowNode, edges, data.node_id])
 
-    useEffect(() => {
 
+    useEffect(() => {
+        if(!flowNode) return;
         const { isQuestion, branchLength, expectedLength } = helper;
         const alreadyIdle = incomplete_nodes.includes(data.node_id);
 
@@ -71,7 +75,7 @@ export default function UserInputNode({ data }: { data: any }) {
             }
         }
 
-    }, [flowNode, incomplete_nodes, updateIncomplete, data.node_id]);
+    }, [helper, incomplete_nodes, updateIncomplete]);
 
     return (
         <NodeWrapper node_id={data.node_id}>
@@ -95,12 +99,13 @@ export default function UserInputNode({ data }: { data: any }) {
                         help
                     </span>
                     {
-                        flowNode? nodeTypeMap[flowNode.node_type as keyof typeof nodeTypeMap] : 'User Input'
+                        flowNode? node_type_map[flowNode.node_type as keyof typeof node_type_map] : 'User Input'
                     }
                 </header>
                 <p className="text-[7px]">{data.message || 'Please type in a message'}</p>
             </div>
     
+
             <Handle 
                 position={Position.Right} 
                 type="source"

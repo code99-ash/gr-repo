@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import DeleteNodeConfirm from './delete-node-confirm';
-import { NodeTypes, usePolicyForm } from '@/store/policies/policy-form';
+import { INodeTypes, usePolicyForm } from '@/store/policies/policy-form';
 import { UpdateNodeCtx } from './selected-panel';
 import { ProductDataType } from '@/interfaces/product.interface';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
@@ -88,20 +88,23 @@ export default function UserInputPanel() {
   const edges = useReactflowStore(state => state.edges)
 
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [node_type, setNodeType] = useState<NodeTypes>('yes_no_question');
+  const [node_type, setNodeType] = useState<INodeTypes>('yes_no_question');
   const [node_message, setNodeMessage] = useState<string>('');
 
   useEffect(() => {
+    
     setNodeType(selectedNode.node_type)
     setNodeMessage(selectedNode.data.message)
+
   }, [selectedNode])
 
   useEffect(() => {
     if(node_type === 'asset_upload') {
+      
       clearUploadChildren(selectedNode.id)
 
-    
       updateIncomplete([...incomplete_nodes, selectedNode.id]);
+
     }
 
     const newNode = {
@@ -142,17 +145,10 @@ export default function UserInputPanel() {
       })
 
       modifyNodeBranches(selectedNode.id, branches, newEdges)
-    }
 
-    else if(new_type === 'asset_upload') {
-      clearUploadChildren(selectedNode.id)
-      updateIncomplete([...incomplete_nodes, selectedNode.id]);
-    }
+    }  
 
-    
-
-
-    setNodeType(new_type as NodeTypes)
+    setNodeType(new_type as INodeTypes)
   }
 
   const deleteAnyway = () => {
