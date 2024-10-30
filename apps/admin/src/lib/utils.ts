@@ -16,3 +16,5 @@ export function formatDate(timestamp: string) {
 
   return date.toLocaleDateString('en-US', options).replace(',', '.');
 }
+
+export const PERIODS = ['hours', 'days', 'weeks', 'months', 'years']
