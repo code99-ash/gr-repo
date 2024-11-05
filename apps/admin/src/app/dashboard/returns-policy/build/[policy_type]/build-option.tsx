@@ -93,6 +93,7 @@ export default function BuildOption() {
     const switchToSelectedNode = useCallback((props: SwitchToSelectedNodeProps) => {
         const { node_id, new_type, node_data_props, label, position, parent_id } = props;
         
+        console.log({type: new_type, match: NODE_TYPE_MATCH[new_type]})
         updateNode({
             id: node_id,
             type: NODE_TYPE_MATCH[new_type],

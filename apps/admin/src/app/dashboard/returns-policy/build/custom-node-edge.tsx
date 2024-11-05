@@ -27,16 +27,20 @@ const CustomEdge: FC<EdgeProps<Edge<{ label: string }>>> = ({
     targetPosition,
   });
 
-  const label_bg = useMemo(() => {
-    switch(data?.label) {
-      case 'Yes': 
-        return 'bg-primary';
-      case 'No': 
-        return 'bg-destructive';
-      default: 
-        return 'bg-background border border-border';
-    }
-  }, [data?.label])
+  const bg_options = {
+    'Yes': 'bg-primary',
+    'No': 'bg-destructive'
+  }
+
+  if(!data) {
+    return null;
+  }
+
+  const label_bg = bg_options[data.label as keyof typeof bg_options] ? 
+                  bg_options[data.label as keyof typeof bg_options] : 
+                  'bg-background border border-border'
+
+
 
   return (
     <>
