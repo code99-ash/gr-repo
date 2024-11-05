@@ -1,50 +1,31 @@
 'use client';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Edge, Handle, Position } from '@xyflow/react';
+import React, { useEffect, useState } from 'react';
+import { Handle, Position } from '@xyflow/react';
 import NodeWrapper from '../node-wrapper';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
-import { usePolicyForm } from '@/store/policies/policy-form';
-import { ProductDataType } from '@/interfaces/product.interface';
 import { useIncompleteNodes } from '@/hooks/use-incomplete';
+import { useNodeEdge } from '@/hooks/use-node-edge';
+import { useBranchwatch } from '@/hooks/use-branch-watch';
 
 const MAX_BRANCHES = 2;
 
 export default function YesNoQuestionNode({ data }: { data: any }) {
-    const edges = useReactflowStore(state => state.edges);
-    const policy_flow = usePolicyForm(state => state.policy_flow);
-    const {validateNode} = useIncompleteNodes()
-    
-    const flowNode = policy_flow[data.node_id] as ProductDataType
-
-    const [nodeEdge, setNodeEdge] = useState<Edge | null>(null)
-    const [helper, setHelper] = useState({
-        branchLength: 0,
-        isConnectable: false
+    const { nodeEdge } = useNodeEdge(data.node_id)
+    const { branch_length, is_connectable } = useBranchwatch(data.node_id, { 
+        threshold: MAX_BRANCHES, 
+        operator: '<' 
     })
+    const { validateNode } = useIncompleteNodes()
+   
     
     useEffect(() => {
-        
-        const edge = edges.find(each => each.source === data.node_id);
-        setNodeEdge(edge || null)
 
-    }, [edges, data.node_id])
+        validateNode(
+            data.node_id, 
+            branch_length === MAX_BRANCHES && data.message.trim()
+        )
 
-    useEffect(() => {
-        if(!flowNode) return;
-
-        const branchLength = flowNode.branches.length;
-        const edgeCount = edges.filter(each => each.source === data.node_id).length;
-
-        const isConnectable = edgeCount < MAX_BRANCHES
-
-        setHelper({ branchLength, isConnectable })
-        
-    }, [flowNode, edges])
-    
-    
-    useEffect(() => {
-        validateNode(data.node_id, helper.branchLength === MAX_BRANCHES && data.message.trim())
-    }, [helper, data])
+    }, [branch_length, data])
 
     return (
         <NodeWrapper node_id={data.node_id}>
@@ -77,7 +58,7 @@ export default function YesNoQuestionNode({ data }: { data: any }) {
                 position={Position.Right} 
                 type="source"
                 id={`${data.node_id}-right`}
-                isConnectable={helper.isConnectable}
+                isConnectable={is_connectable}
                 isConnectableStart={true}
                 isConnectableEnd={false}
             />
