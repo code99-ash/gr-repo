@@ -40,7 +40,7 @@ export const SwitchNodeCtx = React.createContext<SwitchNodeCtxType>({
 })
 
 export default function BuildOption() {
-    const { screenToFlowPosition, getViewport } = useReactFlow();
+    const { getViewport } = useReactFlow();
     const { addNewNode } = usePolicyForm();
     const {
         viewport,
@@ -92,12 +92,11 @@ export default function BuildOption() {
 
     const switchToSelectedNode = useCallback((props: SwitchToSelectedNodeProps) => {
         const { node_id, new_type, node_data_props, label, position, parent_id } = props;
-        
-        console.log({type: new_type, match: NODE_TYPE_MATCH[new_type]})
+
         updateNode({
             id: node_id,
             type: NODE_TYPE_MATCH[new_type],
-            node_type: 'user-input',
+            node_type: new_type,
             draggable: false,
             data: { node_id, ...node_data_props },
             label,
@@ -105,7 +104,7 @@ export default function BuildOption() {
         });
 
         addNewNode(node_id, new_type, parent_id, label);
-        console.log('Node switched to:', new_type);
+        
     }, [addNewNode, updateNode]);
 
     const onCreateNode = useCallback(({ node_id, new_type, position, parent_id, label }: OnCreateNodeProps) => {

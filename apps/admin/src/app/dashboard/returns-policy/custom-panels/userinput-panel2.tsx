@@ -113,6 +113,7 @@ export default function UserInputPanel() {
       node_type
     }
 
+    console.log('node type changed', node_type)
     updateNode(newNode)
 
   }, [node_type, node_message])
@@ -120,7 +121,6 @@ export default function UserInputPanel() {
   const handleNodeTypeChange = (new_type: string) => {
 
     const renderedEdges = edges.filter(each => each.source === selectedNode.id);
-
     
     if(new_type === 'yes_no_question') {
 

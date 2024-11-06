@@ -9,9 +9,7 @@ interface ConditionConfig {
 }
 
 
-export function useBranchwatch(node_id: string, conditionConfig: ConditionConfig) {
-
-    const {operator, threshold} = conditionConfig;
+export function useBranchwatch(node_id: string, conditionConfig?: ConditionConfig) {
 
     const edges = useReactflowStore(state => state.edges);
     const { flow_node } = useNodeEdge(node_id)
@@ -20,6 +18,10 @@ export function useBranchwatch(node_id: string, conditionConfig: ConditionConfig
     const [is_connectable, setIsConnectable] = useState(false);
 
     const evaluateCondition = (edgeCount: number) => {
+        if(!conditionConfig) return true;
+
+        const {operator, threshold} = conditionConfig;
+        
         switch (operator) {
             case '<':
                 return edgeCount < threshold;

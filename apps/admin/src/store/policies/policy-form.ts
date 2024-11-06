@@ -18,10 +18,10 @@ export interface NodeObjectType {
 }
 
 export type INodeTypes =    'yes_no_question' | 
-                    'multiple_choice_question' | 
-                    'asset_upload' | 
-                    'action' | 
-                    'conditions';
+                            'multiple_choice_question' | 
+                            'asset_upload' | 
+                            'action' | 
+                            'conditions';
 
 export type PolicyTypes = 'product' | 'duration' | 'customer' | 'order';
 
@@ -38,6 +38,7 @@ interface PolicyFormType {
     setPolicyName: (name: string) => void;
     setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => void;
     setPolicyFlow: (type: PolicyFlow) => void;
+    changeNodeType: (node_id: string, node_type: INodeTypes) => void;
     addNewNode: (node_id: string, node_type: INodeTypes, parent_id: string, label: any) => void;
     modifyNode: (node_id: string, data: any, node_type?: INodeTypes) => void;
     modifyNodeBranches: (node_id: string, branches: BranchType[], edges: Edge[], isYesNo?: boolean) => void;
@@ -183,6 +184,28 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
         })
 
         useReactflowStore.getState().initializeGraph(get().policy_flow)
+    },
+
+    changeNodeType: (node_id: string, node_type: INodeTypes) => {
+        set((state: PolicyState) => ({
+            policy_flow: {
+                ...state.policy_flow,
+                [node_id]: {
+                    ...state.policy_flow[node_id],
+                    node_type
+                }
+            }
+        }))
+
+        console.log('In ChangeNodeType method')
+        console.log({
+            selected: node_id, 
+            node_type: node_type
+        })
+        console.log(get().policy_flow)
+
+        useReactflowStore.getState().initializeGraph(get().policy_flow);
+        useReactflowStore.getState().layoutGraph();
     },
 
     selectNode: (node: NodeObjectType | null) => {

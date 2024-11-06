@@ -1,11 +1,11 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import NodeWrapper from '../node-wrapper';
-import { useReactflowStore } from '@/store/react-flow/reactflow-store';
 import { useIncompleteNodes } from '@/hooks/use-incomplete';
 import { useNodeEdge } from '@/hooks/use-node-edge';
 import { useBranchwatch } from '@/hooks/use-branch-watch';
+import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 
 const MAX_BRANCHES = 2;
 
@@ -40,14 +40,9 @@ export default function YesNoQuestionNode({ data }: { data: any }) {
     
  
             <h1 className="text-primary text-[10px] satoshi-bold capitalize">User Input</h1>
-            <div className="w-full grow border rounded p-2 space-y-1">
-                <header className="flex items-center gap-1 capitalize text-[7px]">
-                    <span 
-                        className="material-symbols-outlined"
-                        style={{ fontSize: '8px' }}
-                    >
-                        help
-                    </span>
+            <div className="w-full grow border rounded p-2 space-y-1 bg-accent">
+                <header className="flex items-center gap-1 satoshi-medium capitalize text-[7px]">
+                    <QuestionMarkCircledIcon width={10} height={10} />
                     Yes/No Question
                 </header>
                 <p className="text-[7px]">{data.message || 'Please type in a message'}</p>

@@ -1,9 +1,9 @@
 import React, { createContext } from 'react'
 import RootConditionPanel from './condition-panel/root-cond-panel';
-import UserInputPanel from './userinput-panel';
 import ActionPanel from './action-panel';
 import { INodeTypes, usePolicyForm } from '@/store/policies/policy-form';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
+import RootInputPanel from './userinput-panel/root-panel';
 
 
 interface UpdateNodeContextType {
@@ -45,9 +45,9 @@ export default function SelectedPanel() {
     if(!selectedNode) return null;
 
     const activePanel = {
-        asset_upload: <UserInputPanel />,
-        yes_no_question: <UserInputPanel />,
-        multiple_choice_question: <UserInputPanel />,
+        asset_upload: <RootInputPanel />,
+        yes_no_question: <RootInputPanel />,
+        multiple_choice_question: <RootInputPanel />,
         action: <ActionPanel />,
         conditions: <RootConditionPanel />
     }[selectedNode.node_type]
