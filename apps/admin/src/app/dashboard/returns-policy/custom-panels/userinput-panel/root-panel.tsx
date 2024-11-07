@@ -1,11 +1,12 @@
 'use client';
 import React, { useContext, useEffect, useState } from 'react';
 import { Textarea } from "@/components/ui/textarea"
-import { INodeTypes, usePolicyForm } from '@/store/policies/policy-form';
+import { usePolicyForm } from '@/store/policies/policy-form';
 import { ProductDataType } from '@/interfaces/product.interface';
 import { UpdateNodeCtx } from '../selected-panel';
 import { CameraIcon, QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 import SwitchInputType from './switch-input-type';
+import YesNoBranches from './yes-no-branches';
 export default function RootInputPanel() {
   const { updateNode } = useContext(UpdateNodeCtx)
   const selectedNode = usePolicyForm(state => state.selectedNode) as ProductDataType
@@ -35,10 +36,10 @@ export default function RootInputPanel() {
         User Input
       </header>
 
-      <main className='border rounded-xl p-3 space-y-3'>
+      <main className='border rounded-xl p-3 space-y-1'>
         <SwitchInputType />
 
-        <section className='space-y-1 py-5'>
+        <section className='space-y-1 py-1'>
           <h4 className='text-grey text-sm'>Message</h4>
           <Textarea 
             placeholder="Type your message here." 
@@ -47,6 +48,8 @@ export default function RootInputPanel() {
             onChange={(e) => handleMessageChange(e.target.value)}
           />
         </section>
+
+        <YesNoBranches />
 
         
       </main>

@@ -1,4 +1,4 @@
-import React, { useMemo, type FC } from 'react';
+import React, { type FC } from 'react';
 import {
   getBezierPath,
   EdgeLabelRenderer,
@@ -6,6 +6,12 @@ import {
   type EdgeProps,
   type Edge,
 } from '@xyflow/react';
+import { useReactflowStore } from '@/store/react-flow/reactflow-store';
+
+const yes_no_options: Record<any, string> = {
+  'Yes': 'bg-primary text-white',
+  'No': 'bg-destructive text-white'
+}
 
 const CustomEdge: FC<EdgeProps<Edge<{ label: string }>>> = ({
   id,
@@ -17,6 +23,9 @@ const CustomEdge: FC<EdgeProps<Edge<{ label: string }>>> = ({
   targetPosition,
   data,
 }) => {
+  const edges = useReactflowStore(state => state.edges);
+  const edge = edges.find(each => each.id === id);
+
   // Get the bezier path for edge positioning
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -27,20 +36,11 @@ const CustomEdge: FC<EdgeProps<Edge<{ label: string }>>> = ({
     targetPosition,
   });
 
-  const bg_options = {
-    'Yes': 'bg-primary',
-    'No': 'bg-destructive'
-  }
+  
 
-  if(!data) {
-    return null;
-  }
+  if(!data || !edge) return null;
 
-  const label_bg = bg_options[data.label as keyof typeof bg_options] ? 
-                  bg_options[data.label as keyof typeof bg_options] : 
-                  'bg-background border border-border'
-
-
+  let label_bg = yes_no_options[edge.label as string] ?? 'bg-background'
 
   return (
     <>

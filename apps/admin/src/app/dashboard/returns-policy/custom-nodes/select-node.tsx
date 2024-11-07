@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Edge, Handle, Position } from '@xyflow/react';
 import NodeWrapper from './node-wrapper';
@@ -5,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { INodeTypes, usePolicyForm } from '@/store/policies/policy-form';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
 import { SwitchNodeCtx } from '../build/[policy_type]/build-option';
+import { useNodeEdge } from '@/hooks/use-node-edge';
 
 const generateUniqueLabel = (existing_labels: string[], length = 6) => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -21,18 +24,9 @@ const generateUniqueLabel = (existing_labels: string[], length = 6) => {
 
 const getYesNoQuestionLabel = (parent_id: string, edges: Edge[]) => {
 
-    const parent_edges = edges.filter(edge => edge.source === parent_id);
-
-
-    const getOppositeOption = (option: string) => {
-        return (!option || option === 'No')? 'Yes' : 'No';
-    }
-
-    if(parent_edges.length <= 1) {
-        return 'Yes';
-    }else {
-        return getOppositeOption(parent_edges[0].label as string);
-    }
+    const parent_edge = edges.find(edge => edge.source === parent_id);
+  
+    return (parent_edge?.label === 'Yes')? 'No' : 'Yes'
 
 }
 
@@ -43,16 +37,13 @@ export default function SelectNode({ data }: { data: any }) {
     const edges = useReactflowStore(state => state.edges)
     const setEdges = useReactflowStore(state => state.setEdges)
 
-    const [is_upload, setIsUpload] = useState(false);
 
-    useEffect(() => {
+    const parent_node = policy_flow[data.parentId];
+    const is_upload = parent_node.node_type === 'asset_upload';
 
-        const parent_node = policy_flow[data.parentId];
-        setIsUpload(parent_node?.node_type === 'asset_upload')
-        
-    }, [policy_flow, data])
-
-   
+    
+    // const parent_edges = useMemo(() => edges.filter(edge => edge.source === data.parentId), [edges])
+    // const parent_branches = parent_node['branches'];
 
     const handleReplaceNode = useCallback((new_type: INodeTypes, label: string |null) => {
         
@@ -67,6 +58,17 @@ export default function SelectNode({ data }: { data: any }) {
 
     }, [data, onCreateNode]);
 
+    // const label = useMemo(() => {
+    //     let edge_label = 'Hey';
+
+    //     if(parent_node.node_type === 'yes_no_question') {
+
+    //     }
+
+
+    //     return edge_label;
+    // }, [policy_flow, data])
+
       
     const label = useMemo(() => {
         const parent_node = policy_flow[data.parentId];
@@ -78,6 +80,12 @@ export default function SelectNode({ data }: { data: any }) {
         let edgeLabel = null; 
         
         if(node_type === 'yes_no_question') {
+
+            const parent_edges = edges.filter(edge => edge.source === data.parentId);
+            const one_not_connected = parent_edges.some(edge => !edge.label);
+
+            if(parent_node.branches.length === 2 && !one_not_connected) return;
+
             edgeLabel = getYesNoQuestionLabel(data.parentId, edges);
         }
 
@@ -107,6 +115,7 @@ export default function SelectNode({ data }: { data: any }) {
         return edgeLabel;
 
     }, [policy_flow, data])
+
 
 
     return (

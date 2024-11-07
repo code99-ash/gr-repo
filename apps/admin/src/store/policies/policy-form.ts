@@ -221,7 +221,10 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
                     id: node_id,
                     parent: parent_id,
                     node_type: node_type,
-                    branches: [],
+                    branches: [
+                        {label: 'Yes', node_id: ''},
+                        {label: 'No', node_id: ''},
+                    ],
                     data: getNodeDataProps(node_type),
                     position: { x: 0, y: 0 }
                 }
