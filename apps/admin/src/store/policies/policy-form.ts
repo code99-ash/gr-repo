@@ -187,22 +187,31 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
     },
 
     changeNodeType: (node_id: string, node_type: INodeTypes) => {
+        
+        const node = get().policy_flow[node_id];
+
+        let valid_branches = node.branches;
+
+        if(node_type === 'yes_no_question') {
+            valid_branches = valid_branches.map((each, index) => index < 2? each : null)
+                                .filter(branch => branch !== null)
+        }
+
+        else if(node_type === 'asset_upload') {
+            valid_branches = valid_branches.map((each, index) => index < 1? each : null)
+                                .filter(branch => branch !== null)
+        }
+
         set((state: PolicyState) => ({
             policy_flow: {
                 ...state.policy_flow,
                 [node_id]: {
                     ...state.policy_flow[node_id],
-                    node_type
+                    node_type,
+                    branches: valid_branches
                 }
             }
         }))
-
-        console.log('In ChangeNodeType method')
-        console.log({
-            selected: node_id, 
-            node_type: node_type
-        })
-        console.log(get().policy_flow)
 
         useReactflowStore.getState().initializeGraph(get().policy_flow);
         useReactflowStore.getState().layoutGraph();
@@ -221,10 +230,7 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
                     id: node_id,
                     parent: parent_id,
                     node_type: node_type,
-                    branches: [
-                        {label: 'Yes', node_id: ''},
-                        {label: 'No', node_id: ''},
-                    ],
+                    branches: [],
                     data: getNodeDataProps(node_type),
                     position: { x: 0, y: 0 }
                 }

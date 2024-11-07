@@ -49,7 +49,11 @@ export default function RootInputPanel() {
           />
         </section>
 
-        <YesNoBranches />
+        {
+          selectedNode.node_type === 'yes_no_question' && (
+            <YesNoBranches />
+          )
+        }
 
         
       </main>

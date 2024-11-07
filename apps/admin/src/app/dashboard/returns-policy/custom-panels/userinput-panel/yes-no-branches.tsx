@@ -14,8 +14,6 @@ export default function YesNoBranches() {
     return branch.label?.toLowerCase() === option && !!branch.node_id;
   }
 
-  console.log(flow_node)
-
   return (
     <section className="flex flex-col gap-3">
       <div className='flex items-center gap-2'>
