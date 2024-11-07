@@ -38,12 +38,11 @@ interface PolicyFormType {
     setPolicyName: (name: string) => void;
     setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => void;
     setPolicyFlow: (type: PolicyFlow) => void;
-    changeNodeType: (node_id: string, node_type: INodeTypes) => void;
+    changeNodeType: (node_id: string, node_type: INodeTypes, branch_limit?: number) => void;
     addNewNode: (node_id: string, node_type: INodeTypes, parent_id: string, label: any) => void;
     modifyNode: (node_id: string, data: any, node_type?: INodeTypes) => void;
     modifyNodeBranches: (node_id: string, branches: BranchType[], edges: Edge[], isYesNo?: boolean) => void;
     removeNode: (node_id: string) => void;
-    clearUploadChildren: (node_id: string) => void;
     getConditionData: (policy_type: PolicyTypes) => any;
     defaultOrderCondition: () => OrderConditionData;
     defaultCustomerCondition: () => CustomerConditionData;
@@ -186,21 +185,32 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
         useReactflowStore.getState().initializeGraph(get().policy_flow)
     },
 
-    changeNodeType: (node_id: string, node_type: INodeTypes) => {
+    changeNodeType: (node_id: string, node_type: INodeTypes, branch_limit?: number) => {
         
         const node = get().policy_flow[node_id];
 
-        let valid_branches = node.branches;
 
-        if(node_type === 'yes_no_question') {
-            valid_branches = valid_branches.map((each, index) => index < 2? each : null)
-                                .filter(branch => branch !== null)
+        let valid_branches = [...node.branches];
+        let ignored_branches = new Array();
+
+        if(branch_limit) {
+            valid_branches = valid_branches.slice(0, branch_limit).filter(branch => branch !== null)
+            const [ ...rest ] = node.branches.slice(branch_limit);
+
+            ignored_branches = rest;
         }
 
-        else if(node_type === 'asset_upload') {
-            valid_branches = valid_branches.map((each, index) => index < 1? each : null)
-                                .filter(branch => branch !== null)
+        if(node_type === 'asset_upload') {
+            valid_branches = valid_branches.map(each => ({...each, label: null}))
         }
+
+
+        ignored_branches.forEach((branch: BranchType) => {
+            if(get().policy_flow[branch.node_id]) {
+                get().removeNode(branch.node_id)
+            }
+        })
+
 
         set((state: PolicyState) => ({
             policy_flow: {
@@ -363,43 +373,5 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
         });
 
     },
-    clearUploadChildren: (node_id: string) => {
-        set((state: PolicyState) => {
-            const policy_flow = state.policy_flow
-            const node = policy_flow[node_id];
-
-
-            // Recursively remove child nodes
-            const removeBranchNodes = (branches: BranchType[]) => {
-                branches.forEach((branch) => {
-                    const childNodeId = branch.node_id;
-                    if (policy_flow[childNodeId]) {
-                        // remove from incomplete nodes if it exists;
-                        if(get().incomplete_nodes.includes(childNodeId)) {
-                            const filtered = get().incomplete_nodes.filter(id => id !== childNodeId);
-                            get().updateIncomplete(filtered)
-                        }
-                        removeBranchNodes(policy_flow[childNodeId].branches); // Recursively remove child branches
-                        delete policy_flow[childNodeId]; // Delete the child node
-                    }
-                });
-            };
-
-            // Remove all branches connected to the current node
-            if(node.branches) {
-                removeBranchNodes(node.branches);
-            }
-
-            // cleanup branches
-            node.branches = []
-            
-            // Update the graph with the modified policy_flow
-            useReactflowStore.getState().initializeGraph(policy_flow);
-            useReactflowStore.getState().layoutGraph();
-
-            return { policy_flow: policy_flow };
-        })
-    }
-
     
 }));

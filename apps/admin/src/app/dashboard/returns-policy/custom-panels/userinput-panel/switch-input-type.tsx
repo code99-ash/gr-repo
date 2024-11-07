@@ -11,31 +11,29 @@ import {
 import { INodeTypes, usePolicyForm } from '@/store/policies/policy-form';
 import { ProductDataType } from '@/interfaces/product.interface';
 import { input_types } from './utils';
-import { useIncompleteNodes } from '@/hooks/use-incomplete';
 
+const type_branch_limit: Record<INodeTypes, number> = {
+  "yes_no_question": 2,
+  "asset_upload": 1,
+  "action": 0,
+  "conditions": 0,
+  "multiple_choice_question": Infinity
+}
 
 
 export default function SwitchInputType() {
   const selected_node = usePolicyForm(state => state.selectedNode) as ProductDataType;
   const selectNode = usePolicyForm(state => state.selectNode);
   const changeNodeType = usePolicyForm(state => state.changeNodeType);
-  const clearUploadChildren = usePolicyForm(state => state.clearUploadChildren);
-  const { recordAsIncomplete } = useIncompleteNodes()
 
   const [node_type, setNodeType] = useState(selected_node.node_type);
 
   const handleNodeTypeChange = (value: INodeTypes) => {
     setNodeType(value);
 
-    changeNodeType(selected_node.id, value)
+    changeNodeType(selected_node.id, value, type_branch_limit[value])
 
     selectNode({...selected_node, node_type: value})
-
-    if(value === 'asset_upload') {
-        clearUploadChildren(selected_node.id)
-        recordAsIncomplete(selected_node.id);
-    }
-
   }
 
   return (
