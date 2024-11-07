@@ -56,6 +56,7 @@ const BranchLabel = ({ branch, updateLabel, branches }: BranchLabelProp ) => {
     }
 
     updateLabel(branch.node_id, label)
+    setEdit(false)
   }
 
   return (
