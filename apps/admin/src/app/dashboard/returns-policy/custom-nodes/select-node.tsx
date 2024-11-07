@@ -67,8 +67,6 @@ export default function SelectNode({ data }: { data: any }) {
 
         
         if(parent_node_type === 'yes_no_question') {
-            const connected_parent_edge = edges.find(edge => edge.source === data.parentId && edge.target === data.node_id);
-            console.log('connected_parent_edge', connected_parent_edge)
 
             const parent_edges = edges.filter(edge => edge.source === data.parentId);
             const one_not_connected = parent_edges.some(edge => !edge.label);
@@ -121,7 +119,7 @@ export default function SelectNode({ data }: { data: any }) {
                     policy_type === 'product' && (
                         <Button variant='outline'
                             className={`select-node-btn ${parent_is_upload? 'opacity-20':''}`}
-                            onClick={() => handleReplaceNode('yes_no_question', label)}
+                            onClick={() => handleReplaceNode('yes_no_question', label ?? null)}
                             disabled={parent_is_upload}
                         >
                             <span className="material-symbols-outlined" style={{fontSize: '13px'}}>
@@ -132,7 +130,7 @@ export default function SelectNode({ data }: { data: any }) {
                 }
                 <Button variant='outline'
                     className="select-node-btn"
-                    onClick={() => handleReplaceNode('action', label)}
+                    onClick={() => handleReplaceNode('action', label ?? null)}
                 >
                     <span className="material-symbols-outlined" style={{fontSize: '13px'}}>autorenew</span>
                     Action
