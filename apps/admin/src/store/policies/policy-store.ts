@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { PolicyFlow, PolicyTypes } from "./policy-form";
-import { PolicyListType } from '@/store/policies/policy-store';
 
 type PolicyStatus = 'draft' | 'published' | 'active';
 

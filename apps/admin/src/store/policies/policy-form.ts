@@ -133,7 +133,6 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
     },
     setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => {
 
-        // Refresh react-flow rendered nodes & edges
         useReactflowStore.getState().setNodes([])
         useReactflowStore.getState().setEdges([])
 
@@ -152,7 +151,7 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
                 }
             }
     
-            if(type === "duration") { // Add decline action by Default
+            if(type === "duration") {
     
                 const uid = new Date().getTime().toString();
                 const actionNode: NodeObjectType = {
@@ -347,17 +346,14 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
             const { [node_id]: nodeToRemove, ...rest } = state.policy_flow;
             const nodeParentId = nodeToRemove.parent;
 
-            // remove from incomplete nodes if it exists;
             if(get().incomplete_nodes.includes(node_id)) {
                 const filtered = get().incomplete_nodes.filter(id => id !== node_id);
                 get().updateIncomplete(filtered)
             }
 
-            // Remove node from parent branches
             if (nodeParentId) {
                 const parentNode = state.policy_flow[nodeParentId];
 
-                // Update branches of the parent node
                 const updatedBranches = parentNode.branches.filter((each: BranchType) => each.node_id !== node_id);
 
                 rest[nodeParentId] = {
@@ -366,28 +362,25 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
                 };
             }
 
-            // Recursively remove child nodes
             const removeBranchNodes = (branches: BranchType[]) => {
                 branches.forEach((branch) => {
                     const childNodeId = branch.node_id;
                     if (rest[childNodeId]) {
-                        // remove from incomplete nodes if it exists;
+           
                         if(get().incomplete_nodes.includes(childNodeId)) {
                             const filtered = get().incomplete_nodes.filter(id => id !== childNodeId);
                             get().updateIncomplete(filtered)
                         }
-                        removeBranchNodes(rest[childNodeId].branches); // Recursively remove child branches
-                        delete rest[childNodeId]; // Delete the child node
+                        removeBranchNodes(rest[childNodeId].branches);
+                        delete rest[childNodeId];
                     }
                 });
             };
 
-            // Remove all branches connected to the current node
             if(nodeToRemove.branches) {
                 removeBranchNodes(nodeToRemove.branches);
             }
 
-            // Update the graph with the modified policy_flow
             useReactflowStore.getState().initializeGraph(rest);
             useReactflowStore.getState().layoutGraph();
 

@@ -1,11 +1,11 @@
 import { create } from 'zustand';
-import dagre from 'dagre'; // Import Dagre for layout calculation
+import dagre from 'dagre';
 import { addEdge, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 
 import { type AppState } from './types';
 import { transformEdges, transformNodes } from '@/lib/reactflow-resolver';
 
-// Initial nodes and edges getter with checks for undefined or null values
+
 const getInitialNodes = (option_flow: any) => option_flow ? transformNodes(option_flow) : [];
 const getInitialEdges = (option_flow: any) => option_flow ? transformEdges(option_flow) : [];
 
@@ -28,7 +28,7 @@ export const useReactflowStore = create<AppState>((set, get) => ({
         set({
             nodes: applyNodeChanges(changes, get().nodes),
         });
-        get().layoutGraph(); // Call layout Graph after node changes
+        get().layoutGraph();
     },
 
     onEdgesChange: (changes: any) => {
@@ -36,7 +36,7 @@ export const useReactflowStore = create<AppState>((set, get) => ({
             edges: applyEdgeChanges(changes, get().edges),
         });
  
-        get().layoutGraph(); // Call layoutGraph after edge changes
+        get().layoutGraph();
     },
 
     onConnect: (connection: any) => {
