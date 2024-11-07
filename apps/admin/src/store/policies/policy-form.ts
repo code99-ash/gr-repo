@@ -236,8 +236,6 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
             each.node_id === branch_id? {...each, label} : each
         ))
 
-        console.log(targetNode)
-
         set({ policy_flow: { ...get().policy_flow, [node_id]: targetNode } })
 
         const current_edges = useReactflowStore.getState().edges;
