@@ -17,7 +17,6 @@ export default function MultiChoiceQuestion({ data }: { data: any }) {
 
     useEffect(() => {
 
-        console.log('Multiple input node branch length', branch_length)
         validateNode(data.node_id, branch_length >= MIN_BRANCHES && data.message.trim())
 
     }, [branch_length, data])

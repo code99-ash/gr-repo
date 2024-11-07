@@ -39,6 +39,7 @@ interface PolicyFormType {
     setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => void;
     setPolicyFlow: (type: PolicyFlow) => void;
     changeNodeType: (node_id: string, node_type: INodeTypes, branch_limit?: number) => void;
+    updateBranchLabel: (node_id: string, branch_id: string, label: string) => void;
     addNewNode: (node_id: string, node_type: INodeTypes, parent_id: string, label: any) => void;
     modifyNode: (node_id: string, data: any, node_type?: INodeTypes) => void;
     modifyNodeBranches: (node_id: string, branches: BranchType[], edges: Edge[], isYesNo?: boolean) => void;
@@ -225,6 +226,29 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
 
         useReactflowStore.getState().initializeGraph(get().policy_flow);
         useReactflowStore.getState().layoutGraph();
+    },
+
+    updateBranchLabel: (node_id, branch_id, label) => {
+
+        const targetNode = get().policy_flow[node_id];
+        
+        targetNode.branches = targetNode.branches.map(each => (
+            each.node_id === branch_id? {...each, label} : each
+        ))
+
+        console.log(targetNode)
+
+        set({ policy_flow: { ...get().policy_flow, [node_id]: targetNode } })
+
+        const current_edges = useReactflowStore.getState().edges;
+
+        useReactflowStore.getState().setEdges(current_edges.map(edge => {
+            if(edge.target === branch_id) {
+                edge = {...edge, label, data: { label }}
+            }
+
+            return edge;
+        }))
     },
 
     selectNode: (node: NodeObjectType | null) => {

@@ -7,6 +7,7 @@ import { UpdateNodeCtx } from '../selected-panel';
 import { CameraIcon, QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 import SwitchInputType from './switch-input-type';
 import YesNoBranches from './yes-no-branches';
+import MultpleChoiceBranches from './multiple-choice-branches';
 export default function RootInputPanel() {
   const { updateNode } = useContext(UpdateNodeCtx)
   const selectedNode = usePolicyForm(state => state.selectedNode) as ProductDataType
@@ -47,16 +48,13 @@ export default function RootInputPanel() {
             value={node_message}
             onChange={(e) => handleMessageChange(e.target.value)}
           />
-        </section>
-
-        {
-          selectedNode.node_type === 'yes_no_question' && (
-            <YesNoBranches />
-          )
-        }
-
-        
+        </section>      
       </main>
+
+      {
+        selectedNode.node_type === 'yes_no_question'? <YesNoBranches /> : <MultpleChoiceBranches />
+      }
+
     </div>
   );
 }
