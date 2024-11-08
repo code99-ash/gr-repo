@@ -42,10 +42,6 @@ export default function SelectNode({ data }: { data: any }) {
 
     const parent_is_upload = parent_node_type === 'asset_upload';
 
-    
-    // const parent_edges = useMemo(() => edges.filter(edge => edge.source === data.parentId), [edges])
-    // const parent_branches = parent_node['branches'];
-
     const handleReplaceNode = useCallback((new_type: INodeTypes, label: string |null) => {
         
         const { node_id, position, parentId: parent_id } = data;

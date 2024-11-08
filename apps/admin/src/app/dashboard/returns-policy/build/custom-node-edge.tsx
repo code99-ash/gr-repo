@@ -43,7 +43,7 @@ const CustomEdge: FC<EdgeProps<Edge<{ label: string }>>> = ({
   
   const parent_type = policy_flow[edge.source].node_type
 
-  let label_bg = parent_type === "yes_no_question"? yes_no_options[edge.label as string] : 'bg-background'
+  const label_bg = parent_type === "yes_no_question"? yes_no_options[edge.label as string] : 'bg-background'
 
   return (
     <>
