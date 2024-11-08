@@ -2,20 +2,16 @@
 import React, { useContext, useEffect, useState } from 'react';
 
 import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Input } from "@/components/ui/input"
 import { Button } from '@/components/ui/button';
-import { Checkbox } from "@/components/ui/checkbox"
+import { Card } from '@/components/ui/card';
+import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 import { ProductConditionType } from '@/interfaces/product.interface';
 import { usePolicyForm } from '@/store/policies/policy-form';
 import { UpdateNodeCtx } from '../selected-panel';
+import { CheckCheck } from 'lucide-react';
 
-const rulings = [
-  { code: 'any', label: 'ANY condition selected' },
-  { code: 'all', label: 'ALL conditions selected' },
-];
-
-const defaultConditions = [
+const suggestions = [
   'Damaged',
   'Personalized Product',
   'Non-Refundable',
@@ -23,59 +19,41 @@ const defaultConditions = [
   'Product not as described',
   'Opened but unused',
   'Missing item',
-  'Used', // fixed typo 'Userd'
+  'Used',
 ];
 
 export default function ProductConditionPanel() {
   const { updateNode } = useContext(UpdateNodeCtx)
-  const [activeRuling, setActiveRuling] = useState('any');
-  const selectedNode = usePolicyForm(state => state.selectedNode) as ProductConditionType
+  const selectedNode = usePolicyForm(state => state.selectedNode) as ProductConditionType;
 
-  const [defaultUsed, setDefaultUsed] = useState<string[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+
+  const [condition, setCondition] = useState<string>('');
   const [form, setForm] = useState<string>('');
 
   useEffect(() => {
-    console.log(selectedNode)
-    setCategories(selectedNode.data.list || []);
-    setActiveRuling(selectedNode.data.ruling || 'any');
+    const initialCondition = selectedNode?.data?.list[0] || suggestions[0]
+    setCondition(initialCondition);
   }, [selectedNode]);
 
-  const updateCategory = (category: string) => {
-    setDefaultUsed((prev) => {
-      if (prev.includes(category)) {
-        return prev.filter((c) => c !== category); // Remove if already selected
-      } else {
-        return [...prev, category]; // Add if not selected
-      }
-    });
+  useEffect(() => {
+    const updatedNode = {
+      ...selectedNode,
+      data: { ruling: 'all', list: [condition] }
+    };
+    updateNode(updatedNode);
+  }, [condition]);
+
+  const handleSelectChange = (selectedCondition: string) => {
+    setCondition(selectedCondition);
   };
 
-  useEffect(() => {
-    const newNode = {
-      ...selectedNode,
-      data: { ruling: activeRuling, list: [...categories, ...defaultUsed] }
+  const handleAddCustomCondition = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (form.trim() && form !== condition) {
+      setCondition(form);
+      setForm('');
     }
-    updateNode(newNode, selectedNode.id)
-  }, [activeRuling, categories, defaultUsed])
-
-  const appendCategory = (e: React.FormEvent<HTMLFormElement>) => {
-    e?.preventDefault()
-
-    if(categories.includes(form)) return;
-
-    setCategories((prev) => {
-      return [...prev, form]
-    })
-
-    setForm('')
-  }
-
-  const removeCategory = (category: string) => {
-    setCategories(prev => {
-      return prev.filter(each => each !== category)
-    })
-  }
+  };
 
   return (
     <div className='space-y-3'>
@@ -84,64 +62,44 @@ export default function ProductConditionPanel() {
         Condition
       </header>
 
-      <div className='flex flex-col gap-y-2 py-2'>
-        <RadioGroup value={activeRuling} onValueChange={(value) => setActiveRuling(value)}>
-          {rulings.map((ruling) => (
-            <div className="flex items-center space-x-2" key={ruling.code}>
-              <RadioGroupItem 
-                value={ruling.code} 
-                className={`text-foreground ${activeRuling===ruling.code?'border-primary':'border-muted'}`}
-                id={`ruling-${ruling.code}`} 
+      <main className='border rounded-xl px-2 py-3'>
+        <section className='space-y-3'>
+
+          {/* Suggestions Dropdown */}
+          <Select onValueChange={handleSelectChange}>
+            <SelectTrigger className="w-full">
+              <span>Suggestions</span>
+            </SelectTrigger>
+            <SelectContent>
+              {suggestions.map((suggestion, index) => (
+                <SelectItem key={index} value={suggestion}>
+                  {suggestion}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Display Selected Conditions */}
+          <div className="flex items-center space-x-2 py-3">
+            <CheckCheck className='w-4 h-4 text-primary' />
+            <Label>{condition}</Label>
+          </div>
+
+          {/* Add New Custom Condition */}
+          <Card className='p-3 space-y-1'>
+            <Label>Not in the list?</Label>
+            <form onSubmit={handleAddCustomCondition} className="flex gap-2 items-center">
+              <Input
+                className='border-border w-full py-2 pr-1 text-sm'
+                placeholder="Custom condition"
+                onChange={(e) => setForm(e.target.value)}
+                value={form}
               />
-              <Label htmlFor={`ruling-${ruling.code}`}>{ruling.label}</Label>
-            </div>
-          ))}
-        </RadioGroup>
-      </div>
-
-      <main className='border rounded-xl p-3'>
-        <header className='flex items-center justify-between'>
-          <h4 className='text-grey text-base'>Categories</h4>
-        </header>
-
-        <section className='space-y-3 py-5'>
-          {/* Map through default Conditions */}
-          {defaultConditions.map((defaultCateg, index) => (
-            <button
-              key={index} onClick={()=>updateCategory(defaultCateg)}
-              className='flex items-center gap-2 text-grey text-sm'
-            >
-              <Checkbox checked={defaultUsed.includes(defaultCateg)} />
-              <span>{defaultCateg}</span>
-            </button>
-          ))}
-
-          {/* Additional Conditions */}
-          {categories.map((category, index) => (
-            <button
-              key={index} onClick={()=>updateCategory(category)}
-              className='flex items-center gap-2 text-grey text-sm'
-            >
-              <span 
-                className="material-symbols-outlined hover:text-red-600" 
-                role='button' onClick={() => removeCategory(category)}
-              >Delete</span>
-              <span>{category}</span>
-            </button>
-          ))}
-
-          {/* Add New Category */}
-          <form onSubmit={appendCategory} className="h-[40px] w-full flex gap-2 items-center">
-            <Input 
-              className='border-border w-full h-full py-2 pr-1 text-sm' 
-              placeholder="Custom category" 
-              onChange={(e) => setForm(e.target.value)} 
-              value={form}
-            />
-            <Button variant='outline' size='icon' className='w-[45px] h-full group' disabled={!form.trim()}>
-              <span className="material-symbols-outlined group-hover:text-primary">add</span>
-            </Button>
-          </form>
+              <Button variant='outline' size='icon' disabled={!form.trim()}>
+                <span className="material-symbols-outlined">add</span>
+              </Button>
+            </form>
+          </Card>
         </section>
       </main>
     </div>

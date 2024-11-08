@@ -5,6 +5,8 @@ import { usePolicyForm } from '@/store/policies/policy-form';
 import { Label } from '@radix-ui/react-dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { CustomerConditionType } from '@/interfaces/customer.interface';
+import { PERIODS } from '@/lib/utils';
+
 import {
   Select,
   SelectContent,
@@ -13,17 +15,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-const constraints: string[] = [
-  'is less than'
+const constraints = [
+  {
+    value: 'is_less_than',
+    label: 'is less than'
+  }
 ]
-
-const periods: string[] = [
-  'Hours',
-  'Days',
-  'Weeks',
-  'Months',
-  'Years',
-];
 
 export default function CustomerConditionPanel() {
   const { updateNode } = useContext(UpdateNodeCtx)
@@ -91,7 +88,7 @@ export default function CustomerConditionPanel() {
                 <SelectContent>
                   {
                     constraints.map((constraint, i) => (
-                      <SelectItem value={constraint} key={i}>{constraint}</SelectItem>
+                      <SelectItem value={constraint.value} key={i}>{constraint.label}</SelectItem>
                     ))
                   }
                 </SelectContent>
@@ -132,8 +129,8 @@ export default function CustomerConditionPanel() {
                 </SelectTrigger>
                 <SelectContent>
                   {
-                    periods.map((period, i) => (
-                      <SelectItem value={period} key={i}>{period}</SelectItem>
+                    PERIODS.map((period, i) => (
+                      <SelectItem value={period.toLowerCase()} key={i}>{period}</SelectItem>
                     ))
                   }
                 </SelectContent>

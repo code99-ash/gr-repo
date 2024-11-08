@@ -13,22 +13,37 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-const categories: OrderCategoryType[] = [
-  'Discounted orders',
-  'Orders without discounts',
-  'Order value'
+const categories = [
+  {
+    value: 'discounted_orders',
+    label: 'Discounted orders'
+  },
+  {
+    value: 'orders_without_discounts',
+    label: 'Orders without discounts'
+  },
+  {
+    value: 'order_value',
+    label: 'Order value'
+  }
 ]
 
-const constraints: OrderConstraint[] = [
-  'is less than',
-  'is greater than'
+const constraints = [
+  {
+    value: 'is_less_than',
+    label: 'is less than'
+  },
+  {
+    value: 'is_greater_than',
+    label: 'is greater than'
+  }
 ]
 
 export default function OrderConditionPanel() {
   const { updateNode } = useContext(UpdateNodeCtx)
   const [form, setForm] = useState<OrderConditionData>({
-    category: 'Discounted orders',
-    operator: 'is less than',
+    category: 'discounted_orders',
+    operator: 'is_less_than',
     value: 5
   })
 
@@ -86,7 +101,7 @@ export default function OrderConditionPanel() {
               <SelectContent>
                 {
                   categories.map((category, i) => (
-                    <SelectItem value={category} key={i}>{category}</SelectItem>
+                    <SelectItem value={category.value} key={i}>{category.label}</SelectItem>
                   ))
                 }
               </SelectContent>
@@ -102,7 +117,7 @@ export default function OrderConditionPanel() {
               <SelectContent>
                 {
                   constraints.map((constraint, i) => (
-                    <SelectItem value={constraint} key={i}>{constraint}</SelectItem>
+                    <SelectItem value={constraint.value} key={i}>{constraint.label}</SelectItem>
                   ))
                 }
               </SelectContent>

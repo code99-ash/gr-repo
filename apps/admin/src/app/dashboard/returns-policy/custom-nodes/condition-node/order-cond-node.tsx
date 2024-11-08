@@ -17,10 +17,10 @@ export default function OrderConditionNode({data}: PropType) {
                     className="material-symbols-outlined"
                     style={{fontSize: '8px'}}    
                 >autorenew</span>
-                {data.category}
+                <span className="capitalize">{data.category.replaceAll('_', ' ')}</span>
             </header>
             <p className="text-[7px]">
-                Amount {data.operator} {data.value}
+                Amount {data.operator.replaceAll('_', ' ')} {data.value}
             </p>
         </div>
     </>

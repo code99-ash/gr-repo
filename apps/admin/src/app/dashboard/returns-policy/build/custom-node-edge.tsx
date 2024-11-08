@@ -6,6 +6,13 @@ import {
   type EdgeProps,
   type Edge,
 } from '@xyflow/react';
+import { useReactflowStore } from '@/store/react-flow/reactflow-store';
+import { usePolicyForm } from '@/store/policies/policy-form';
+
+const yes_no_options: Record<any, string> = {
+  'Yes': 'bg-primary text-white',
+  'No': 'bg-destructive text-white'
+}
 
 const CustomEdge: FC<EdgeProps<Edge<{ label: string }>>> = ({
   id,
@@ -17,6 +24,10 @@ const CustomEdge: FC<EdgeProps<Edge<{ label: string }>>> = ({
   targetPosition,
   data,
 }) => {
+  const edges = useReactflowStore(state => state.edges);
+  const edge = edges.find(each => each.id === id);
+  const policy_flow = usePolicyForm(state => state.policy_flow)
+
   // Get the bezier path for edge positioning
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -25,7 +36,14 @@ const CustomEdge: FC<EdgeProps<Edge<{ label: string }>>> = ({
     targetX,
     targetY,
     targetPosition,
-  });
+  }); 
+  
+  
+  if(!data || !edge) return null;
+  
+  const parent_type = policy_flow[edge.source].node_type
+
+  const label_bg = parent_type === "yes_no_question"? yes_no_options[edge.label as string] : 'bg-background'
 
   return (
     <>
@@ -43,7 +61,7 @@ const CustomEdge: FC<EdgeProps<Edge<{ label: string }>>> = ({
               fontSize: 10,
               fontWeight: 700,
             }}
-            className={`nodrag nopan px-2 py-1 ${data.label === 'Yes' ? 'bg-primary' : 'bg-destructive'}`}
+            className={`nodrag nopan px-2 py-1 ${label_bg}`}
           >
             {data.label}
           </div>

@@ -20,7 +20,7 @@ export default function CustomerConditionNode({data}: PropType) {
                 Customer's Returns count
             </header>
             <p className="text-[7px]">
-                {data.operator} {data.expectedPeriod}
+                {data.operator.replaceAll('_', ' ')} {data.expectedPeriod}
             </p>
         </div>
     </>

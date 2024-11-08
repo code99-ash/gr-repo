@@ -128,8 +128,6 @@ export default function ProductPolicyBuiler() {
       }
 
       defaultResponse({description})
-      
-      // console.log(resp)
 
     }catch(error: any) {
       errorResponse({description: error.response.data})
@@ -202,31 +200,31 @@ export default function ProductPolicyBuiler() {
   return (
     <section>
       {policyUID && <p className='px-3 text-foreground'>Editing - {policyUID}</p>}
-      <header className="flex items-center justify-between gap-2 px-3">
-        <EdittableTitle />
-
-        <div className="flex items-center gap-2">
-          {
-            !loading? 
-            <>
-              <Button 
-                onClick={saveToDraft} 
-                className="border bg-transparent text-primary border-primary hover:bg-transparent"
-              >{policyUID? 'Update as': 'Save to'} Draft</Button>
-              <Button onClick={publishFlow}>{policyUID? 'Update &' : ''} Publish</Button>
-            </>
-            : <div className="px-3 py-2 cursor-wait rounded bg-card border border-border text-foreground">Loading...</div>
-          }
-        </div>
-      </header>
 
       <main>
         <ReactFlowProvider>
           <section className="flex items-center h-[90vh] gap-1">
-            <div className="w-full h-full">
+            <div className="grow h-full">
+              <header className="flex items-center justify-between gap-2 px-3">
+                <EdittableTitle />
+
+                <div className="flex items-center gap-2">
+                  {
+                    !loading? 
+                    <>
+                      <Button 
+                        onClick={saveToDraft} 
+                        className="border bg-transparent text-primary border-primary hover:bg-transparent"
+                      >{policyUID? 'Update as': 'Save to'} Draft</Button>
+                      <Button onClick={publishFlow}>{policyUID? 'Update &' : ''} Publish</Button>
+                    </>
+                    : <div className="px-3 py-2 cursor-wait rounded bg-card border border-border text-foreground">Loading...</div>
+                  }
+                </div>
+              </header>
               <BuildOption />
             </div>
-            <nav className={`flex-none transition-all flex-none overflow-hidden h-[100vh] bg-card ${!selectedNode? 'w-0':'w-[300px]'}`}>
+            <nav className={`flex-none transition-all flex-none overflow-hidden h-[92vh] rounded-xl bg-card ${!selectedNode? 'w-0':'w-[300px]'}`}>
               <SelectedPanel />
             </nav>
           </section>

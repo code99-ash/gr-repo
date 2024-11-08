@@ -11,26 +11,49 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import DeleteNodeConfirm from './delete-node-confirm';
-import { usePolicyForm, MyNodeType } from '@/store/policies/policy-form';
+import { usePolicyForm, NodeObjectType } from '@/store/policies/policy-form';
 import { UpdateNodeCtx } from './selected-panel';
 
 
-const baseActions: string[] = [
-  'Accept Exchange',
-  'Accept Refund',
-  'Manual Review',
-  // 'AI Review',
-  'Decline'
+const baseActions = [
+  {
+    value: 'accept_exchange',
+    label: 'Accept Exchange'
+  },
+  {
+    value: 'accept_refund',
+    label: 'Accept Refund'
+  },
+  {
+    value: 'manual_review',
+    label: 'Manual Review'
+  },
+  {
+    value: 'decline',
+    label: 'Decline'
+  }
 ];
 
-const customerActions: string[] = [
-  'Accept Exchange',
-  'Accept Refund',
-  'Decline'
+const customerActions = [
+  {
+    value: 'accept_exchange',
+    label: 'Accept Exchange'
+  },
+  {
+    value: 'accept_refund',
+    label: 'Accept Refund'
+  },
+  {
+    value: 'decline',
+    label: 'Decline'
+  }
 ]
 
-const durationActions: string[] = [
-  'Decline'
+const durationActions = [
+  {
+    value: 'decline',
+    label: 'Decline'
+  }
 ]
 
 export default function ActionPanel() {
@@ -38,7 +61,7 @@ export default function ActionPanel() {
   const policy_type = usePolicyForm(state => state.policy_type)
   const [action, setAction] = useState('Decline')
   const [message, setMessage] = useState('')
-  const selectedNode = usePolicyForm(state => state.selectedNode) as MyNodeType;
+  const selectedNode = usePolicyForm(state => state.selectedNode) as NodeObjectType;
   const selectNode = usePolicyForm(state => state.selectNode)
 
   const removeNode = usePolicyForm(state => state.removeNode);
@@ -120,9 +143,9 @@ export default function ActionPanel() {
                 <SelectGroup>
                 {actions.map(action => (
                   <SelectItem 
-                    value={action}
+                    value={action.value}
                   >
-                    {action}
+                    {action.label}
                   </SelectItem>
                 ))} 
                 </SelectGroup>

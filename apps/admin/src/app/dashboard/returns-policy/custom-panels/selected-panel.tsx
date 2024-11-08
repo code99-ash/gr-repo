@@ -1,9 +1,9 @@
-import React, { createContext, useMemo } from 'react'
+import React, { createContext } from 'react'
 import RootConditionPanel from './condition-panel/root-cond-panel';
-import UserInputPanel from './userinput-panel';
 import ActionPanel from './action-panel';
-import { usePolicyForm } from '@/store/policies/policy-form';
+import { INodeTypes, usePolicyForm } from '@/store/policies/policy-form';
 import { useReactflowStore } from '@/store/react-flow/reactflow-store';
+import RootInputPanel from './userinput-panel/root-panel';
 
 
 interface UpdateNodeContextType {
@@ -13,6 +13,7 @@ interface UpdateNodeContextType {
 
 interface UpdatedNodeType {
     id: string;
+    node_type?: INodeTypes;
     data: any;
 }
 
@@ -37,20 +38,21 @@ export default function SelectedPanel() {
             }
         });
 
-   
-        modifyNode(updatedNode.id, updatedNode.data);
+     
+        modifyNode(updatedNode.id, updatedNode.data, updatedNode.node_type);
     }
 
-    const activePanel = useMemo(() => {
-        switch (selectedNode?.node_type) {
-            case 'user-input':
-                return <UserInputPanel />;
-            case 'action':
-                return <ActionPanel />;
-            default:
-                return <RootConditionPanel />;
-        }
-    }, [selectedNode]);
+    if(!selectedNode) return null;
+
+    const activePanel = {
+        asset_upload: <RootInputPanel />,
+        yes_no_question: <RootInputPanel />,
+        multiple_choice_question: <RootInputPanel />,
+        action: <ActionPanel />,
+        conditions: <RootConditionPanel />
+    }[selectedNode.node_type]
+
+    
 
     return (
         <div className='relative p-3'>
@@ -58,11 +60,11 @@ export default function SelectedPanel() {
                 className="material-symbols-outlined absolute top-2 right-2 text-foreground"
                 role='button' onClick={closePanel}
             >close</span>
-            {selectedNode ? (
-                <UpdateNodeCtx.Provider value={{ updateNode }}>
-                    {activePanel}
-                </UpdateNodeCtx.Provider>
-            ) : null}
+            
+            <UpdateNodeCtx.Provider value={{ updateNode }}>
+                {activePanel}
+            </UpdateNodeCtx.Provider>
+          
         </div>
     );
 }

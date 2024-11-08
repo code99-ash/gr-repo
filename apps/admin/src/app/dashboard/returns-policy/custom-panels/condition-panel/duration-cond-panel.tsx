@@ -8,23 +8,23 @@ import { usePolicyForm } from '@/store/policies/policy-form';
 import { UpdateNodeCtx } from '../selected-panel';
 import { DurationConditionData, DurationConditionType } from '@/interfaces/duration.interface';
 
+type PeriodType = 'hours' | 'days' | 'weeks' | 'months' | 'years'
 
-const periods = [
-  'Hours',
-  'Days',
-  'Weeks',
-  'Months',
-  'Years',
-];
+const periods: PeriodType[] = [
+  'hours',
+  'days',
+  'weeks',
+  'months',
+  'years',
+]
 
-type PeriodType = 'Hours' | 'Days' | 'Weeks' | 'Months' | 'Years'
 
 export default function DurationConditionPanel() {
   const { updateNode } = useContext(UpdateNodeCtx)
   const selectedNode = usePolicyForm(state => state.selectedNode) as DurationConditionType
 
   const [form, setForm] = useState<DurationConditionData>({
-    period: 'Days',
+    period: 'days',
     periodValue: 10
   });
 

@@ -1,15 +1,9 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Handle, Position } from '@xyflow/react'
 import NodeWrapper from './node-wrapper'
-import { useReactflowStore } from '@/store/react-flow/reactflow-store'
 
 
 export default function ActionNode({data}: { data: any }) {
-    const edges = useReactflowStore(state => state.edges)
-    
-    const nodeEdge = edges.find(edge => edge.source === data.node_id)
-
-
     return (
       <NodeWrapper node_id={data.node_id}>
         <Handle 
@@ -26,7 +20,7 @@ export default function ActionNode({data}: { data: any }) {
                     className="material-symbols-outlined"
                     style={{fontSize: '8px'}}    
                 >autorenew</span>
-                {data.action_type}
+                <span className="capitalize">{data.action_type.replace('_', ' ')}</span>
             </header>
             <p className="text-[7px]">{data.message}</p>
         </div>
