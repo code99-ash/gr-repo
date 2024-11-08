@@ -16,9 +16,8 @@ export interface PolicyListType {
   organization_uid?: string;
   policy_name: string;
   policy_type: PolicyTypes;
-  status: PolicyStatus;
-  current_flow: FlowRecord;
-  policy_history: FlowRecord[];
+  policy_status: PolicyStatus;
+  policy_flow: FlowRecord;
   deleted_at: string | null;
   updated_at: string;
   created_at: string;

@@ -7,7 +7,7 @@ import { formatDate } from '@/lib/utils'
 export default function PolicyItem({policy}: {policy: PolicyListType}) {
     const router = useRouter()
     
-    const variantText = policy.status === 'draft'? "text-[#2A9E69]" : "text-[#FDB747]"
+    const variantText = policy.policy_status === 'draft'? "text-[#2A9E69]" : "text-[#FDB747]"
 
     const date = useMemo(() => formatDate(policy.updated_at), [policy])
 
@@ -16,7 +16,7 @@ export default function PolicyItem({policy}: {policy: PolicyListType}) {
             <section className='space-y-2'>
                 <h1 
                     className="text-primary satoshi-medium group-hover:underline cursor-pointer w-max"
-                    onClick={() => router.push(`/returns-policy/build/${policy.policy_type}?uid=${policy.uid}`)}
+                    onClick={() => router.push(`/dashboard/returns-policy/build/${policy.policy_type}/${policy.uid}`)}
                 >{policy.policy_name}</h1>
                 <p className="text-foreground text-xs uppercase">{policy.policy_type}</p>
             </section>
@@ -25,7 +25,7 @@ export default function PolicyItem({policy}: {policy: PolicyListType}) {
                     <button className="px-4 py-2 text-foreground bg-accent text-sm rounded">0 items</button>
                     <button 
                         className={`px-4 py-2 capitalize bg-accent text-sm rounded mx-auto ${variantText}`}
-                    >{policy.status}</button>
+                    >{policy.policy_status}</button>
                 </div>
                 <div className="flex items-center justify-between col-span-3">
                     <button className="px-4 py-2 text-foreground text-sm rounded">
