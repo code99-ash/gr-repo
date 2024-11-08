@@ -8,9 +8,15 @@ import { CameraIcon, QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 import SwitchInputType from './switch-input-type';
 import YesNoBranches from './yes-no-branches';
 import MultpleChoiceBranches from './multiple-choice-branches';
+import DeleteNodeConfirm from '../delete-node-confirm';
+
+
 export default function RootInputPanel() {
   const { updateNode } = useContext(UpdateNodeCtx)
+  const removeNode = usePolicyForm(state => state.removeNode);
+  const selectNode = usePolicyForm(state => state.selectNode)
   const selectedNode = usePolicyForm(state => state.selectedNode) as ProductDataType
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const [node_message, setNodeMessage] = useState<string>('');
 
@@ -26,6 +32,12 @@ export default function RootInputPanel() {
     updateNode({ ...selectedNode, data: { message: value } })
   }
 
+  const deleteAnyway = () => {
+    removeNode(selectedNode.id)
+    setConfirmDelete(false)
+    selectNode(null)
+  }
+
   return (
     <div className='space-y-3'>
       <header className='node-panel-header'>
@@ -36,6 +48,12 @@ export default function RootInputPanel() {
         }
         User Input
       </header>
+
+      <DeleteNodeConfirm
+        confirmDelete={confirmDelete}
+        setConfirmDelete={setConfirmDelete}
+        deleteAnyway={deleteAnyway}
+      />
 
       <main className='border rounded-xl p-3 space-y-1'>
         <SwitchInputType />
