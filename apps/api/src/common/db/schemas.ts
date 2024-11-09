@@ -15,3 +15,4 @@ export * from '../../core/modules/users/db/users.db';
 export * from '../../core/modules/users/db/users-accounts.db';
 export * from '../../core/modules/policies/db/policies.db';
 export * from '../../core/modules/policy_histories/db/policy_histories.db';
+export * from '../../core/modules/stores/db/stores.db';
