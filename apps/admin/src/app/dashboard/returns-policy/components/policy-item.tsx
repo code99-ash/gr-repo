@@ -4,6 +4,15 @@ import { useRouter } from 'next/navigation';
 import React, { useMemo } from 'react'
 import { formatDate } from '@/lib/utils'
 
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+
 export default function PolicyItem({policy}: {policy: PolicyListType}) {
     const router = useRouter()
     
