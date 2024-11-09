@@ -52,6 +52,7 @@ export class StoresService {
 
   async createStore(store: CreateStoreDto) {
     const data = await this.storesRepository.createStore(store);
+    
     this.sendStoreCreateEvent({
       store_name: store.store_name,
       store_uid: data[0].uid,
@@ -62,14 +63,14 @@ export class StoresService {
     return data;
   }
 
-  async authorizeStore(store_type: store_types, store_domain: string, organization_uid: string) {
+  async authorizeStore(store_type: store_types, store_domain: string) {
     const store = await this.storesRepository.findStore('store_name', store_domain);
     if(store) {
       throw new BadRequestException('Store already exists');
     }
 
     if(store_type === 'shopify') {
-      return encodeURI(`https://${store_domain}/admin/oauth/authorize?client_id=${env.SHOPIFY_CLIENT_ID}&scope=${env.SHOPIFY_SCOPES}&redirect_uri=${env.SHOPIFY_REDIRECT_URL}&state=${organization_uid}`);
+      return encodeURI(`https://${store_domain}/admin/oauth/authorize?client_id=${env.SHOPIFY_CLIENT_ID}&scope=${env.SHOPIFY_SCOPES}&redirect_uri=${env.SHOPIFY_REDIRECT_URL}`);
     }
 
     throw new BadRequestException('Invalid store type');

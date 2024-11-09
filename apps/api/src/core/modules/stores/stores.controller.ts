@@ -23,9 +23,7 @@ export class StoresController {
             throw new UnauthorizedException();
         }
 
-        const user = req.user as ORM<typeof SafeBaseAccount>;
-
-        return this.storesService.authorizeStore(type, domain, user.organization_uid);
+        return this.storesService.authorizeStore(type, domain);
     }
 
     @UseGuards(JWTAuthGuard)
@@ -42,7 +40,7 @@ export class StoresController {
     ) {
 
         if(!req.user) {
-        throw new UnauthorizedException();
+            throw new UnauthorizedException();
         }
 
         const user = req.user as ORM<typeof SafeBaseAccount>;
