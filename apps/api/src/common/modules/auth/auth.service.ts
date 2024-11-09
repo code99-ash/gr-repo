@@ -29,7 +29,7 @@ export class AuthService {
   async validateAccountCredentials(email: string, password: string) {
     const account = await this.accountsService.getBaseAccount('email', email);
 
-    const result = bcrypt.compare(password, account.password);
+    const result = await bcrypt.compare(password, account.password);
 
     if (!result) return null;
 
