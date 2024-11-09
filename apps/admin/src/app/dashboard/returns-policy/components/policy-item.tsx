@@ -3,15 +3,7 @@ import { PolicyListType } from '@/store/policies/policy-store';
 import { useRouter } from 'next/navigation';
 import React, { useMemo } from 'react'
 import { formatDate } from '@/lib/utils'
-
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+import ConfirmDelete from './confirm-delete';
 
 export default function PolicyItem({policy}: {policy: PolicyListType}) {
     const router = useRouter()
@@ -40,9 +32,10 @@ export default function PolicyItem({policy}: {policy: PolicyListType}) {
                     <button className="px-4 py-2 text-foreground text-sm rounded">
                         {date}
                     </button>
-                    <button className="px-4 py-2 text-sm text-foreground bg-accent text-sm rounded group">
+                    <ConfirmDelete policy_name={policy.policy_name} policy_id={policy.uid} />
+                    {/* <button className="px-4 py-2 text-sm text-foreground bg-accent text-sm rounded group">
                         <span className="material-symbols-outlined group-hover:text-destructive">delete</span>
-                    </button>
+                    </button> */}
                 </div>
             </section>
         </div>

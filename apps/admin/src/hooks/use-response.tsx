@@ -17,6 +17,7 @@ export default function useResponse() {
     }
     const defaultResponse = (props: ResponseProp) => {
         toast({
+            variant: "primary",
             title: props.title ?? "Success Alert",
             description: props.description,
         })

@@ -31,6 +31,7 @@ interface PolicyState {
   setPolicies: (data: PolicyListType[]) => void;
   newPolicy: (data: PolicyListType) => void;
   updatePolicy: (data: PolicyListType) => void;
+  removePolicy: (uid: string) => void;
 }
 
 export const usePolicyStore = create<PolicyState>((set, get) => ({
@@ -51,4 +52,9 @@ export const usePolicyStore = create<PolicyState>((set, get) => ({
       ))
     })
   },
+  removePolicy(policy_uid: string) {
+    set({
+      policies: get().policies.filter(policy => policy.uid !== policy_uid)
+    })
+  }
 }));

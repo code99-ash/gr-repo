@@ -84,8 +84,7 @@ export default function ProductPolicyBuiler() {
 
 
     }catch(error: any) {
-      console.log(error)
-      console.log(error.message)
+      
       errorResponse({description: error.data})
 
     } finally {
