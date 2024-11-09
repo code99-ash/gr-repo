@@ -6,7 +6,7 @@ export interface InitialDataProps {
   response_data: PolicyData;
 }
 
-interface CtxProp {
+export interface CtxProp {
   params: {
     policy_uid: string;
   };
@@ -15,14 +15,11 @@ interface CtxProp {
 export default async function UpdatePolicyPage(context: CtxProp) {
   const policy_uid = context.params?.policy_uid;
 
-  console.log('policy_uid', policy_uid);
-
   const response = await fetch(`${process.env.NEST_API_URL}/policies/${policy_uid}`, {
     cache: 'no-store',
   });
 
   if (!response.ok) {
-    console.log('response', response.status);
     notFound();
   }
 

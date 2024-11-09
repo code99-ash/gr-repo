@@ -14,6 +14,7 @@ import { useParams } from 'next/navigation';
 import { usePolicyStore } from '@/store/policies/policy-store';
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/hooks/use-toast"
+import useResponse from '@/hooks/use-response';
 
 
 
@@ -27,22 +28,9 @@ export default function ProductPolicyBuiler() {
   const { initializeGraph } = useReactflowStore();
   const { selectedNode, setPolicyType } = policyForm;
   const newPolicy = usePolicyStore(state => state.newPolicy)
+  const { defaultResponse, errorResponse } = useResponse()
 
   const [loading, setLoading] = useState(false)
-
-  const errorResponse = (props: any) => {
-    toast({
-      variant: "destructive",
-      title: props.title ?? "Error Alert",
-      description: props.description,
-    })
-  }
-  const defaultResponse = (props: any) => {
-    toast({
-      title: props.title ?? "Success Alert",
-      description: props.description,
-    })
-  }
   
   useEffect(() => {
     
@@ -80,7 +68,7 @@ export default function ProductPolicyBuiler() {
       newPolicy(data)
       defaultResponse({description: "Successfully created policy"})
 
-      router.push(`/build-success?uid=${data.uid}`)
+      router.push(`/build-success/${data.uid}`)
 
 
     }catch(error: any) {

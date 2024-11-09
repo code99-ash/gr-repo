@@ -4,8 +4,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const token = req.cookies.token;
     const { policy_uid } = JSON.parse(req.body)
-
-    console.log(JSON.parse(req.body))
+    
     // if (!token) {
     //     return res.status(401).json({ message: 'Unauthorized: Token not found' });
     // }

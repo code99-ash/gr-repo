@@ -12,8 +12,6 @@ import { usePolicyStore } from '../../../../../../store/policies/policy-store';
 import useResponse from '../../../../../../hooks/use-response';
 import { Button } from '../../../../../../components/ui/button';
 
-const acceptedTypes: PolicyTypes[] = ['duration', 'order', 'customer', 'product'];
-
 export default function UpdateClient({ response_data }: { response_data: PolicyData }) {
   const router = useRouter();
   const policyForm = usePolicyForm();

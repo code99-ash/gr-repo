@@ -97,7 +97,6 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
     },
 
     setPolicy(policy: PolicyData) {
-        console.log('setting policy for update', policy)
         set({ ...policy, policy_uid: policy.uid })
         useReactflowStore.getState().initializeGraph(policy.policy_flow);
         useReactflowStore.getState().layoutGraph()
