@@ -3,6 +3,7 @@ import "./globals.css";
 
 import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/toaster"
+import { AuthProvider } from '@/contexts/auth-context';
 
 const satoshi = localFont({
   src: [
@@ -49,8 +50,10 @@ export default function RootLayout({
         />
       </head>
       <body className={satoshi.className}>
+        <AuthProvider>
           {children}
           <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );
