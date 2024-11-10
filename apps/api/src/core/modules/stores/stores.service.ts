@@ -8,7 +8,7 @@ import { store_types } from './db/stores.db';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BroadcastStoreCreated } from './store.interface';
 
-const STORE_CREATED = 'store.created'
+export const STORE_CREATED = 'store.created'
 
 @Injectable()
 export class StoresService {
@@ -48,6 +48,10 @@ export class StoresService {
       access_token: data.access_token,
       store_type: data.store_type
     })
+  }
+
+  async find(organization_uid: string) {
+    return await this.storesRepository.findStore('organization_uid', organization_uid)
   }
 
   async createStore(store: CreateStoreDto) {

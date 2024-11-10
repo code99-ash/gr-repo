@@ -22,6 +22,18 @@ EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."store_type" AS ENUM('shopify', 'woocommerce', 'etsy', 'amazon', 'custom');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."origin" AS ENUM('internal', 'external');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "accounts" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"uid" varchar(256) NOT NULL,
@@ -85,10 +97,11 @@ CREATE TABLE IF NOT EXISTS "organizations" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "products" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" varchar PRIMARY KEY NOT NULL,
 	"uid" varchar(256) NOT NULL,
-	"name" text NOT NULL,
-	"price" integer NOT NULL,
+	"store_uid" varchar NOT NULL,
+	"title" text NOT NULL,
+	"status" varchar NOT NULL,
 	"images" jsonb DEFAULT '[]'::jsonb,
 	"meta" jsonb DEFAULT '{}'::jsonb,
 	"created_at" timestamp DEFAULT now(),
@@ -150,6 +163,36 @@ CREATE TABLE IF NOT EXISTS "policy_histories" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "stores" (
+	"uid" varchar(256) PRIMARY KEY NOT NULL,
+	"organization_uid" varchar,
+	"store_name" varchar NOT NULL,
+	"store_type" "store_type" NOT NULL,
+	"api_key" jsonb NOT NULL,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp,
+	"deleted_at" timestamp,
+	CONSTRAINT "stores_uid_unique" UNIQUE("uid")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "collections" (
+	"id" varchar PRIMARY KEY NOT NULL,
+	"uid" varchar(256) NOT NULL,
+	"store_uid" varchar NOT NULL,
+	"title" varchar NOT NULL,
+	"origin" "origin" DEFAULT 'external' NOT NULL,
+	"meta" jsonb DEFAULT '{}'::jsonb,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now(),
+	CONSTRAINT "collections_uid_unique" UNIQUE("uid")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "collections_to_products" (
+	"collection_id" varchar NOT NULL,
+	"product_id" varchar NOT NULL,
+	CONSTRAINT "collections_to_products_collection_id_product_id_pk" PRIMARY KEY("collection_id","product_id")
+);
+--> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "accounts" ADD CONSTRAINT "accounts_organization_uid_organizations_uid_fk" FOREIGN KEY ("organization_uid") REFERENCES "public"."organizations"("uid") ON DELETE no action ON UPDATE no action;
 EXCEPTION
@@ -193,6 +236,12 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "products" ADD CONSTRAINT "products_store_uid_stores_uid_fk" FOREIGN KEY ("store_uid") REFERENCES "public"."stores"("uid") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "return_requests" ADD CONSTRAINT "return_requests_customer_uid_customers_uid_fk" FOREIGN KEY ("customer_uid") REFERENCES "public"."customers"("uid") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -218,6 +267,30 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "policy_histories" ADD CONSTRAINT "policy_histories_activated_by_users_uid_fk" FOREIGN KEY ("activated_by") REFERENCES "public"."users"("uid") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "stores" ADD CONSTRAINT "stores_organization_uid_organizations_uid_fk" FOREIGN KEY ("organization_uid") REFERENCES "public"."organizations"("uid") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "collections" ADD CONSTRAINT "collections_store_uid_stores_uid_fk" FOREIGN KEY ("store_uid") REFERENCES "public"."stores"("uid") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "collections_to_products" ADD CONSTRAINT "collections_to_products_collection_id_collections_id_fk" FOREIGN KEY ("collection_id") REFERENCES "public"."collections"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "collections_to_products" ADD CONSTRAINT "collections_to_products_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
