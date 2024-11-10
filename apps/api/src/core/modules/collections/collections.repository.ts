@@ -24,7 +24,9 @@ export class CollectionsRepository {
       with: {
         collection_products: {
           with: {
-            products: true
+            products: {
+              columns: { meta: false }
+            }
           }
         }
       }
