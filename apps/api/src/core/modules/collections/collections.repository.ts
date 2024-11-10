@@ -40,7 +40,6 @@ export class CollectionsRepository {
   }
 
   async createCollectProductPairs(payload: CreateCollectionProductDto[]) {
-    console.log('collect create', payload)
     return await this.db.insert(collectionOnProducts).values(payload).returning();
   }
   

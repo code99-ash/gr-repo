@@ -29,7 +29,6 @@ export class CollectionsController {
         const user = req.user as ORM<typeof SafeBaseAccount>;
 
         const findStore = await this.storesService.find(user.organization_uid);
-
         if(!findStore) {
             throw new NotFoundException('Store not found')
         }

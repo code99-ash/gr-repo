@@ -53,7 +53,6 @@ export class CollectionsService {
             
             const collects = data.collects;
 
-            console.log('collects', collects)
             this.createCollectionProduct(collects);
 
         } catch(error) {
