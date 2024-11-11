@@ -1,17 +1,12 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import PolicyTypeMenu from './policy-type-menu';
-import { useTheme } from 'next-themes';
+import ChangePolicyStatus from './change-status';
+
 
 export default function PageHeader() {
-    const { theme } = useTheme();
-
-    // Dynamic border color based on theme
-    const borderClass = useMemo(() => {
-        return theme === 'dark' ? 'border-neutral-700' : 'border-neutral-200';
-    }, [theme]);
-
+    
     return (
-        <header className={`flex items-center justify-between gap-2 md:px-3 pb-3 border-b ${borderClass}`}>
+        <header className="flex items-center justify-between gap-2 md:px-3 pb-3 border-b">
             <h1 className="text-foreground text-xl md:text-2xl satoshi-bold">
                 Returns Policy Builder
             </h1>
@@ -21,7 +16,7 @@ export default function PageHeader() {
                     Pick a policy template
                 </button>
 
-                {/* Replace the Build from scratch button with NavigationMenu */}
+                <ChangePolicyStatus />
                 <PolicyTypeMenu />
             </div>
         </header>

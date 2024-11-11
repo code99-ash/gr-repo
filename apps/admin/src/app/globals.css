@@ -156,3 +156,19 @@
 .react-flow__edge-text::content('Yes') {
   @apply bg-primary !important;
 }
+
+
+
+.login-main {
+  @apply w-full md:w-[55%] flex flex-col md:items-start px-5 md:px-[20px] xl:px-[120px] py-[50px]
+  text-neutral-700;
+}
+
+.login-input {
+  @apply w-full h-[50px] md:h-[60px] text-sm md:text-base satoshi-medium placeholder:satoshi-regular;
+}
+
+.login-btn {
+  @apply mt-5 bg-primary w-full h-[40px] md:h-[50px] bg-primary text-white satoshi-bold rounded-lg
+  hover:bg-primary;
+}
