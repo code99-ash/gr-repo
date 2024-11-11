@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Req, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Req, UnauthorizedException, NotFoundException, Patch } from '@nestjs/common';
 import { CollectionsService } from './collections.service';
 import { BroadcastStoreCreated } from '../stores/store.interface';
 import { JWTAuthGuard } from 'src/common/modules/auth/jwt-auth.guard';
@@ -9,6 +9,7 @@ import { Request as IRequest } from 'express';
 import { SafeBaseAccount } from '../accounts/db/accounts.db';
 import { ORM } from 'src/common/repository';
 import { StoresService } from '../stores/stores.service';
+import { CollectionPolicyDto } from './dto/collection-policy.dto';
 
 @Controller('collections')
 export class CollectionsController {
@@ -33,12 +34,24 @@ export class CollectionsController {
             throw new NotFoundException('Store not found')
         }
 
-        return await this.collectionsService.fetch(findStore.uid)
+        const data = await this.collectionsService.fetch(findStore.uid)
+
+        return data;
     }
 
     @Post()
     create(@Body() payload: BroadcastStoreCreated) {
         this.collectionsService.asyncFetchCollect(payload)
+    }
+
+    @Post('/policies')
+    async assignPolicy(@Body() payload: CollectionPolicyDto) {
+        return await this.collectionsService.assignPolicy(payload)
+    }
+
+    @Patch('/policies')
+    async unassignPolicy(@Body() payload: CollectionPolicyDto) {
+        return await this.collectionsService.unassignPolicy(payload)
     }
   
 }

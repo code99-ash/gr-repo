@@ -57,7 +57,6 @@ export default function ChangePolicyStatus() {
             defaultResponse({description: 'Successfully updated status'})
 
         }catch(error: any) {
-            console.log(error)
             errorResponse({description: error.data})
         }finally {
             setLoading(false)

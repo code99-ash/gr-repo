@@ -1,10 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { type Database } from 'src/common/db/db.types';
 import { DB } from 'src/common/db/drizzle.provider';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { collections } from './db/collections.db';
 import { CreateCollectionDto, CreateCollectionProductDto } from './dto/create-collection.dto';
 import { collectionOnProducts } from './db/collections-products.db';
+import { collectionOnPolicies } from './db/collection-policies.db';
+import { CollectionPolicyDto } from './dto/collection-policy.dto';
 
 @Injectable()
 export class CollectionsRepository {
@@ -25,8 +27,15 @@ export class CollectionsRepository {
         collection_products: {
           with: {
             products: {
-              columns: { meta: false }
-            }
+              columns: { 
+                meta: false 
+              }
+            },
+          }
+        },
+        collection_policies: {
+          columns: {
+            collection_id: false
           }
         }
       }
@@ -41,6 +50,18 @@ export class CollectionsRepository {
 
   async createCollectProductPairs(payload: CreateCollectionProductDto[]) {
     return await this.db.insert(collectionOnProducts).values(payload).returning();
+  }
+
+  async assignPolicy(payload: CollectionPolicyDto) {
+    return this.db.insert(collectionOnPolicies).values(payload).returning();
+  }
+
+  async unassignPolicy(payload: CollectionPolicyDto) {
+    return this.db.delete(collectionOnPolicies)
+          .where(and(
+            eq(collectionOnPolicies.collection_id, payload.collection_id),
+            eq(collectionOnPolicies.policy_uid, payload.policy_uid),
+          )).returning()
   }
   
 }

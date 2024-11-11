@@ -51,7 +51,7 @@ export default function ReturnPolicy() {
         <SelectionCtx.Provider value={{selected, policies}}>
             <section className="space-y-5">
 
-                <PageHeader selected={selected} policies={policies} />
+                <PageHeader />
 
                 <main>
                     {policies.length < 1? <EmptyData /> : <PolicyList policies={policies} setSelected={setSelected} />}

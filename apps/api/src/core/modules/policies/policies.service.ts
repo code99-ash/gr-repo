@@ -72,6 +72,23 @@ export class PoliciesService {
     }
   }
   
+  async filterFetch(filters: string[]) {
+    try {
+      return await this.policiesRepository.filterFetch(filters)
+    } catch (error) {
+      throw new InternalServerErrorException('Error fetching policies');
+    }
+  }
+
+  async filterFetchInArray(filters: string[]) {
+    try {
+      return await this.policiesRepository.filterFetchInArray(filters)
+    } catch (error) {
+      throw new InternalServerErrorException('Error fetching policies');
+    }
+  }
+
+  
   async findOne(uid: string) {
     const policy = await this.policiesRepository.get('uid', uid);
     if (!policy) {
@@ -152,7 +169,7 @@ export class PoliciesService {
     
   }
 
-  async updateStatus(uid: string, updatePolicyStatusDto: UpdatePolicyStatusDto) {
+  async updateStatus(uid: string, updatePolicyStatusDto: UpdatePolicyStatusDto, user_id: string) {
     const { policy_status } = updatePolicyStatusDto;
 
     const existing_policy = await this.findOne(uid);
@@ -179,7 +196,8 @@ export class PoliciesService {
 
       if(policy_status === 'active') {
         // // Authorized user_uid is required
-        // return await this.policiesRepository.activate(uid, 'authorized_user_uid');
+        console.log('status', policy_status, user_id)
+        return await this.policiesRepository.activate(uid, user_id);
       }else {
         return await this.policiesRepository.updateStatus(uid, updatePolicyStatusDto);
       }

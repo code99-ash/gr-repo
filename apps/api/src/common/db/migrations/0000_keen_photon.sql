@@ -193,6 +193,12 @@ CREATE TABLE IF NOT EXISTS "collections_to_products" (
 	CONSTRAINT "collections_to_products_collection_id_product_id_pk" PRIMARY KEY("collection_id","product_id")
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "collection_to_policies" (
+	"collection_id" varchar NOT NULL,
+	"policy_uid" varchar NOT NULL,
+	CONSTRAINT "collection_to_policies_collection_id_policy_uid_pk" PRIMARY KEY("collection_id","policy_uid")
+);
+--> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "accounts" ADD CONSTRAINT "accounts_organization_uid_organizations_uid_fk" FOREIGN KEY ("organization_uid") REFERENCES "public"."organizations"("uid") ON DELETE no action ON UPDATE no action;
 EXCEPTION
@@ -291,6 +297,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "collections_to_products" ADD CONSTRAINT "collections_to_products_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "collection_to_policies" ADD CONSTRAINT "collection_to_policies_collection_id_collections_id_fk" FOREIGN KEY ("collection_id") REFERENCES "public"."collections"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "collection_to_policies" ADD CONSTRAINT "collection_to_policies_policy_uid_policies_uid_fk" FOREIGN KEY ("policy_uid") REFERENCES "public"."policies"("uid") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

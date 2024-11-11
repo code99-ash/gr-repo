@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import CollectionGroup from './components/collection-group';
 import { cookies } from 'next/headers'
 
@@ -12,8 +13,8 @@ export default async function ProductPage() {
     }
   });
 
-  if (!response.ok) {
-    console.log(response)
+  if (response.status === 401) {
+   redirect('/login')
   }
 
   const data = await response.json();

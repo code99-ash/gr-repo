@@ -1,7 +1,13 @@
-import React from 'react'
-import { Button } from '@/components/ui/button';
+"use client";
+import React, { useContext } from 'react'
+import { SelectedCtx } from './collection-group';
+import AssignPolicyTrigger from './assign-policy-trigger'
+import UnassignPolicyTrigger from './unassign-policy-trigger';
+
+
 
 export default function PageHeader() {
+    const { selected } = useContext(SelectedCtx)
     
     return (
         <header className="flex items-center justify-between gap-2 md:px-3 pb-3 border-b border-neutral-200">
@@ -9,11 +15,12 @@ export default function PageHeader() {
                 Product Catalogue
             </h1>
 
-            <div className="flex items-center gap-2 satoshi-medium">
-                <Button className="bg-neutral-400 hover:bg-neutral-400 saturate-50 text-white">
-                    Assign Policy
-                </Button>               
-            </div>
+            {selected && (
+                <div className="flex items-center gap-2 satoshi-medium">
+                    <AssignPolicyTrigger />
+                    <UnassignPolicyTrigger />
+                </div>
+            )}
         </header>
   )
 }

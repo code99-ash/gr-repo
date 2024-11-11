@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, DBQueryConfig, eq, isNull } from 'drizzle-orm';
+import { and, DBQueryConfig, eq, inArray, isNull, ne, notInArray } from 'drizzle-orm';
 import { type Database } from 'src/common/db/db.types';
 import { DB } from 'src/common/db/drizzle.provider';
 import { policies } from './db/policies.db';
@@ -24,6 +24,26 @@ export class PoliciesRepository {
     async list() {
         return await this.db.query.policies.findMany({
             where: isNull(policies.deleted_at)
+        });
+    }
+
+    async filterFetch(filters: string[]) {
+        return await this.db.query.policies.findMany({
+            where: and(
+                isNull(policies.deleted_at),
+                ne(policies.policy_status, 'draft'),
+                notInArray(policies.uid, filters),
+            )
+        });
+    }
+
+    async filterFetchInArray(filters: string[]) {
+        return await this.db.query.policies.findMany({
+            where: and(
+                isNull(policies.deleted_at),
+                ne(policies.policy_status, 'draft'),
+                inArray(policies.uid, filters),
+            )
         });
     }
 
@@ -64,8 +84,7 @@ export class PoliciesRepository {
         })
         .where(and(
             isNull(policies.deleted_at), 
-            eq(policies.uid, uid),
-            eq(policies.policy_status, 'published')
+            eq(policies.uid, uid)
         ))
         .returning()
 

@@ -5,6 +5,7 @@ import { STORE_CREATED } from '../stores/stores.service';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ClientCollectionDto, CreateCollectionDto, CreateCollectionProductDto } from './dto/create-collection.dto';
 import { BroadcastStoreCreated } from '../stores/store.interface';
+import { CollectionPolicyDto } from './dto/collection-policy.dto';
 
 @Injectable()
 export class CollectionsService {
@@ -77,6 +78,14 @@ export class CollectionsService {
 
     async createCollectionProduct(payload: CreateCollectionProductDto[]) {
         return await this.collectionsRepository.createCollectProductPairs(payload);
+    }
+
+    async assignPolicy(payload: CollectionPolicyDto) {
+        return await this.collectionsRepository.assignPolicy(payload)
+    }
+
+    async unassignPolicy(payload: CollectionPolicyDto) {
+        return await this.collectionsRepository.unassignPolicy(payload)
     }
 
 

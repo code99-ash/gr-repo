@@ -1,5 +1,5 @@
 {
-  "id": "bd5967fa-b247-4514-b7fd-736283a1044e",
+  "id": "9e5f74f8-322d-4bd1-97e5-5f67c44ef4a7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1134,6 +1134,63 @@
           "columns": [
             "collection_id",
             "product_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.collection_to_policies": {
+      "name": "collection_to_policies",
+      "schema": "",
+      "columns": {
+        "collection_id": {
+          "name": "collection_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "policy_uid": {
+          "name": "policy_uid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "collection_to_policies_collection_id_collections_id_fk": {
+          "name": "collection_to_policies_collection_id_collections_id_fk",
+          "tableFrom": "collection_to_policies",
+          "tableTo": "collections",
+          "columnsFrom": [
+            "collection_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "collection_to_policies_policy_uid_policies_uid_fk": {
+          "name": "collection_to_policies_policy_uid_policies_uid_fk",
+          "tableFrom": "collection_to_policies",
+          "tableTo": "policies",
+          "columnsFrom": [
+            "policy_uid"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "collection_to_policies_collection_id_policy_uid_pk": {
+          "name": "collection_to_policies_collection_id_policy_uid_pk",
+          "columns": [
+            "collection_id",
+            "policy_uid"
           ]
         }
       },
