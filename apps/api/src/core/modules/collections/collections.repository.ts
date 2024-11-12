@@ -1,12 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { type Database } from 'src/common/db/db.types';
 import { DB } from 'src/common/db/drizzle.provider';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull, ne } from 'drizzle-orm';
 import { collections } from './db/collections.db';
 import { CreateCollectionDto, CreateCollectionProductDto } from './dto/create-collection.dto';
 import { collectionOnProducts } from './db/collections-products.db';
 import { collectionOnPolicies } from './db/collection-policies.db';
 import { CollectionPolicyDto } from './dto/collection-policy.dto';
+import { policy_status } from 'src/common/db/schemas';
+import { policies } from '../policies/db/policies.db';
 
 @Injectable()
 export class CollectionsRepository {
@@ -26,9 +28,24 @@ export class CollectionsRepository {
       with: {
         collection_products: {
           with: {
-            products: {
+            product: {
               columns: { 
                 meta: false 
+              },
+              with: {
+                product_policies: {
+                  with: {
+                    policy: {
+                      column: {
+                        uid: true
+                      },
+                      where: and(
+                        isNull(policies.deleted_at),
+                        ne(policies.policy_status, 'draft'),
+                      ) 
+                    }
+                  }
+                }
               }
             },
           }
@@ -36,6 +53,13 @@ export class CollectionsRepository {
         collection_policies: {
           columns: {
             collection_id: false
+          },
+          with: {
+            policies: {
+              columns: {
+                uid: true
+              }
+            }
           }
         }
       }

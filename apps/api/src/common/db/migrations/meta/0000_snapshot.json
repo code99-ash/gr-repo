@@ -1,5 +1,5 @@
 {
-  "id": "9e5f74f8-322d-4bd1-97e5-5f67c44ef4a7",
+  "id": "df07a9d7-fdad-44a3-b39a-1e00b950df42",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1081,6 +1081,63 @@
           ]
         }
       }
+    },
+    "public.products_policies": {
+      "name": "products_policies",
+      "schema": "",
+      "columns": {
+        "product_id": {
+          "name": "product_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "policy_uid": {
+          "name": "policy_uid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "products_policies_product_id_products_id_fk": {
+          "name": "products_policies_product_id_products_id_fk",
+          "tableFrom": "products_policies",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "products_policies_policy_uid_policies_uid_fk": {
+          "name": "products_policies_policy_uid_policies_uid_fk",
+          "tableFrom": "products_policies",
+          "tableTo": "policies",
+          "columnsFrom": [
+            "policy_uid"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "products_policies_product_id_policy_uid_pk": {
+          "name": "products_policies_product_id_policy_uid_pk",
+          "columns": [
+            "product_id",
+            "policy_uid"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
     },
     "public.collections_to_products": {
       "name": "collections_to_products",

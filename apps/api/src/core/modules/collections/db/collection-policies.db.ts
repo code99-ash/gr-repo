@@ -12,4 +12,4 @@ export const collectionOnPolicies = pgTable('collection_to_policies', {
 }),
 );
   
-  export const CreateCollectionPolicy = createInsertSchema(collectionOnPolicies);
+export const CreateCollectionPolicy = createInsertSchema(collectionOnPolicies);

@@ -13,49 +13,52 @@ import {
 
 import { Button } from '@/components/ui/button';
 import { PolicyListType } from '@/store/policies/policy-store';
-import { SelectedCtx } from './collection-group';
+import { SelectedCtx } from '../collection-group';
 import { Card } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import useResponse from '@/hooks/use-response';
 import { LoaderCircle } from 'lucide-react';
 
-export default function AssignPolicyTrigger() {
+export default function UnassignPolicyTrigger() {
+    const {selected, collections, unassignPolicy} = useContext(SelectedCtx)
     const { errorResponse } = useResponse()
-    const {selected, collections, assignPolicy} = useContext(SelectedCtx)
     const [chosen, setChosen] = useState<string>('')
     const [loading, setLoading] = useState<boolean>(false)
     const [open, setOpen] = useState<boolean>(false)
-
     const [policies, setPolicies] = useState<{policy_uid: string}[]>([]);
 
     const [filtered, setFiltered] = useState<PolicyListType[]>([])
 
     useEffect(() => {
-        if(!open) return;
         
+        if(!open) return;
+
         fetchFilteredPolicies()
 
     }, [open])
-
-    useEffect(() => {
-
-        const collection = collections.find(each => each.id === selected);
-        setPolicies(collection?.collection_policies || []);
-
-    }, [collections])
 
     const openDialog = (cmd: any) => {
         setOpen(cmd)
     }
 
+    useEffect(() => {
+
+        const collection = collections.find(each => each.id === selected);
+        console.log('Collections altered', collection)
+        setPolicies(collection?.collection_policies || []);
+
+    }, [collections])
+
     const fetchFilteredPolicies = async() => {
         try {
             if(!selected) return;
 
+            console.log(policies.map(each => each.policy_uid))
+
             setLoading(true)
-            const response = await fetch('/api/policies/not-in-array', {
-                cache: 'no-store',
+            const response = await fetch('/api/policies/in-array', {
                 method: 'POST',
+                cache: 'no-store',
                 body: JSON.stringify(policies.map(each => each.policy_uid))
             })
 
@@ -64,22 +67,22 @@ export default function AssignPolicyTrigger() {
             }
 
             const data = await response.json()
-
+            console.log('unassigned policy fetch',data)
             setFiltered(data)
 
         }catch(error) {
+            console.log(error)
             errorResponse({description: 'Unable to fetch policies'})
         }finally {
             setLoading(false)
         }
     }
 
-    const assign2Collection = async() => {
+    const unassignFromCollection = async() => {
         try {
             if(!chosen) return;
-
             setLoading(true)
-            const response = await fetch('/api/collection/assign-policy', {
+            const response = await fetch('/api/collection/unassign-policy', {
                 method: 'PUT',
                 body: JSON.stringify({
                     collection_id: selected,
@@ -88,11 +91,12 @@ export default function AssignPolicyTrigger() {
             })
 
             await response.json()
-            assignPolicy(selected, chosen)
+            unassignPolicy(selected, chosen)
 
             setOpen(false)
 
         }catch(error) {
+            console.log(error)
             errorResponse({description: 'Failed to assign policy'})
         }finally {
             setLoading(false)
@@ -103,15 +107,15 @@ export default function AssignPolicyTrigger() {
         <Dialog open={open} onOpenChange={openDialog}>
             <DialogTrigger asChild>
                 <Button 
-                    className="bg-primary hover:bg-primary hover:saturate-50 text-white"
-                    onClick={() => setOpen(true)}
+                    className="bg-destructive hover:bg-destructive hover:saturate-50 text-white"
+                    onClick={() => setOpen(true)}    
                 >
-                    Assign Policy
+                    UnAssign Policy
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Assign policy</DialogTitle>
+                    <DialogTitle>UnAssign policy</DialogTitle>
                     <DialogDescription>These are policies that are yet to be assigned to your selection</DialogDescription>
                 </DialogHeader>
 
@@ -140,11 +144,11 @@ export default function AssignPolicyTrigger() {
 
                 <DialogFooter>
                     <Button 
-                        type="submit" disabled={loading}
-                        className='hover:bg-primary hover:saturate-50'
-                        onClick={assign2Collection}
+                        type="submit" disabled={loading} variant="destructive"
+                        className='hover:bg-destructive hover:saturate-50'
+                        onClick={unassignFromCollection}
                     >
-                        Assign {loading && <LoaderCircle width={15} height={15} className='ml-1 animate-spin' />}
+                        UnAssign {loading && <LoaderCircle width={15} height={15} className='ml-1 animate-spin' />}
                     </Button>
                 </DialogFooter>
             </DialogContent>

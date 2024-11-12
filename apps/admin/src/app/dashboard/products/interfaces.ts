@@ -1,6 +1,9 @@
 import { PolicyStatus } from "@/store/policies/policy-form";
 
-import { PolicyTypes } from "@/store/policies/policy-form";
+export interface ProductPolicy {
+    policy_uid: string;
+    product_id: string;
+}
 
 export interface Product {
     id: string;
@@ -9,6 +12,7 @@ export interface Product {
     title: string;
     status: string;
     images: any[];
+    product_policies: ProductPolicy[];
     created_at: string;
     updated_at: string;
 }
@@ -16,7 +20,7 @@ export interface Product {
 export interface CollectionProduct {
     collection_id: string;
     product_id: string;
-    products: Product
+    product: Product
 }
 
 export interface CollectionGroupItem {

@@ -23,7 +23,7 @@ export default function CollectionGroupItem({collection}: {collection: ItemProp}
             </div>
             <Table className="w-full">
             {collection.collection_products.map((each, index) => (
-                <ProductItem key={index} product={each.products} />
+                <ProductItem key={index} product={each.product} collection_id={collection.id} />
             ))}
             </Table>
         </CardContent>

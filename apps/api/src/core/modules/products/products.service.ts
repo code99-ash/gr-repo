@@ -4,7 +4,6 @@ import { BroadcastStoreCreated } from '../stores/store.interface';
 import { OnEvent } from '@nestjs/event-emitter';
 import { STORE_CREATED } from '../stores/stores.service';
 import axios from 'axios';
-import { CreateProductDto } from './dto/create-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -50,6 +49,14 @@ export class ProductsService {
     }catch(error) {
       console.log(error)
     }
+  }
+
+  async assignPolicy(product_id: string, payload: string[]) {
+    return await this.productsRepository.assignPolicy(product_id, payload)
+  }
+
+  async unassignPolicy(product_id: string, payload: string[]) {
+    return await this.productsRepository.unassignPolicy(product_id, payload)
   }
 
 }

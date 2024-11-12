@@ -7,7 +7,6 @@ import LoginAds from './ads';
 import LoginForm from './login-form';
 import { useAuth } from '@/contexts/auth-context';
 import { LoaderCircle } from 'lucide-react';
-import './login.css';
 
 export default function Login() {
     const router = useRouter();

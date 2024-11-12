@@ -1,8 +1,8 @@
 "use client";
 import React, { useContext } from 'react'
 import { SelectedCtx } from './collection-group';
-import AssignPolicyTrigger from './assign-policy-trigger'
-import UnassignPolicyTrigger from './unassign-policy-trigger';
+import AssignPolicyTrigger from './collections/assign-policy-trigger'
+import UnassignPolicyTrigger from './collections/unassign-policy-trigger';
 
 
 

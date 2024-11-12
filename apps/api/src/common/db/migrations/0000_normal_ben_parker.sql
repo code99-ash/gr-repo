@@ -187,6 +187,12 @@ CREATE TABLE IF NOT EXISTS "collections" (
 	CONSTRAINT "collections_uid_unique" UNIQUE("uid")
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "products_policies" (
+	"product_id" varchar NOT NULL,
+	"policy_uid" varchar NOT NULL,
+	CONSTRAINT "products_policies_product_id_policy_uid_pk" PRIMARY KEY("product_id","policy_uid")
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "collections_to_products" (
 	"collection_id" varchar NOT NULL,
 	"product_id" varchar NOT NULL,
@@ -285,6 +291,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "collections" ADD CONSTRAINT "collections_store_uid_stores_uid_fk" FOREIGN KEY ("store_uid") REFERENCES "public"."stores"("uid") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "products_policies" ADD CONSTRAINT "products_policies_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "products_policies" ADD CONSTRAINT "products_policies_policy_uid_policies_uid_fk" FOREIGN KEY ("policy_uid") REFERENCES "public"."policies"("uid") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

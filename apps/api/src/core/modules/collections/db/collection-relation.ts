@@ -5,6 +5,7 @@ import { collectionOnProducts } from './collections-products.db';
 import { products } from '../../products/db/products.db';
 import { collectionOnPolicies } from './collection-policies.db';
 import { policies } from '../../policies/db/policies.db';
+import { productsOnpolicies } from 'src/common/db/schemas';
 
 export const collectionRelations = relations(collections, ({ one, many }) => ({
   store: one(stores, {
@@ -20,7 +21,7 @@ export const collectionOnProductsRelation = relations(collectionOnProducts, ({ o
         fields: [collectionOnProducts.collection_id],
         references: [collections.id]
     }),
-    products: one(products, {
+    product: one(products, {
         fields: [collectionOnProducts.product_id],
         references: [products.id]
     })
@@ -37,10 +38,22 @@ export const collectionOnPoliciesRelation = relations(collectionOnPolicies, ({ o
     })
 }))
 
-export const productRelations = relations(products, ({ many }) => ({
-  collection_products: many(collectionOnProducts)
-}))
-
 export const policyRelations = relations(policies, ({ many }) => ({
   collection_policies: many(collectionOnPolicies)
+}))
+
+export const productRelations = relations(products, ({ many }) => ({
+  product_policies: many(productsOnpolicies),
+  collection_products: many(collectionOnProducts)
+}));
+
+export const productsOnpoliciesRelation = relations(productsOnpolicies, ({ one }) => ({
+  policy: one(policies, {
+      fields: [productsOnpolicies.policy_uid],
+      references: [policies.uid]
+  }),
+  product: one(products, {
+      fields: [productsOnpolicies.product_id],
+      references: [products.id]
+  })
 }))

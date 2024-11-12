@@ -1,5 +1,5 @@
 'use client';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface AuthContextType {
@@ -29,6 +29,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await fetch('/api/auth/profile', { method: 'GET' });
       
       if (!response.ok) {
+        if(response.status === 401) {
+          return redirect('/login')
+        }
         throw new Error('Profile fetch failed');
       }
       

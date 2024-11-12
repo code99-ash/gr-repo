@@ -14,7 +14,7 @@ export default async function ProductPage() {
   });
 
   if (response.status === 401) {
-   redirect('/login')
+   return redirect('/login')
   }
 
   const data = await response.json();

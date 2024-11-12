@@ -23,7 +23,10 @@ export class PoliciesRepository {
 
     async list() {
         return await this.db.query.policies.findMany({
-            where: isNull(policies.deleted_at)
+            where: isNull(policies.deleted_at),
+            columns: {
+                policy_flow: false
+            }
         });
     }
 

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, createContext } from 'react'
-import { CollectionGroupItem as ItemProp } from '../interfaces';
+import { CollectionGroupItem as ItemProp, ProductPolicy } from '../interfaces';
 import { RadioGroup } from "@/components/ui/radio-group"
 import CollectionGroupItem from './collection-item'
 import { Card } from '@/components/ui/card'
@@ -13,6 +13,11 @@ interface SelectedProp {
     setSelected: (uid: any) => void;
     assignPolicy: (id: string, policy_uid: string) => void,
     unassignPolicy: (id: string, policy_uid: string) => void,
+    updateProductPolicy: (
+        collection_id: string, 
+        product_id: string, 
+        product_policies: ProductPolicy[]
+    ) => void
 }
 
 export const SelectedCtx = createContext<SelectedProp>({
@@ -21,6 +26,7 @@ export const SelectedCtx = createContext<SelectedProp>({
     setSelected: () => {}, 
     assignPolicy: () => {},
     unassignPolicy: () => {},
+    updateProductPolicy: () => {}
 });
 
 interface CollectionGroupProp {
@@ -55,8 +61,32 @@ export default function CollectionGroup({ data }: CollectionGroupProp) {
         })
     }
 
+    const updateProductPolicy = (collection_id: string, product_id: string, product_policies: ProductPolicy[]) => {
+        setCollections((prev_collections) => {
+            return prev_collections.map(collection => {
+                if(collection.id === collection_id) {
+                    collection.collection_products.map(collection_product => {
+                        if(collection_product.product_id === product_id) {
+                            const product = collection_product.product;
+                            product.product_policies = product_policies
+                        }
+                        return collection_product
+                    })
+                }
+                return collection
+            })
+        })
+    }
+
     return (
-        <SelectedCtx.Provider value={{selected, setSelected, collections, assignPolicy, unassignPolicy}}>
+        <SelectedCtx.Provider value={{
+            selected, 
+            setSelected, 
+            collections, 
+            assignPolicy, 
+            unassignPolicy,
+            updateProductPolicy
+        }}>
 
             <section className='space-y-5'>
                 <PageHeader />
