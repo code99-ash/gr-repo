@@ -1,6 +1,6 @@
 export const condition_operators = {
-    customer: ['is less than'] as const,
-    order:['is less than', 'is greater than'] as const
+    customer: ['is_less_than'] as const,
+    order:['is_less_than', 'is_greater_than'] as const
 }
 
 export const action_types = [

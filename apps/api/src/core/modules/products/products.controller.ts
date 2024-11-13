@@ -37,6 +37,26 @@ export class ProductsController {
 
   }
 
+  @Get(':id')
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions([`*:*:${Resources.USER}:${Actions.READ}`])
+  async find(@Req() req: IRequest, @Param('id') product_id: string) {
+    if(!req.user) {
+      throw new UnauthorizedException();
+    }
+
+    const user = req.user as ORM<typeof SafeBaseAccount>;
+
+    const store = await this.storesService.find(user.organization_uid);
+    if(!store) {
+      throw new UnauthorizedException('Store not found');
+    }
+
+    return this.productsService.find(store.uid, product_id);
+
+  }
+
   @Post()
   async getMyProducts(@Body() payload: BroadcastStoreCreated) {
     return this.productsService.asyncFetch(payload);

@@ -26,7 +26,10 @@ export class PoliciesRepository {
             where: isNull(policies.deleted_at),
             columns: {
                 policy_flow: false
-            }
+            },
+            // with: {
+            //     product_policies: true
+            // }
         });
     }
 

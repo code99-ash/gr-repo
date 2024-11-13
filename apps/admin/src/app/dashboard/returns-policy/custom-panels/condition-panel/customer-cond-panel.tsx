@@ -27,28 +27,28 @@ export default function CustomerConditionPanel() {
   const selectedNode = usePolicyForm(state => state.selectedNode) as CustomerConditionType
   
   const [form, setForm] = useState({
-    expectedPeriod: 5,
+    expected_period: 5,
     operator: 'is less than',
-    period: 'Days',
-    periodValue: 2
+    period: 'days',
+    period_value: 2
   })
 
   useEffect(() => {
     const {data} = selectedNode;
     setForm({
-      expectedPeriod: data.expectedPeriod,
+      expected_period: data.expected_period,
       operator: data.operator,
       period: data.period,
-      periodValue: data.periodValue,
+      period_value: data.period_value,
     })
   }, [selectedNode]);
 
-  const onPeriodValueChange = (value: number) => {
-    setForm((prev) => ({...prev, periodValue: value}))
+  const onperiod_valueChange = (value: number) => {
+    setForm((prev) => ({...prev, period_value: value}))
   }
 
   const onExpectedValueChange = (value: number) => {
-    setForm((prev) => ({...prev, expectedPeriod: value}))
+    setForm((prev) => ({...prev, expected_period: value}))
   }
 
   const operatorChanged = (value: string) => {
@@ -104,7 +104,7 @@ export default function CustomerConditionPanel() {
                 type='number'
                 min={1}
                 onChange={(e) => onExpectedValueChange(Number(e.target.value))} 
-                value={form.expectedPeriod}
+                value={form.expected_period}
               />
             </div>
 
@@ -116,8 +116,8 @@ export default function CustomerConditionPanel() {
                 id="period-value"
                 type='number'
                 min={1}
-                onChange={(e) => onPeriodValueChange(Number(e.target.value))} 
-                value={form.periodValue}
+                onChange={(e) => onperiod_valueChange(Number(e.target.value))} 
+                value={form.period_value}
               />
             </div>
 

@@ -19,10 +19,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           body: JSON.stringify({policy_status})
         });
 
+        if(!nestResponse.ok) {
+            const data = await nestResponse.json()
+            console.log(data)
+            return res.status(data.statusCode).json({message: data.message})
+        }
+
         const data = await nestResponse.json();
 
         res.status(200).json({message: data.data});
-    } catch (error) {
-        res.status(500).json({ message: 'Internal Server Error' });
+    } catch (error: any) {
+        res.status(error.status).json({ message: 'Internal Server Error' });
     }
 }

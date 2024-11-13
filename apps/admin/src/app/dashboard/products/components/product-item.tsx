@@ -6,11 +6,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Trash2Icon } from 'lucide-react';
 import { Product } from '../interfaces';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function ProductItem({product}: {product: Product}) {
+    const router = useRouter()
     
     return <>
-        <Card className='product-item'>
+        <Card className='product-item group'>
             <CardContent className='p-0 md:px-6 col-span-4'>
                 <div className='flex items-center gap-3'>
                     <Checkbox />
@@ -25,7 +27,8 @@ export default function ProductItem({product}: {product: Product}) {
                         /> :
                         <div className='placeholder-img'></div>
                     }
-                    <h3 className='satoshi-medium text-sm md:text-base'>
+                    <h3 className='satoshi-medium text-sm md:text-base group-hover:text-primary hover:underline cursor-pointer'
+                    onClick={()=>router.push(`/dashboard/products/${product.id}`)}>
                         {product.title}
                     </h3>
                 </div>

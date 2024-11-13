@@ -25,6 +25,7 @@ export class PoliciesService {
 
   private _flowIsComplete(policy_flow: PolicyFlowDto, policy_type: PolicyType) {
     let isValid = true;
+
     try {
 
       switch (policy_type) { 
@@ -42,7 +43,6 @@ export class PoliciesService {
       }
 
     } catch (error) {
-      console.log(error)
       isValid = false;
     }
 
@@ -186,10 +186,18 @@ export class PoliciesService {
       throw new BadRequestException(`Sorry you cannot downgrade the status of an active policy`);
     }
 
-    const flowIsValid = this._flowIsComplete(existing_policy.policy_flow, existing_policy.policy_type);
+    
 
-    if(policy_status !== 'draft' && !flowIsValid) {
-      throw new BadRequestException(`Invalid policy flow, make sure it is complete and valid`);
+    if(policy_status !== 'draft') {
+      try {
+        const validate_flow = this._flowIsComplete(existing_policy.policy_flow, existing_policy.policy_type);
+        if(!validate_flow) {
+          throw new BadRequestException(`Invalid policy flow, make sure it is complete and valid`);
+        }
+      }catch {
+        console.log('Policy not complete')
+        throw new BadRequestException(`Invalid policy flow, make sure it is complete and valid`);
+      }
     }
 
     try {
@@ -203,7 +211,7 @@ export class PoliciesService {
       }
 
     } catch (error) {
-      throw new InternalServerErrorException('Error updating policy status');
+      throw new BadRequestException('Error updating policy status');
     }
     
   }

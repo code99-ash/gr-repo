@@ -4,7 +4,7 @@ import { BroadcastStoreCreated } from '../stores/store.interface';
 import { OnEvent } from '@nestjs/event-emitter';
 import { STORE_CREATED } from '../stores/stores.service';
 import axios from 'axios';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { products } from './db/products.db';
 
 @Injectable()
@@ -17,6 +17,42 @@ export class ProductsService {
     try {
       const response = await this.productsRepository.list({
         where: eq(products.store_uid, store_uid),
+        columns: {
+          meta: false,
+        },
+        with: {
+          product_policies: {
+            with: {
+              policy: {
+                columns: {
+                  id: false,
+                  policy_flow: false,
+                  created_at: false,
+                  updated_at: false,
+                  deleted_at: false,
+                  activated_at: false,
+                  activated_by: false,
+                }
+              }
+            }
+          }
+        }
+      })
+
+      return response;
+
+    }catch(error) {
+      throw new InternalServerErrorException('Unable to fetch products')
+    } 
+  }
+
+  async find(store_uid: string, product_id: string) {
+    try {
+      const response = await this.productsRepository.find({
+        where: and(
+          eq(products.id, product_id),
+          eq(products.store_uid, store_uid),
+        ),
         columns: {
           meta: false,
         },

@@ -38,7 +38,3 @@ export const collectionOnPoliciesRelation = relations(collectionOnPolicies, ({ o
     })
 }))
 
-export const policyRelations = relations(policies, ({ many }) => ({
-  collection_policies: many(collectionOnPolicies)
-}))
-

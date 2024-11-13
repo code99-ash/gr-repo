@@ -21,7 +21,6 @@ import useResponse from '@/hooks/use-response';
 const accepted_types: PolicyTypes[] = ['duration', 'order', 'customer', 'product']
 
 export default function ProductPolicyBuiler() {
-  const { toast } = useToast()
   const params = useParams()
   const router = useRouter()
   const policyForm = usePolicyForm()

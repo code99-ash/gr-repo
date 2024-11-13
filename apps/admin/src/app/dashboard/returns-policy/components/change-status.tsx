@@ -50,14 +50,17 @@ export default function ChangePolicyStatus() {
                 method: 'POST',
                 body: JSON.stringify({policy_status, policy_uid: selected})
             })
-
+            if(!response.ok) {
+                const data = await response.json()
+                return errorResponse({description: data.message}, true)
+            }
             await response.json();
             updateStatus({uid: selected, status: policy_status});
 
             defaultResponse({description: 'Successfully updated status'})
 
         }catch(error: any) {
-            errorResponse({description: error.data})
+            errorResponse({description: error.data}, true)
         }finally {
             setLoading(false)
         }

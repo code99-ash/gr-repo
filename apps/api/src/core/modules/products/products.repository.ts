@@ -18,6 +18,10 @@ export class ProductsRepository {
     return await this.db.query.products.findMany(config);
   }
 
+  async find(config: any) {
+    return await this.db.query.products.findFirst(config);
+  }
+
   async assignPolicy(product_id: string, payload: string[]) {
     return this.db.insert(productsOnpolicies).values(
       payload.map(policy_uid => ({product_id, policy_uid}))

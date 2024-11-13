@@ -18,11 +18,20 @@ import { PolicyListType } from '@/store/policies/policy-store';
 import { ProductPolicy } from '../../interfaces';
 import PolicyItem from './policy-item';
 
-export default function PolicyAssignment({ product_policies, product_id, updatePolicies }: { 
+interface PropType {
     product_policies: ProductPolicy[],
     product_id: string,
-    updatePolicies: (to_assign: string[], to_unassign: string[]) => void
-}) {
+    updatePolicies: (to_assign: string[], to_unassign: string[]) => void;
+    button?: React.ReactNode
+}
+
+export default function PolicyAssignment({ 
+    product_policies, 
+    product_id, 
+    updatePolicies, 
+    button 
+}: PropType) {
+
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [policies, setPolicies] = useState<PolicyListType[]>([]);
@@ -109,13 +118,16 @@ export default function PolicyAssignment({ product_policies, product_id, updateP
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button 
-                    variant="ghost"
-                    className="text-primary"
-                    onClick={() => setOpen(true)}
-                >
-                    {product_policies.length} Policies
-                </Button>
+                {
+                    button ?? 
+                    <Button 
+                        variant="ghost"
+                        className="text-primary"
+                        onClick={() => setOpen(true)}
+                    >
+                        {product_policies.length} Policies
+                    </Button>
+                }
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
