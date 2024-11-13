@@ -15,4 +15,6 @@ export const policyRelations = relations(policies, ({one, many}) => ({
     fields: [policies.activated_by],
     references: [users.uid]
   }),
+
+  product_policies: many(productsOnpolicies)
 }))

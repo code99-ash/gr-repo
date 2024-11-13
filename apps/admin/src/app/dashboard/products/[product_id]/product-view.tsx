@@ -8,10 +8,11 @@ import Image from 'next/image';
 import PolicyAssignment from '../components/products/policy-assignment';
 
 export default function ProductView({data}: {data: Product}) {
+
   const policy_names = data.product_policies.map(each => each.policy.policy_name);
 
   const updatePolicies = () => {
-
+    window.location.reload()
   }
 
   return (

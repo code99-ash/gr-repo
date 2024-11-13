@@ -14,7 +14,7 @@ export default function PolicyItem({policy}: {policy: PolicyListType}) {
     const date = useMemo(() => formatDate(policy.updated_at), [policy])
 
     return (
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-1 bg-card p-3 rounded shadow-sm hover:border hover:border-border group'>
+        <div className='w-full grid grid-cols-1 lg:grid-cols-2 gap-1 bg-card p-3 rounded shadow-sm hover:border hover:border-border group'>
             <section className='space-y-2'>
                 <h1 
                     className="text-primary satoshi-medium group-hover:underline cursor-pointer w-max"
