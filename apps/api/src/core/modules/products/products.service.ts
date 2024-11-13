@@ -25,9 +25,13 @@ export class ProductsService {
             with: {
               policy: {
                 columns: {
+                  id: false,
                   policy_flow: false,
                   created_at: false,
-                  updated_at: false
+                  updated_at: false,
+                  deleted_at: false,
+                  activated_at: false,
+                  activated_by: false,
                 }
               }
             }

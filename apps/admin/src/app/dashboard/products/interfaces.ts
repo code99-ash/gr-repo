@@ -3,6 +3,13 @@ import { PolicyStatus } from "@/store/policies/policy-form";
 export interface ProductPolicy {
     policy_uid: string;
     product_id: string;
+    policy: {
+        uid: string;
+        organization_uid: string | null;
+        policy_name: string;
+        policy_type: string;
+        policy_status: PolicyStatus;
+    }
 }
 
 export interface Product {
@@ -11,7 +18,10 @@ export interface Product {
     store_uid: string;
     title: string;
     status: string;
-    images: any[];
+    images: {
+        id: string;
+        src: string;
+    }[];
     product_policies: ProductPolicy[];
     created_at: string;
     updated_at: string;

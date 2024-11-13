@@ -5,7 +5,7 @@ import { Table } from '@/components/ui/table';
 import { CardContent, CardTitle } from '@/components/ui/card';
 import { RadioGroupItem } from '@/components/ui/radio-group';
 import { CollectionGroupItem as ItemProp } from '../interfaces';
-import ProductItem from './product-item';
+import ProductItem from './product-item-v2';
 
 export default function CollectionGroupItem({collection}: {collection: ItemProp}) {
     const policy_length = collection.collection_policies.length
