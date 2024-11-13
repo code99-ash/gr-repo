@@ -14,10 +14,8 @@ export class ProductsRepository {
     return await this.db.insert(products).values(data)
   }
 
-  async list(key: keyof typeof products._.columns, value: string | number) {
-    return await this.db.query.products.findMany({
-      where: eq(products[key], value)
-    });
+  async list(config: any) {
+    return await this.db.query.products.findMany(config);
   }
 
   async assignPolicy(product_id: string, payload: string[]) {

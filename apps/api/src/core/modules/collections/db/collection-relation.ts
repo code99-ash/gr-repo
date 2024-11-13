@@ -42,18 +42,3 @@ export const policyRelations = relations(policies, ({ many }) => ({
   collection_policies: many(collectionOnPolicies)
 }))
 
-export const productRelations = relations(products, ({ many }) => ({
-  product_policies: many(productsOnpolicies),
-  collection_products: many(collectionOnProducts)
-}));
-
-export const productsOnpoliciesRelation = relations(productsOnpolicies, ({ one }) => ({
-  policy: one(policies, {
-      fields: [productsOnpolicies.policy_uid],
-      references: [policies.uid]
-  }),
-  product: one(products, {
-      fields: [productsOnpolicies.product_id],
-      references: [products.id]
-  })
-}))

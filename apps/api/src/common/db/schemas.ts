@@ -18,7 +18,7 @@ export * from '../../core/modules/policy_histories/db/policy_histories.db';
 export * from '../../core/modules/stores/db/stores.db';
 export * from '../../core/modules/collections/db/collections.db';
 export * from '../../core/modules/products/db/products.db';
-// export * from '../../core/modules/products/db/product-relations.db';
+export * from '../../core/modules/products/db/product-relations.db';
 export * from '../../core/modules/products/db/products-policies.db';
 export * from '../../core/modules/collections/db/collections-products.db';
 export * from '../../core/modules/collections/db/collection-policies.db';

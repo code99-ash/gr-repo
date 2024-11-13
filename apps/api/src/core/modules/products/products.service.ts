@@ -4,12 +4,43 @@ import { BroadcastStoreCreated } from '../stores/store.interface';
 import { OnEvent } from '@nestjs/event-emitter';
 import { STORE_CREATED } from '../stores/stores.service';
 import axios from 'axios';
+import { eq } from 'drizzle-orm';
+import { products } from './db/products.db';
 
 @Injectable()
 export class ProductsService {
   constructor(
     private readonly productsRepository: ProductsRepository,
   ) {}
+
+  async fetch(store_uid: string) {
+    try {
+      const response = await this.productsRepository.list({
+        where: eq(products.store_uid, store_uid),
+        columns: {
+          meta: false,
+        },
+        with: {
+          product_policies: {
+            with: {
+              policy: {
+                columns: {
+                  policy_flow: false,
+                  created_at: false,
+                  updated_at: false
+                }
+              }
+            }
+          }
+        }
+      })
+
+      return response;
+
+    }catch(error) {
+      throw new InternalServerErrorException('Unable to fetch products')
+    } 
+  }
 
   inArray(array: any[], prop: string, value: any) {
     return array.some(each => each[prop] === value)
