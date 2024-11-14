@@ -17,8 +17,15 @@ export class PoliciesController {
     constructor(private readonly policiesService: PoliciesService) {}
 
     @Get()
-    async findAll() {
-        return await this.policiesService.findAll()
+    @UseGuards(JWTAuthGuard)
+    @ApiBearerAuth()
+    @Permissions([`*:*:${Resources.USER}:${Actions.READ}`])
+    async findAll(@Req() req: IRequest) {
+  
+        if(!req.user) throw new UnauthorizedException();
+        const user = req.user as ORM<typeof SafeBaseAccount>;
+        return await this.policiesService.findAll(user.organization_uid)
+        
     }
 
     @Post('/not-in-array')
@@ -26,11 +33,11 @@ export class PoliciesController {
     @ApiBearerAuth()
     @Permissions([`*:*:${Resources.USER}:${Actions.READ}`])
     async filterFetch(@Body() filters: string[], @Req() req: IRequest) {
-        if(!req.user) {
-            throw new UnauthorizedException();
-        }
 
-        return await this.policiesService.filterFetch(filters)
+        if(!req.user) throw new UnauthorizedException();
+        const user = req.user as ORM<typeof SafeBaseAccount>;
+        return await this.policiesService.filterFetch(filters, user.organization_uid)
+
     }
 
     @Post('/in-array')
@@ -38,11 +45,11 @@ export class PoliciesController {
     @ApiBearerAuth()
     @Permissions([`*:*:${Resources.USER}:${Actions.READ}`])
     async filterFetchInArray(@Body() filters: string[], @Req() req: IRequest) {
-        if(!req.user) {
-            throw new UnauthorizedException();
-        }
+        
+        if(!req.user) throw new UnauthorizedException();
+        const user = req.user as ORM<typeof SafeBaseAccount>;
 
-        return await this.policiesService.filterFetchInArray(filters)
+        return await this.policiesService.filterFetchInArray(filters, user.organization_uid)
     }
 
     @Get(':uid')
@@ -64,24 +71,49 @@ export class PoliciesController {
         @Body() updatePolicyStatusDto: UpdatePolicyStatusDto,
         @Req() req: IRequest
     ) {
-        if(!req.user) {
-            throw new UnauthorizedException();
-        }
-
+        if(!req.user) throw new UnauthorizedException();
         const user = req.user as ORM<typeof SafeBaseAccount>;
-        return this.policiesService.updateStatus(uid, updatePolicyStatusDto, user.user_uid)
+
+        return this.policiesService.updateStatus(
+            uid, 
+            updatePolicyStatusDto, 
+            user.user_uid, 
+            user.organization_uid
+        )
     }
 
     @Patch(':uid')
+    @UseGuards(JWTAuthGuard)
+    @ApiBearerAuth()
+    @Permissions([`*:*:${Resources.USER}:${Actions.READ}`])
     async update(
         @Param('uid') uid: string, 
-        @Body() updatePolicyDto: UpdatePolicyDto
+        @Body() updatePolicyDto: UpdatePolicyDto,
+        @Req() req: IRequest
     ) {
-        return this.policiesService.update(uid, updatePolicyDto)
+
+        if(!req.user) throw new UnauthorizedException();
+        const user = req.user as ORM<typeof SafeBaseAccount>;
+
+        return this.policiesService.update(
+            uid, 
+            updatePolicyDto, 
+            user.organization_uid
+        )
     }
 
     @Delete(':uid')
-    async remove(@Param('uid') uid: string) {
-        return await this.policiesService.delete(uid)
+    @UseGuards(JWTAuthGuard)
+    @ApiBearerAuth()
+    @Permissions([`*:*:${Resources.USER}:${Actions.READ}`])
+    async remove(@Param('uid') uid: string, @Req() req: IRequest) {
+
+        if(!req.user) throw new UnauthorizedException();
+        const user = req.user as ORM<typeof SafeBaseAccount>;
+
+        return await this.policiesService.delete(
+            uid, 
+            user.organization_uid
+        )
     }
 }

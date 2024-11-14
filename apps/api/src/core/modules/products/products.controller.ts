@@ -27,9 +27,7 @@ export class ProductsController {
   ) {}
 
   @Post('/created')
-  async postCreated(payload: any) {
-
-  }
+  async postCreated(payload: any) { }
 
   @Get()
   @UseGuards(JWTAuthGuard)
@@ -69,11 +67,6 @@ export class ProductsController {
 
     return this.productsService.find(store.uid, product_id);
 
-  }
-
-  @Post()
-  async getMyProducts(@Body() payload: BroadcastStoreCreated) {
-    return this.productsService.asyncFetch(payload);
   }
 
   @Post('/:product_id/policies')

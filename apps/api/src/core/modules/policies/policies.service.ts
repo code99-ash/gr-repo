@@ -64,25 +64,25 @@ export class PoliciesService {
     }
   }
 
-  async findAll(organization_uid?: string) {
+  async findAll(organization_uid: string) {
     try {
-      return await this.policiesRepository.list();
+      return await this.policiesRepository.list(organization_uid);
     } catch (error) {
       throw new InternalServerErrorException('Error fetching policies');
     }
   }
   
-  async filterFetch(filters: string[]) {
+  async filterFetch(filters: string[], organization_uid: string) {
     try {
-      return await this.policiesRepository.filterFetch(filters)
+      return await this.policiesRepository.filterFetch(filters, organization_uid)
     } catch (error) {
       throw new InternalServerErrorException('Error fetching policies');
     }
   }
 
-  async filterFetchInArray(filters: string[]) {
+  async filterFetchInArray(filters: string[], organization_uid: string) {
     try {
-      return await this.policiesRepository.filterFetchInArray(filters)
+      return await this.policiesRepository.filterFetchInArray(filters, organization_uid)
     } catch (error) {
       throw new InternalServerErrorException('Error fetching policies');
     }
@@ -138,7 +138,7 @@ export class PoliciesService {
     return rest;
   }
 
-  async update(uid: string, updateData: UpdatePolicyDto) {
+  async update(uid: string, updateData: UpdatePolicyDto, organization_uid: string) {
 
     const updatePolicyDto = this.filterOut(updateData, 'policy_status');
 
@@ -165,11 +165,16 @@ export class PoliciesService {
     }
 
  
-    return await this.policiesRepository.update(uid, updatePolicyDto)   
+    return await this.policiesRepository.update(uid, updatePolicyDto, organization_uid)   
     
   }
 
-  async updateStatus(uid: string, updatePolicyStatusDto: UpdatePolicyStatusDto, user_id: string) {
+  async updateStatus(
+    uid: string, 
+    updatePolicyStatusDto: UpdatePolicyStatusDto, 
+    user_id: string,
+    organization_uid: string,
+  ) {
     const { policy_status } = updatePolicyStatusDto;
 
     const existing_policy = await this.findOne(uid);
@@ -205,9 +210,9 @@ export class PoliciesService {
       if(policy_status === 'active') {
         // // Authorized user_uid is required
         console.log('status', policy_status, user_id)
-        return await this.policiesRepository.activate(uid, user_id);
+        return await this.policiesRepository.activate(uid, user_id, organization_uid);
       }else {
-        return await this.policiesRepository.updateStatus(uid, updatePolicyStatusDto);
+        return await this.policiesRepository.updateStatus(uid, updatePolicyStatusDto, organization_uid);
       }
 
     } catch (error) {
@@ -216,14 +221,14 @@ export class PoliciesService {
     
   }
 
-  async delete(uid: string) {
+  async delete(uid: string, organization_uid: string) {
     const policy = await this.policiesRepository.get('uid', uid);
     if (!policy) {
       throw new NotFoundException(`Policy with UID ${uid} not found.`);
     }
 
     try {
-        return await this.policiesRepository.softDelete(uid);
+        return await this.policiesRepository.softDelete(uid, organization_uid);
     } catch (error) {
       throw new InternalServerErrorException('Error deleting policy');
     }

@@ -1,8 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ProductsRepository } from './products.repository';
 import { BroadcastStoreCreated } from '../stores/store.interface';
-import { OnEvent } from '@nestjs/event-emitter';
-import { STORE_CREATED } from '../stores/stores.service';
 import axios from 'axios';
 import { and, eq } from 'drizzle-orm';
 import { products } from './db/products.db';

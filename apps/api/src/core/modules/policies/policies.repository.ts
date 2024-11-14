@@ -21,9 +21,12 @@ export class PoliciesRepository {
         return data ?? null;
     }
 
-    async list() {
+    async list(organization_uid: string) {
         return await this.db.query.policies.findMany({
-            where: isNull(policies.deleted_at),
+            where: and(
+                isNull(policies.deleted_at),
+                eq(policies.organization_uid, organization_uid),
+            ),
             columns: {
                 policy_flow: false
             },
@@ -33,9 +36,10 @@ export class PoliciesRepository {
         });
     }
 
-    async filterFetch(filters: string[]) {
+    async filterFetch(filters: string[], organization_uid: string) {
         return await this.db.query.policies.findMany({
             where: and(
+                eq(policies.organization_uid, organization_uid),
                 isNull(policies.deleted_at),
                 ne(policies.policy_status, 'draft'),
                 notInArray(policies.uid, filters),
@@ -43,9 +47,10 @@ export class PoliciesRepository {
         });
     }
 
-    async filterFetchInArray(filters: string[]) {
+    async filterFetchInArray(filters: string[], organization_uid: string) {
         return await this.db.query.policies.findMany({
             where: and(
+                eq(policies.organization_uid, organization_uid),
                 isNull(policies.deleted_at),
                 ne(policies.policy_status, 'draft'),
                 inArray(policies.uid, filters),
@@ -65,30 +70,41 @@ export class PoliciesRepository {
         return policy;
     }
 
-    async update(uid: string, policySchema: UpdatePolicyDto) {
+    async update(uid: string, policySchema: UpdatePolicyDto, organization_uid: string) {
         
         const [updatedPolicy] = await this.db.update(policies)
                                             .set(policySchema)
-                                            .where(eq(policies.uid, uid))
+                                            .where(and(
+                                                eq(policies.uid, uid),
+                                                eq(policies.organization_uid, organization_uid),
+                                            ))
                                             .returning();
 
         return updatedPolicy;
     }
 
-    async updateStatus(uid: string, updatePolicyStatusDto: UpdatePolicyStatusDto) {
+    async updateStatus(
+        uid: string, 
+        updatePolicyStatusDto: UpdatePolicyStatusDto,
+        organization_uid: string
+    ) {
         return await this.db.update(policies)
                             .set(updatePolicyStatusDto)
-                            .where(eq(policies.uid, uid))
+                            .where(and(
+                                eq(policies.uid, uid),
+                                eq(policies.organization_uid, organization_uid),
+                            ))
                             .returning();
     }
 
-    async activate(uid: string,  user_uid: string) {
+    async activate(uid: string,  user_uid: string, organization_uid: string) {
         const [activated] = await this.db.update(policies).set({
             policy_status: 'active',
             activated_at: new Date(),
             activated_by: user_uid,
         })
         .where(and(
+            eq(policies.organization_uid, organization_uid),
             isNull(policies.deleted_at), 
             eq(policies.uid, uid)
         ))
@@ -97,11 +113,14 @@ export class PoliciesRepository {
         return activated;
     }
 
-    async softDelete(uid: string) {
+    async softDelete(uid: string, organization_uid: string) {
         return await this.db
                     .update(policies)
                     .set({deleted_at: new Date()})
-                    .where(eq(policies.uid, uid))
+                    .where(and(
+                        eq(policies.uid, uid),
+                        eq(policies.organization_uid, organization_uid),
+                    ))
                     .returning();
                     
     }
