@@ -14,6 +14,8 @@ const ENV_SCHEMA = z.object({
   SHOPIFY_CLIENT_SECRET: z.string(),
   SHOPIFY_SCOPES: z.string(),
   SHOPIFY_REDIRECT_URL: z.string(),
+
+  WEBHOOK_BASE_URL: z.string(),
 });
 
 export const env = ENV_SCHEMA.parse({
@@ -29,4 +31,6 @@ export const env = ENV_SCHEMA.parse({
   SHOPIFY_CLIENT_SECRET: process.env.SHOPIFY_CLIENT_SECRET,
   SHOPIFY_SCOPES: process.env.SHOPIFY_SCOPES, 
   SHOPIFY_REDIRECT_URL: process.env.SHOPIFY_REDIRECT_URL, 
+
+  WEBHOOK_BASE_URL: process.env.WEBHOOK_BASE_URL
 });

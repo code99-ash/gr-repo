@@ -5,6 +5,7 @@ import { BroadcastStoreCreated } from "./store.interface";
 import axios from "axios";
 import { ProductsService } from "../products/products.service";
 import { CollectionsService } from "../collections/collections.service";
+import { env } from "src/common/env/env.schema";
 
 
 interface WebhookReqData {
@@ -64,8 +65,7 @@ export class StoresListener {
     
     @OnEvent(STORE_CREATED)
     async registerShopifyWebhooks(payload: BroadcastStoreCreated) {
-        const base_url = `https://5eec-105-119-12-23.ngrok-free.app/api/v1`;
-        console.log('store_domain', payload.store_name)
+        const base_url = `${env.WEBHOOK_BASE_URL}/api/v1`;
 
         const webhooks = [
             { 
@@ -92,12 +92,7 @@ export class StoresListener {
                 topic: 'orders/updated',  
                 address:`${base_url}/products/updated/${payload.store_uid}`,
                 format: 'json' 
-            },
-            // { 
-            //     topic: 'shop/delete',     
-            //     address: `${base_url}/products/deleted/${payload.store_uid}`,
-            //     format: 'json' 
-            // },
+            }
         ];
 
         try {
