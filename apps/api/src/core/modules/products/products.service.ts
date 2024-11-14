@@ -86,7 +86,7 @@ export class ProductsService {
     return array.some(each => each[prop] === value)
   }
 
-  @OnEvent(STORE_CREATED)
+
   async asyncFetch(payload: BroadcastStoreCreated) {
     const url = `https://${payload.store_name}/admin/api/2024-01/products.json`;
       try {

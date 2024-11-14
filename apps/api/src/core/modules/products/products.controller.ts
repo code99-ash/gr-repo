@@ -1,4 +1,13 @@
-import { Body, Controller, Get, InternalServerErrorException, Param, Post, Put, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { 
+  Body, 
+  Controller, 
+  Get, 
+  InternalServerErrorException, 
+  NotFoundException, 
+  Param, Post, Put, Req, 
+  UnauthorizedException,
+  UseGuards 
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { BroadcastStoreCreated } from '../stores/store.interface';
 import { Permissions } from 'src/common/decorators/permissions';
@@ -17,6 +26,11 @@ export class ProductsController {
     private readonly storesService: StoresService,
   ) {}
 
+  @Post('/created')
+  async postCreated(payload: any) {
+
+  }
+
   @Get()
   @UseGuards(JWTAuthGuard)
   @ApiBearerAuth()
@@ -30,7 +44,7 @@ export class ProductsController {
 
     const store = await this.storesService.find(user.organization_uid);
     if(!store) {
-      throw new UnauthorizedException('Store not found');
+      throw new NotFoundException('Store not found.');
     }
 
     return this.productsService.fetch(store.uid);

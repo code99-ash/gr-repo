@@ -1,9 +1,8 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CollectionsController } from './collections.controller';
 import { CollectionsRepository } from './collections.repository';
 import { DbModule } from 'src/common/db/db.module';
 import { PassportModule } from '@nestjs/passport';
-import { OrdersModule } from '../orders/orders.module';
 import { CollectionsService } from './collections.service';
 import { StoresModule } from '../stores/stores.module';
 
@@ -11,7 +10,7 @@ import { StoresModule } from '../stores/stores.module';
   imports: [
     DbModule,
     PassportModule,
-    StoresModule
+    forwardRef(() => StoresModule),
   ],
   controllers: [CollectionsController],
   providers: [CollectionsService, CollectionsRepository],

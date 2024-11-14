@@ -13,8 +13,13 @@ export default async function ProductPage() {
     }
   });
 
-  if (response.status === 401) {
-   return redirect('/login')
+  if (!response.ok) {
+    if(response.status === 404) {
+      return redirect('/dashboard/connect-store')
+    }
+    if(response.status === 401) {
+      return redirect('/login')
+    }
   }
 
   const data = await response.json();

@@ -1,8 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import axios from 'axios';
 import { CollectionsRepository } from './collections.repository';
-import { STORE_CREATED } from '../stores/stores.service';
-import { OnEvent } from '@nestjs/event-emitter';
 import { ClientCollectionDto, CreateCollectionDto, CreateCollectionProductDto } from './dto/create-collection.dto';
 import { BroadcastStoreCreated } from '../stores/store.interface';
 import { CollectionPolicyDto } from './dto/collection-policy.dto';
@@ -18,7 +16,6 @@ export class CollectionsService {
         return await this.collectionsRepository.list('store_uid', store_uid);
     }
 
-    @OnEvent(STORE_CREATED)
     async asyncFetchCollection(payload: BroadcastStoreCreated) {
         const url = `https://${payload.store_name}/admin/api/2024-01/custom_collections.json`;
         
@@ -40,7 +37,6 @@ export class CollectionsService {
         }
     }
 
-    @OnEvent(STORE_CREATED)
     async asyncFetchCollect(payload: BroadcastStoreCreated) {
         const url = `https://${payload.store_name}/admin/api/2024-01/collects.json`;
         

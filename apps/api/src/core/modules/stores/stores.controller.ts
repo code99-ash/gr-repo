@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, Req, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req, UseGuards, UnauthorizedException, Post, InternalServerErrorException, Body } from '@nestjs/common';
 import { StoresService } from './stores.service';
 import { Request as IRequest } from 'express';
 import { JWTAuthGuard } from 'src/common/modules/auth/jwt-auth.guard';
@@ -7,12 +7,24 @@ import { Permissions } from 'src/common/decorators/permissions';
 import { Actions, Resources } from 'src/common/modules/auth/permissions.interface';
 import { SafeBaseAccount, store_types } from 'src/common/db/schemas';
 import { ORM } from 'src/common/repository';
+import { BroadcastStoreCreated } from './store.interface';
+import { StoresListener } from './stores.listener';
 
 @Controller('stores')
 export class StoresController {
     constructor(
-        private readonly storesService: StoresService
+        private readonly storesService: StoresService,
+        private readonly storesListener: StoresListener,
     ) {}
+
+    @Post('webhook')
+    async registerWebhooks(@Body() payload: BroadcastStoreCreated) {
+        try {
+            return await this.storesListener.registerShopifyWebhooks(payload)
+        }catch(error: any) {
+            throw new InternalServerErrorException('Failed to complete webhook register')
+        }
+    }
 
     @UseGuards(JWTAuthGuard)
     @ApiBearerAuth()
