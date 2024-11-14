@@ -11,16 +11,33 @@ import { ProductPolicyDto } from './dto/product-policy.dto';
 export class ProductsRepository {
   constructor(@Inject(DB) private db: Database) {}
 
-  async create(data: CreateProductDto[]) {
-    return await this.db.insert(products).values(data)
-  }
-
   async list(config: any) {
     return await this.db.query.products.findMany(config);
   }
 
   async find(config: any) {
     return await this.db.query.products.findFirst(config);
+  }
+
+  async create(data: CreateProductDto[]) {
+    return await this.db.insert(products).values(data)
+  }
+
+  async update(data: CreateProductDto, store_uid: string) {
+    return await this.db.update(products)
+                        .set(data)
+                        .where(and(
+                          eq(products.id, data.id),
+                          eq(products.store_uid, store_uid),
+                        )).returning()
+  }
+
+  async remove(product_id: any, store_uid: string) {
+    return await this.db.delete(products)
+                        .where(and(
+                          eq(products.id, product_id),
+                          eq(products.store_uid, store_uid)
+                        )).returning({id: products.id})
   }
 
   async assignPolicy(product_id: string, payload: string[]) {

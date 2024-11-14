@@ -26,8 +26,22 @@ export class ProductsController {
     private readonly storesService: StoresService,
   ) {}
 
-  @Post('/created')
-  async postCreated(payload: any) { }
+  @Post('/created/:store_uid')
+  async productCreated(@Body() payload: any, @Param('store_uid') store_uid: string) {
+    this.productsService.create([payload], store_uid)
+  }
+
+  @Post('/updated/:store_uid')
+  async productUpdated(@Body() payload: any, @Param('store_uid') store_uid: string) {
+    this.productsService.update(payload, store_uid)
+  }
+
+  @Post('/deleted/:store_uid')
+  async productDeleted(@Body() payload: {id: number}, @Param('store_uid') store_uid: string) {
+    this.productsService.remove(payload.id, store_uid)
+  }
+
+
 
   @Get()
   @UseGuards(JWTAuthGuard)

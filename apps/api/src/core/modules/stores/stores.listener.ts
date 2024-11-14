@@ -70,32 +70,32 @@ export class StoresListener {
         const webhooks = [
             { 
                 topic: 'products/create', 
-                address: `${base_url}/products/created`, 
+                address: `${base_url}/products/created/${payload.store_uid}`, 
                 format: 'json' 
             },
             { 
                 topic: 'products/update', 
-                address:`${base_url}/products/updated`, 
+                address:`${base_url}/products/updated/${payload.store_uid}`, 
                 format: 'json' 
             },
             { 
                 topic: 'products/delete', 
-                address: `${base_url}/products/deleted`,  
+                address: `${base_url}/products/deleted/${payload.store_uid}`,  
                 format: 'json' 
             },
             { 
                 topic: 'orders/create',   
-                address: `${base_url}/products/created`, 
+                address: `${base_url}/products/created/${payload.store_uid}`, 
                 format: 'json' 
             },
             { 
                 topic: 'orders/updated',  
-                address:`${base_url}/products/updated`,
+                address:`${base_url}/products/updated/${payload.store_uid}`,
                 format: 'json' 
             },
             // { 
             //     topic: 'shop/delete',     
-            //     address: `${base_url}/products/deleted`,
+            //     address: `${base_url}/products/deleted/${payload.store_uid}`,
             //     format: 'json' 
             // },
         ];

@@ -105,7 +105,7 @@ export class ProductsService {
   async create(payload: any[], store_uid: string) {
     try {
 
-      this.productsRepository.create(payload.map(each => ({
+      await this.productsRepository.create(payload.map(each => ({
         ...each,
         store_uid,
         created_at: each.created_at? new Date(each.created_at) : new Date(),
@@ -118,6 +118,22 @@ export class ProductsService {
     }catch(error) {
       console.log(error)
     }
+  }
+
+  async update(payload: any, store_uid: string) {
+    await this.productsRepository.update({
+      ...payload,
+      store_uid,
+      created_at: payload.created_at? new Date(payload.created_at) : new Date(),
+      updated_at: payload.updated_at? new Date(payload.updated_at) : new Date(),
+      meta: {
+        variants: payload.variants 
+      }
+    }, store_uid)
+  }
+
+  async remove(product_id: number, store_uid: string) {
+    await this.productsRepository.remove(product_id, store_uid)
   }
 
   async assignManytoMany(product_ids: string[], policy_uids: string[]) {
