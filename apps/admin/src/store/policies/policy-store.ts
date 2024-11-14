@@ -16,9 +16,8 @@ export interface PolicyListType {
   organization_uid?: string;
   policy_name: string;
   policy_type: PolicyTypes;
-  status: PolicyStatus;
-  current_flow: FlowRecord;
-  policy_history: FlowRecord[];
+  policy_status: PolicyStatus;
+  policy_flow: FlowRecord;
   deleted_at: string | null;
   updated_at: string;
   created_at: string;
@@ -32,6 +31,7 @@ interface PolicyState {
   setPolicies: (data: PolicyListType[]) => void;
   newPolicy: (data: PolicyListType) => void;
   updatePolicy: (data: PolicyListType) => void;
+  removePolicy: (uid: string) => void;
 }
 
 export const usePolicyStore = create<PolicyState>((set, get) => ({
@@ -52,4 +52,9 @@ export const usePolicyStore = create<PolicyState>((set, get) => ({
       ))
     })
   },
+  removePolicy(policy_uid: string) {
+    set({
+      policies: get().policies.filter(policy => policy.uid !== policy_uid)
+    })
+  }
 }));

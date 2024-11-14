@@ -25,15 +25,35 @@ export type INodeTypes =    'yes_no_question' |
 
 export type PolicyTypes = 'product' | 'duration' | 'customer' | 'order';
 
+export type PolicyStatus = "draft" | "active" | "published"
+
 export interface PolicyFlow {
     [key: string]: NodeObjectType;
 }
 
-interface PolicyFormType {
-    policy_id?: number;
+export interface PolicyData {
+    id: number;
+    uid: string;
     policy_name: string;
     policy_type: PolicyTypes;
     policy_flow: PolicyFlow;
+    policy_status: PolicyStatus;
+    organization_uid?: string;
+    activated_at?: string;
+    activated_by?: string;
+    created_at: string;
+    updated_at: string;
+    deleted_at?: string
+}
+
+interface PolicyFormType {
+    policy_id?: number;
+    policy_uid?: string;
+    policy_name: string;
+    policy_type: PolicyTypes;
+    policy_flow: PolicyFlow;
+    policy_status: PolicyStatus;
+    setPolicy: (policy: any) => void;
     setPolicyId: (id: number) => void;
     setPolicyName: (name: string) => void;
     setPolicyType: (type: PolicyTypes, existing_flow?: PolicyFlow) => void;
@@ -65,6 +85,7 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
     incomplete_nodes: [],
     policy_name: 'Returns policy builder',
     policy_type: 'product',
+    policy_status: 'draft',
     policy_flow: {
         head: {
             id: 'head',
@@ -73,6 +94,12 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
             data: null,
             branches: [],
         }
+    },
+
+    setPolicy(policy: PolicyData) {
+        set({ ...policy, policy_uid: policy.uid })
+        useReactflowStore.getState().initializeGraph(policy.policy_flow);
+        useReactflowStore.getState().layoutGraph()
     },
 
     getConditionData(policy_type: PolicyTypes): any {

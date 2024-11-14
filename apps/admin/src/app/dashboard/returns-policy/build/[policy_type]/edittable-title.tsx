@@ -39,7 +39,7 @@ export default function EdittableTitle() {
 
 
     // Modify
-    const policyUID = searchParams.get('uid');
+    const policyUID = searchParams?.get('uid');
     
     useEffect(() => {
         if(!policyUID) return;
