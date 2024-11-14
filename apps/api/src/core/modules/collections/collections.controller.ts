@@ -9,7 +9,6 @@ import { Request as IRequest } from 'express';
 import { SafeBaseAccount } from '../accounts/db/accounts.db';
 import { ORM } from 'src/common/repository';
 import { StoresService } from '../stores/stores.service';
-import { CollectionPolicyDto } from './dto/collection-policy.dto';
 
 @Controller('collections')
 export class CollectionsController {
@@ -44,14 +43,4 @@ export class CollectionsController {
         this.collectionsService.asyncFetchCollect(payload)
     }
 
-    @Post('/policies')
-    async assignPolicy(@Body() payload: CollectionPolicyDto) {
-        return await this.collectionsService.assignPolicy(payload)
-    }
-
-    @Patch('/policies')
-    async unassignPolicy(@Body() payload: CollectionPolicyDto) {
-        return await this.collectionsService.unassignPolicy(payload)
-    }
-  
 }

@@ -4,11 +4,8 @@ import { DB } from 'src/common/db/drizzle.provider';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 import { collections } from './db/collections.db';
 import { CreateCollectionDto, CreateCollectionProductDto } from './dto/create-collection.dto';
-import { collectionOnProducts } from './db/collections-products.db';
-import { collectionOnPolicies } from './db/collection-policies.db';
-import { CollectionPolicyDto } from './dto/collection-policy.dto';
-import { policy_status } from 'src/common/db/schemas';
 import { policies } from '../policies/db/policies.db';
+import { collectionOnProducts } from './db/collections-products.db';
 
 @Injectable()
 export class CollectionsRepository {
@@ -49,18 +46,6 @@ export class CollectionsRepository {
               }
             },
           }
-        },
-        collection_policies: {
-          columns: {
-            collection_id: false
-          },
-          with: {
-            policies: {
-              columns: {
-                uid: true
-              }
-            }
-          }
         }
       }
     })
@@ -76,16 +61,4 @@ export class CollectionsRepository {
     return await this.db.insert(collectionOnProducts).values(payload).returning();
   }
 
-  async assignPolicy(payload: CollectionPolicyDto) {
-    return this.db.insert(collectionOnPolicies).values(payload).returning();
-  }
-
-  async unassignPolicy(payload: CollectionPolicyDto) {
-    return this.db.delete(collectionOnPolicies)
-          .where(and(
-            eq(collectionOnPolicies.collection_id, payload.collection_id),
-            eq(collectionOnPolicies.policy_uid, payload.policy_uid),
-          )).returning()
-  }
-  
 }

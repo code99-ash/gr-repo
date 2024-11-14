@@ -1,9 +1,12 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import axios from 'axios';
 import { CollectionsRepository } from './collections.repository';
-import { ClientCollectionDto, CreateCollectionDto, CreateCollectionProductDto } from './dto/create-collection.dto';
+import { 
+    ClientCollectionDto, 
+    CreateCollectionDto, 
+    CreateCollectionProductDto 
+} from './dto/create-collection.dto';
 import { BroadcastStoreCreated } from '../stores/store.interface';
-import { CollectionPolicyDto } from './dto/collection-policy.dto';
 
 @Injectable()
 export class CollectionsService {
@@ -53,8 +56,7 @@ export class CollectionsService {
             this.createCollectionProduct(collects);
 
         } catch(error) {
-            console.error('Error fetching store collection-product pairs:', error.response);
-            throw new InternalServerErrorException('Error fetching store  collection-product pairs');
+            throw new InternalServerErrorException('Error fetching store collection-product pairs');
         }
     }
 
@@ -75,14 +77,5 @@ export class CollectionsService {
     async createCollectionProduct(payload: CreateCollectionProductDto[]) {
         return await this.collectionsRepository.createCollectProductPairs(payload);
     }
-
-    async assignPolicy(payload: CollectionPolicyDto) {
-        return await this.collectionsRepository.assignPolicy(payload)
-    }
-
-    async unassignPolicy(payload: CollectionPolicyDto) {
-        return await this.collectionsRepository.unassignPolicy(payload)
-    }
-
 
 }
