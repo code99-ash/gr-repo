@@ -1,14 +1,11 @@
 "use client";
-import React, { useContext } from 'react'
-import { SelectedCtx } from './collection-group';
-import AssignPolicyTrigger from './collections/assign-policy-trigger'
-import UnassignPolicyTrigger from './collections/unassign-policy-trigger';
+import React from 'react'
 import { Button } from '@/components/ui/button';
-
+import { SelectedContext } from './product-list';
+import AssignToManyProducts from './products/many/assign-many';
 
 
 export default function PageHeader() {
-    const { selected } = useContext(SelectedCtx)
     
     return (
         <header className="flex items-center justify-between gap-2 md:px-3 pb-3 border-b border-neutral-200">
@@ -20,17 +17,10 @@ export default function PageHeader() {
                 <Button variant="outline" className="border border-primary text-primary bg-transparent">
                     Update Products
                 </Button>
-                <Button className="bg-[#333] opacity-50 text-white">
-                    Assign Policy
-                </Button>
-            </div>
 
-            {selected && (
-                <div className="flex items-center gap-2 satoshi-medium">
-                    <AssignPolicyTrigger />
-                    <UnassignPolicyTrigger />
-                </div>
-            )}
+                <AssignToManyProducts />
+                
+            </div>
         </header>
   )
 }

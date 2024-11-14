@@ -5,6 +5,7 @@ import { products } from './db/products.db';
 import { and, eq, inArray } from 'drizzle-orm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { productsOnpolicies } from './db/products-policies.db';
+import { ProductPolicyDto } from './dto/product-policy.dto';
 
 @Injectable()
 export class ProductsRepository {
@@ -26,6 +27,14 @@ export class ProductsRepository {
     return this.db.insert(productsOnpolicies).values(
       payload.map(policy_uid => ({product_id, policy_uid}))
     ).returning();
+  }
+
+  async assignManytoMany(payload: ProductPolicyDto[]) {
+    return this.db.insert(productsOnpolicies)
+                  .values(payload)
+                  .onConflictDoNothing({
+                    target: [productsOnpolicies.product_id, productsOnpolicies.policy_uid]
+                  });
   }
 
   async unassignPolicy(product_id: string, payload: string[]) {

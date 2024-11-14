@@ -29,7 +29,7 @@ export default function PolicyAssignment({
     product_policies, 
     product_id, 
     updatePolicies, 
-    button 
+    button
 }: PropType) {
 
     const [open, setOpen] = useState(false);
@@ -162,6 +162,7 @@ export default function PolicyAssignment({
                 )}
 
                 <DialogFooter>
+                    
                     <Button 
                         type="button" 
                         onClick={handleSubmit} 
@@ -171,6 +172,7 @@ export default function PolicyAssignment({
                         Update Assignment 
                         {loading && <LoaderCircle width={15} height={15} className='ml-1 animate-spin' />}
                     </Button>
+                    
                 </DialogFooter>
             </DialogContent>
         </Dialog>

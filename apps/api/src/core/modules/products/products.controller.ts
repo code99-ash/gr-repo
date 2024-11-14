@@ -1,4 +1,4 @@
-import { Body, Controller, Get, InternalServerErrorException, Param, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, InternalServerErrorException, Param, Post, Put, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { BroadcastStoreCreated } from '../stores/store.interface';
 import { Permissions } from 'src/common/decorators/permissions';
@@ -70,23 +70,31 @@ export class ProductsController {
   {
     try {
       
-      console.log('body', body)
       const {to_assign, to_unassign} = body
-      console.log('to_assign', to_assign)
-      console.log('to_unassign', to_unassign)
 
       if(to_assign.length) {
-        console.log('Assigning policies')
         await this.productsService.assignPolicy(product_id, to_assign)
       }
   
       if(to_unassign.length) {
-        console.log('Unassigning policies')
-
         await this.productsService.unassignPolicy(product_id, to_unassign)
       }
   
       return 'ok'
+    
+    }catch(error) {
+      throw new InternalServerErrorException("Unable to manage product policy assignments")
+    }
+  }
+
+  @Put('/assign-policies')
+  async assignManytoMany(
+    @Body('product_ids') product_ids: string[],
+    @Body('policy_uids') policy_uids: string[],
+  ) {
+    try {
+
+      return this.productsService.assignManytoMany(product_ids, policy_uids)
     
     }catch(error) {
       throw new InternalServerErrorException("Unable to manage product policy assignments")

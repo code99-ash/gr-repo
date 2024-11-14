@@ -122,6 +122,14 @@ export class ProductsService {
     }
   }
 
+  async assignManytoMany(product_ids: string[], policy_uids: string[]) {
+
+    const payload = product_ids.flatMap(product_id => (
+      policy_uids.map(policy_uid => ({policy_uid, product_id}))
+    ))
+    
+    return await this.productsRepository.assignManytoMany(payload)
+  }
   async assignPolicy(product_id: string, payload: string[]) {
     return await this.productsRepository.assignPolicy(product_id, payload)
   }

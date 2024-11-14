@@ -1,21 +1,32 @@
 "use client";
 
-import React from 'react'
+import React, { useContext } from 'react'
 import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Trash2Icon } from 'lucide-react';
 import { Product } from '../interfaces';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { SelectionContext } from './product-list';
 
-export default function ProductItem({product}: {product: Product}) {
+interface ItemProp { 
+    product: Product
+}
+
+export default function ProductItem({product}: ItemProp) {
     const router = useRouter()
+    const {selected_products, toggleProductSelection} = useContext(SelectionContext)
+
+    const selected = selected_products.includes(product.id)
     
     return <>
         <Card className='product-item group'>
             <CardContent className='p-0 md:px-6 col-span-4'>
                 <div className='flex items-center gap-3'>
-                    <Checkbox />
+                    <Checkbox  
+                        checked={selected}
+                        onCheckedChange={() => toggleProductSelection(product.id)}
+                    />
                     {
                         product?.images[0] ?
                         <Image 

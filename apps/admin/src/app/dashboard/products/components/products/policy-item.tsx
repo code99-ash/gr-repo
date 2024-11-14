@@ -8,7 +8,7 @@ interface ItemProp {
     policy: PolicyListType
     to_assign: string[];
     to_unassign: string[];
-    initialCheck: (policy_uid: string) => boolean;
+    initialCheck?: (policy_uid: string) => boolean;
     addToAssign: (policy_uid: string) => void;
     addToUnassign: (policy_uid: string) => void;
     removeFromAssign: (policy_uid: string) => void;
@@ -26,7 +26,7 @@ export default function PolicyItem({
     removeFromUnassign
 }: ItemProp) {
     
-    const was_assigned = initialCheck(policy.uid);
+    const was_assigned = initialCheck ? initialCheck(policy.uid) : false;
 
     const [checked, setChecked] = useState(was_assigned);
 
