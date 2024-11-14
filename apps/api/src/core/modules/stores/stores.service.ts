@@ -7,6 +7,7 @@ import * as crypto from 'crypto';
 import { store_types } from './db/stores.db';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BroadcastStoreCreated } from './store.interface';
+import { Request as IRequest } from 'express';
 
 export const STORE_CREATED = 'store.created'
 
@@ -54,14 +55,15 @@ export class StoresService {
     return await this.storesRepository.findStore('organization_uid', organization_uid)
   }
 
-  async createStore(store: CreateStoreDto) {
+  async createStore(request: IRequest, store: CreateStoreDto) {
     const data = await this.storesRepository.createStore(store);
     
     this.sendStoreCreateEvent({
       store_name: store.store_name,
       store_uid: data[0].uid,
       access_token: (store.api_key as { access_token?: string })?.access_token || '',
-      store_type: store.store_type
+      store_type: store.store_type,
+      request_host: `${request.protocol}://${request.get('host')}`
     });
 
     return data;

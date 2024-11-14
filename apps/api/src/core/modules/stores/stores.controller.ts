@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, Req, UseGuards, UnauthorizedException, Post, InternalServerErrorException, Body } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { StoresService } from './stores.service';
 import { Request as IRequest } from 'express';
 import { JWTAuthGuard } from 'src/common/modules/auth/jwt-auth.guard';
@@ -7,7 +7,6 @@ import { Permissions } from 'src/common/decorators/permissions';
 import { Actions, Resources } from 'src/common/modules/auth/permissions.interface';
 import { SafeBaseAccount, store_types } from 'src/common/db/schemas';
 import { ORM } from 'src/common/repository';
-import { StoresListener } from './stores.listener';
 
 @Controller('stores')
 export class StoresController {
@@ -48,7 +47,7 @@ export class StoresController {
 
         const data = await this.storesService.authorizeCallback(shop, code);
 
-        const response = await this.storesService.createStore({
+        const response = await this.storesService.createStore(req, {
             store_name: shop,
             api_key: {
                 access_token: data.access_token,

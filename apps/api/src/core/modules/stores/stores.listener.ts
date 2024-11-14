@@ -65,7 +65,11 @@ export class StoresListener {
     
     @OnEvent(STORE_CREATED)
     async registerShopifyWebhooks(payload: BroadcastStoreCreated) {
-        const base_url = `${env.WEBHOOK_BASE_URL}/api/v1`;
+        
+        const environment = process.env.NODE_ENV || 'development';
+        const WEBHOOK_BASE_URL = environment === 'development'? env.WEBHOOK_BASE_URL : payload.request_host
+
+        const base_url = `${WEBHOOK_BASE_URL}/api/v1`;
 
         const webhooks = [
             { 
