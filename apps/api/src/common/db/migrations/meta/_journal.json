@@ -8,6 +8,20 @@
       "when": 1731334990047,
       "tag": "0000_normal_ben_parker",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1731919532294,
+      "tag": "0001_loose_norman_osborn",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1731919666415,
+      "tag": "0002_luxuriant_sue_storm",
+      "breakpoints": true
     }
   ]
 }

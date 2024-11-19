@@ -16,10 +16,10 @@ export const ordersToProducts = pgTable(
   {
     order_id: text('order_id')
       .notNull()
-      .references(() => orders.uid),
+      .references(() => orders.uid, {onDelete: 'cascade'}),
     product_id: text('product_id')
       .notNull()
-      .references(() => products.uid),
+      .references(() => products.uid, {onDelete: 'cascade'}),
   },
   (t) => ({
     primaryKey: primaryKey({ columns: [t.order_id, t.product_id] }),

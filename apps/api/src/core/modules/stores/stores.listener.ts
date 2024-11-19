@@ -89,12 +89,12 @@ export class StoresListener {
             },
             { 
                 topic: 'orders/create',   
-                address: `${base_url}/products/created/${payload.store_uid}`, 
+                address: `${base_url}/orders/created/${payload.store_uid}`, 
                 format: 'json' 
             },
             { 
                 topic: 'orders/updated',  
-                address:`${base_url}/products/updated/${payload.store_uid}`,
+                address:`${base_url}/orders/updated/${payload.store_uid}`,
                 format: 'json' 
             }
         ];

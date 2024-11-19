@@ -58,8 +58,15 @@ export class PoliciesController {
     }
 
     @Post()
-    async create(@Body() createPolicyDto: CreatePolicyDto) {
-        return this.policiesService.create(createPolicyDto)
+    @UseGuards(JWTAuthGuard)
+    @ApiBearerAuth()
+    @Permissions([`*:*:${Resources.USER}:${Actions.READ}`])
+    async create(@Body() createPolicyDto: CreatePolicyDto, @Req() req: IRequest) {
+
+        if(!req.user) throw new UnauthorizedException();
+        const user = req.user as ORM<typeof SafeBaseAccount>;
+        
+        return this.policiesService.create(createPolicyDto, user.organization_uid)
     }
 
     @Put(':uid/status')

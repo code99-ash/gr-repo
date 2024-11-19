@@ -53,12 +53,15 @@ export class PoliciesService {
     return Object.keys(diff(original, current)).length > 0
   }
 
-  async create(createPolicyDto: CreatePolicyDto) {
+  async create(createPolicyDto: CreatePolicyDto,  organization_uid: string) {
     try {
-      return await this.policiesRepository.create({
-        ...createPolicyDto,
-        policy_status: 'draft'
-      });
+      return await this.policiesRepository.create(
+        {
+          ...createPolicyDto, 
+          policy_status: 'draft',
+          organization_uid
+        },  
+      );
     } catch (error) {
       throw new InternalServerErrorException('Error saving policy');
     }
