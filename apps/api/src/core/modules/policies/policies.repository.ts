@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, DBQueryConfig, eq, inArray, isNull, ne, notInArray } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, ne, notInArray } from 'drizzle-orm';
 import { type Database } from 'src/common/db/db.types';
 import { DB } from 'src/common/db/drizzle.provider';
 import { policies } from './db/policies.db';
@@ -30,9 +30,10 @@ export class PoliciesRepository {
             columns: {
                 policy_flow: false
             },
-            // with: {
-            //     product_policies: true
-            // }
+            orderBy: desc(policies.created_at),
+            with: {
+                product_policies: true
+            }
         });
     }
 
