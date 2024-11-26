@@ -61,13 +61,12 @@ CREATE TABLE IF NOT EXISTS "customers" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "orders" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" varchar PRIMARY KEY NOT NULL,
 	"uid" varchar(256) NOT NULL,
 	"quantity" integer NOT NULL,
 	"total_amount" integer NOT NULL,
 	"shipping_fee" integer NOT NULL,
 	"meta" jsonb DEFAULT '{}'::jsonb,
-	"return_request_uid" text,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp,
 	CONSTRAINT "orders_uid_unique" UNIQUE("uid")
@@ -80,8 +79,8 @@ CREATE TABLE IF NOT EXISTS "orders_to_customers" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "orders_to_products" (
-	"order_id" text NOT NULL,
-	"product_id" text NOT NULL,
+	"order_id" varchar NOT NULL,
+	"product_id" varchar NOT NULL,
 	CONSTRAINT "orders_to_products_order_id_product_id_pk" PRIMARY KEY("order_id","product_id")
 );
 --> statement-breakpoint
@@ -104,6 +103,7 @@ CREATE TABLE IF NOT EXISTS "products" (
 	"status" varchar NOT NULL,
 	"images" jsonb DEFAULT '[]'::jsonb,
 	"meta" jsonb DEFAULT '{}'::jsonb,
+	"deleted_at" timestamp,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp,
 	CONSTRAINT "products_uid_unique" UNIQUE("uid")
@@ -199,12 +199,6 @@ CREATE TABLE IF NOT EXISTS "collections_to_products" (
 	CONSTRAINT "collections_to_products_collection_id_product_id_pk" PRIMARY KEY("collection_id","product_id")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "collection_to_policies" (
-	"collection_id" varchar NOT NULL,
-	"policy_uid" varchar NOT NULL,
-	CONSTRAINT "collection_to_policies_collection_id_policy_uid_pk" PRIMARY KEY("collection_id","policy_uid")
-);
---> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "accounts" ADD CONSTRAINT "accounts_organization_uid_organizations_uid_fk" FOREIGN KEY ("organization_uid") REFERENCES "public"."organizations"("uid") ON DELETE no action ON UPDATE no action;
 EXCEPTION
@@ -213,12 +207,6 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_uid_users_uid_fk" FOREIGN KEY ("user_uid") REFERENCES "public"."users"("uid") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "orders" ADD CONSTRAINT "orders_return_request_uid_return_requests_uid_fk" FOREIGN KEY ("return_request_uid") REFERENCES "public"."return_requests"("uid") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -236,13 +224,13 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "orders_to_products" ADD CONSTRAINT "orders_to_products_order_id_orders_uid_fk" FOREIGN KEY ("order_id") REFERENCES "public"."orders"("uid") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "orders_to_products" ADD CONSTRAINT "orders_to_products_order_id_orders_id_fk" FOREIGN KEY ("order_id") REFERENCES "public"."orders"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "orders_to_products" ADD CONSTRAINT "orders_to_products_product_id_products_uid_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("uid") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "orders_to_products" ADD CONSTRAINT "orders_to_products_product_id_products_uid_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("uid") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -296,37 +284,25 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "products_policies" ADD CONSTRAINT "products_policies_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "products_policies" ADD CONSTRAINT "products_policies_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "products_policies" ADD CONSTRAINT "products_policies_policy_uid_policies_uid_fk" FOREIGN KEY ("policy_uid") REFERENCES "public"."policies"("uid") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "products_policies" ADD CONSTRAINT "products_policies_policy_uid_policies_uid_fk" FOREIGN KEY ("policy_uid") REFERENCES "public"."policies"("uid") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "collections_to_products" ADD CONSTRAINT "collections_to_products_collection_id_collections_id_fk" FOREIGN KEY ("collection_id") REFERENCES "public"."collections"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "collections_to_products" ADD CONSTRAINT "collections_to_products_collection_id_collections_id_fk" FOREIGN KEY ("collection_id") REFERENCES "public"."collections"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "collections_to_products" ADD CONSTRAINT "collections_to_products_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "collection_to_policies" ADD CONSTRAINT "collection_to_policies_collection_id_collections_id_fk" FOREIGN KEY ("collection_id") REFERENCES "public"."collections"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "collection_to_policies" ADD CONSTRAINT "collection_to_policies_policy_uid_policies_uid_fk" FOREIGN KEY ("policy_uid") REFERENCES "public"."policies"("uid") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "collections_to_products" ADD CONSTRAINT "collections_to_products_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

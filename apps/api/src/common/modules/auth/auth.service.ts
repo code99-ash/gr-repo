@@ -86,6 +86,7 @@ export class AuthService {
     const invite_link = `${this.configService.get<string>(
       'ADMIN_BASE_URL',
     )}/reset-password?token=${invite_token}`;
+    console.log(invite_token)
 
     const user = await this.usersService.findOne(account.user_uid);
 

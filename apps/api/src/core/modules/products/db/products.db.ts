@@ -23,6 +23,7 @@ export const products = pgTable('products', {
   meta: jsonb('meta')
         .$type<z.infer<typeof ProductMeta>>()
         .default({}),
+  deleted_at: timestamp('deleted_at'),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').$onUpdateFn(() => new Date()),
 });

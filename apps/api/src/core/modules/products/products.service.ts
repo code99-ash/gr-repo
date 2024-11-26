@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ProductsRepository } from './products.repository';
 import { BroadcastStoreCreated } from '../stores/store.interface';
 import axios from 'axios';
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq, isNull } from 'drizzle-orm';
 import { products } from './db/products.db';
 
 @Injectable()
@@ -14,10 +14,14 @@ export class ProductsService {
   async fetch(store_uid: string) {
     try {
       const response = await this.productsRepository.list({
-        where: eq(products.store_uid, store_uid),
+        where: and(
+          isNull(products.deleted_at),
+          eq(products.store_uid, store_uid)
+        ),
         columns: {
           meta: false,
         },
+        orderBy: desc(products.updated_at),
         with: {
           product_policies: {
             with: {
@@ -133,7 +137,7 @@ export class ProductsService {
   }
 
   async remove(product_id: number, store_uid: string) {
-    await this.productsRepository.remove(product_id, store_uid)
+    await this.productsRepository.softDelete(product_id, store_uid)
   }
 
   async assignManytoMany(product_ids: string[], policy_uids: string[]) {

@@ -32,6 +32,15 @@ export class ProductsRepository {
                         )).returning()
   }
 
+  async softDelete(product_id: any, store_uid: string) {
+    return await this.db.update(products)
+                        .set({deleted_at: new Date()})
+                        .where(and(
+                          eq(products.id, product_id),
+                          eq(products.store_uid, store_uid)
+                        )).returning({id: products.id})
+  }
+
   async remove(product_id: any, store_uid: string) {
     return await this.db.delete(products)
                         .where(and(

@@ -1,5 +1,5 @@
 {
-  "id": "df07a9d7-fdad-44a3-b39a-1e00b950df42",
+  "id": "b3947dd0-6900-4976-b65d-949d5b7f2377",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -187,7 +187,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "varchar",
           "primaryKey": true,
           "notNull": true
         },
@@ -222,12 +222,6 @@
           "notNull": false,
           "default": "'{}'::jsonb"
         },
-        "return_request_uid": {
-          "name": "return_request_uid",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -243,21 +237,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "orders_return_request_uid_return_requests_uid_fk": {
-          "name": "orders_return_request_uid_return_requests_uid_fk",
-          "tableFrom": "orders",
-          "tableTo": "return_requests",
-          "columnsFrom": [
-            "return_request_uid"
-          ],
-          "columnsTo": [
-            "uid"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "orders_uid_unique": {
@@ -332,30 +312,30 @@
       "columns": {
         "order_id": {
           "name": "order_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
         "product_id": {
           "name": "product_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "orders_to_products_order_id_orders_uid_fk": {
-          "name": "orders_to_products_order_id_orders_uid_fk",
+        "orders_to_products_order_id_orders_id_fk": {
+          "name": "orders_to_products_order_id_orders_id_fk",
           "tableFrom": "orders_to_products",
           "tableTo": "orders",
           "columnsFrom": [
             "order_id"
           ],
           "columnsTo": [
-            "uid"
+            "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "orders_to_products_product_id_products_uid_fk": {
@@ -368,7 +348,7 @@
           "columnsTo": [
             "uid"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -492,6 +472,12 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'{}'::jsonb"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -1111,7 +1097,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "products_policies_policy_uid_policies_uid_fk": {
@@ -1124,7 +1110,7 @@
           "columnsTo": [
             "uid"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -1168,7 +1154,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "collections_to_products_product_id_products_id_fk": {
@@ -1181,7 +1167,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -1191,63 +1177,6 @@
           "columns": [
             "collection_id",
             "product_id"
-          ]
-        }
-      },
-      "uniqueConstraints": {}
-    },
-    "public.collection_to_policies": {
-      "name": "collection_to_policies",
-      "schema": "",
-      "columns": {
-        "collection_id": {
-          "name": "collection_id",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "policy_uid": {
-          "name": "policy_uid",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "collection_to_policies_collection_id_collections_id_fk": {
-          "name": "collection_to_policies_collection_id_collections_id_fk",
-          "tableFrom": "collection_to_policies",
-          "tableTo": "collections",
-          "columnsFrom": [
-            "collection_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "collection_to_policies_policy_uid_policies_uid_fk": {
-          "name": "collection_to_policies_policy_uid_policies_uid_fk",
-          "tableFrom": "collection_to_policies",
-          "tableTo": "policies",
-          "columnsFrom": [
-            "policy_uid"
-          ],
-          "columnsTo": [
-            "uid"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "collection_to_policies_collection_id_policy_uid_pk": {
-          "name": "collection_to_policies_collection_id_policy_uid_pk",
-          "columns": [
-            "collection_id",
-            "policy_uid"
           ]
         }
       },
