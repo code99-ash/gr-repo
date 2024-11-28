@@ -2,7 +2,7 @@ import { ActionTypeEnum, BaseNodeType } from "./common.interface";
 
 export interface DurationConditionData {
     period: 'hours' | 'days' | 'weeks' | 'months' | 'years'
-    periodValue: number
+    period_value: number
 } 
 
 export interface DurationConditionType extends BaseNodeType {

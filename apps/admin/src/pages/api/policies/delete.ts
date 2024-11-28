@@ -3,10 +3,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const token = req.cookies.token;
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthorized: Token not found' });
+    }
     const { uid } = req.query
-    // if (!token) {
-    //     return res.status(401).json({ message: 'Unauthorized: Token not found' });
-    // }
 
     try {
         const nestResponse = await fetch(`${process.env.NEST_API_URL}/policies/${uid}`, {

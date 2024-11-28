@@ -25,14 +25,14 @@ export default function DurationConditionPanel() {
 
   const [form, setForm] = useState<DurationConditionData>({
     period: 'days',
-    periodValue: 10
+    period_value: 10
   });
 
   useEffect(() => {
     const {data} = selectedNode;
     setForm({
       period: data.period,
-      periodValue: data.periodValue
+      period_value: data.period_value
     })
   }, [selectedNode]);
 
@@ -46,7 +46,7 @@ export default function DurationConditionPanel() {
 
   const onValueChange = (value: number) => {
     const val = (isNaN(value) || value < 1)? 1 : value;
-    setForm(prev => ({...prev, periodValue: val}))
+    setForm(prev => ({...prev, period_value: val}))
   }
 
 
@@ -77,7 +77,7 @@ export default function DurationConditionPanel() {
               type='number'
               min={1}
               onChange={(e) => onValueChange(Number(e.target.value))} 
-              value={form.periodValue}
+              value={form.period_value}
             />
           </div>
 

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { PolicyFlow, PolicyTypes } from "./policy-form";
 
-type PolicyStatus = 'draft' | 'published' | 'active';
+export type PolicyStatus = 'draft' | 'published' | 'active';
 
 export interface FlowRecord {
   policy_flow_uid: string;
@@ -31,6 +31,7 @@ interface PolicyState {
   setPolicies: (data: PolicyListType[]) => void;
   newPolicy: (data: PolicyListType) => void;
   updatePolicy: (data: PolicyListType) => void;
+  updateStatus: (data: {uid: string, status: PolicyStatus}) => void;
   removePolicy: (uid: string) => void;
 }
 
@@ -49,6 +50,13 @@ export const usePolicyStore = create<PolicyState>((set, get) => ({
     set({
       policies: get().policies.map(each => (
         (each.uid === policy.uid)? {...each, ...policy} : each
+      ))
+    })
+  },
+  updateStatus(policy) {
+    set({
+      policies: get().policies.map(each => (
+        (each.uid === policy.uid)? {...each, policy_status: policy.status} : each
       ))
     })
   },

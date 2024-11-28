@@ -126,23 +126,23 @@ export const usePolicyForm = create<PolicyState>((set, get) => ({
     defaultDurationCondition(): DurationConditionData {
         return {
             period: 'hours',
-            periodValue: 1
+            period_value: 1
         }
     },
 
     defaultCustomerCondition(): CustomerConditionData {
         return {
-            expectedPeriod: 10,
+            expected_period: 10,
             operator: 'is_less_than',
             period: 'days',
-            periodValue: 2
+            period_value: 2
         }
     },
 
     defaultProductCondition(): ProductConditionData {
         return {
             ruling: 'any',
-            list: []
+            list: ['Damaged']
         }
     },
 

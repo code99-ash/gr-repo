@@ -1,12 +1,12 @@
 import { BaseNodeType } from "./common.interface";
 
 export interface CustomerConditionData {
-    expectedPeriod: number;
+    expected_period: number;
     operator: 'is_less_than';
 
     // Dont think this is necessary
     period: 'hours' | 'days' | 'weeks' | 'months' | 'years'
-    periodValue: number
+    period_value: number
 }
 
 export interface CustomerConditionType extends BaseNodeType {

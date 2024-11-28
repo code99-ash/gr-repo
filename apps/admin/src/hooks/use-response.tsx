@@ -8,17 +8,17 @@ interface ResponseProp {
 export default function useResponse() {
     const { toast } = useToast()
 
-    const errorResponse = (props: ResponseProp) => {
+    const errorResponse = (props: ResponseProp, use_title?: boolean) => {
         toast({
           variant: "destructive",
-          title: props.title ?? "Error Alert",
+          title: props.title ?? use_title? props.description : "Error Alert",
           description: props.description,
         })
     }
-    const defaultResponse = (props: ResponseProp) => {
+    const defaultResponse = (props: ResponseProp, use_title?: boolean) => {
         toast({
             variant: "primary",
-            title: props.title ?? "Success Alert",
+            title: props.title ?? use_title? props.description : "Error Alert",
             description: props.description,
         })
     }

@@ -4,18 +4,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const token = req.cookies.token;
 
-    // if (!token) {
-    //     return res.status(401).json({ message: 'Unauthorized: Token not found' });
-    // }
+    if (!token) {
+        return res.status(401).json({ message: 'Unauthorized: Token not found' });
+    }
 
     try {
         const nestResponse = await fetch(`${process.env.NEST_API_URL}/policies`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: req.body
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: req.body
         });
 
         if (!nestResponse.ok) {

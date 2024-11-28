@@ -1,10 +1,15 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { usePolicyStore } from '@/store/policies/policy-store';
+import React, { createContext, useEffect, useState } from 'react';
+import { PolicyListType, usePolicyStore } from '@/store/policies/policy-store';
 import EmptyData from './components/empty-data';
 import PolicyList from './components/policy-list';
 import PageHeader from './components/page-header';
 import useResponse from '@/hooks/use-response';
+
+export const SelectionCtx = createContext<{ 
+    selected: any,
+    policies: PolicyListType[]
+}>({ selected: null, policies: [] });
 
 export default function ReturnPolicy() {
     const [loading, setLoading] = useState(false)
@@ -12,6 +17,8 @@ export default function ReturnPolicy() {
     const fetched = usePolicyStore(state => state.fetched)
     const setPolicies = usePolicyStore(state => state.setPolicies);
     const { errorResponse } = useResponse()
+
+    const [selected, setSelected] = useState(null);
 
     const fetchPolicies = async() => {
         try {
@@ -41,12 +48,15 @@ export default function ReturnPolicy() {
 
 
     return (
-        <section className="space-y-5">
-            <PageHeader />
+        <SelectionCtx.Provider value={{selected, policies}}>
+            <section className="space-y-5">
 
-            <main>
-                {policies.length < 1? <EmptyData /> : <PolicyList policies={policies} />}
-            </main>
-        </section>
+                <PageHeader />
+
+                <main>
+                    {policies.length < 1? <EmptyData /> : <PolicyList policies={policies} setSelected={setSelected} />}
+                </main>
+            </section>
+        </SelectionCtx.Provider>
     );
 }

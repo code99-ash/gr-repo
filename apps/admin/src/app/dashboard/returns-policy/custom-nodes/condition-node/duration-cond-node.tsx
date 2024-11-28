@@ -20,7 +20,7 @@ export default function OrderConditionNode({data}: PropType) {
                 Return window
             </header>
             <p className="text-[7px]">
-                {data.periodValue} {data.period} Return window
+                {data.period_value} {data.period} Return window
             </p>
         </div>
     </>

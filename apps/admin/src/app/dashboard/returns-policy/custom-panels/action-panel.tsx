@@ -59,7 +59,7 @@ const durationActions = [
 export default function ActionPanel() {
   const { updateNode } = useContext(UpdateNodeCtx)
   const policy_type = usePolicyForm(state => state.policy_type)
-  const [action, setAction] = useState('Decline')
+  const [action, setAction] = useState('decline')
   const [message, setMessage] = useState('')
   const selectedNode = usePolicyForm(state => state.selectedNode) as NodeObjectType;
   const selectNode = usePolicyForm(state => state.selectNode)

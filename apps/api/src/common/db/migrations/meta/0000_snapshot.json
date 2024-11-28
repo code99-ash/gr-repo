@@ -1,5 +1,5 @@
 {
-  "id": "d63a89fe-f816-40ab-af6a-e3bcb8c5fd3a",
+  "id": "b3947dd0-6900-4976-b65d-949d5b7f2377",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -187,7 +187,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "varchar",
           "primaryKey": true,
           "notNull": true
         },
@@ -222,12 +222,6 @@
           "notNull": false,
           "default": "'{}'::jsonb"
         },
-        "return_request_uid": {
-          "name": "return_request_uid",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -243,21 +237,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "orders_return_request_uid_return_requests_uid_fk": {
-          "name": "orders_return_request_uid_return_requests_uid_fk",
-          "tableFrom": "orders",
-          "tableTo": "return_requests",
-          "columnsFrom": [
-            "return_request_uid"
-          ],
-          "columnsTo": [
-            "uid"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "orders_uid_unique": {
@@ -332,30 +312,30 @@
       "columns": {
         "order_id": {
           "name": "order_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
         "product_id": {
           "name": "product_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "orders_to_products_order_id_orders_uid_fk": {
-          "name": "orders_to_products_order_id_orders_uid_fk",
+        "orders_to_products_order_id_orders_id_fk": {
+          "name": "orders_to_products_order_id_orders_id_fk",
           "tableFrom": "orders_to_products",
           "tableTo": "orders",
           "columnsFrom": [
             "order_id"
           ],
           "columnsTo": [
-            "uid"
+            "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "orders_to_products_product_id_products_uid_fk": {
@@ -368,7 +348,7 @@
           "columnsTo": [
             "uid"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -451,7 +431,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "varchar",
           "primaryKey": true,
           "notNull": true
         },
@@ -461,15 +441,21 @@
           "primaryKey": false,
           "notNull": true
         },
-        "name": {
-          "name": "name",
+        "store_uid": {
+          "name": "store_uid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "price": {
-          "name": "price",
-          "type": "integer",
+        "status": {
+          "name": "status",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
@@ -487,6 +473,12 @@
           "notNull": false,
           "default": "'{}'::jsonb"
         },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -502,7 +494,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "products_store_uid_stores_uid_fk": {
+          "name": "products_store_uid_stores_uid_fk",
+          "tableFrom": "products",
+          "tableTo": "stores",
+          "columnsFrom": [
+            "store_uid"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "products_uid_unique": {
@@ -894,6 +900,287 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
+    },
+    "public.stores": {
+      "name": "stores",
+      "schema": "",
+      "columns": {
+        "uid": {
+          "name": "uid",
+          "type": "varchar(256)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organization_uid": {
+          "name": "organization_uid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "store_name": {
+          "name": "store_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "store_type": {
+          "name": "store_type",
+          "type": "store_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "api_key": {
+          "name": "api_key",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "stores_organization_uid_organizations_uid_fk": {
+          "name": "stores_organization_uid_organizations_uid_fk",
+          "tableFrom": "stores",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_uid"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "stores_uid_unique": {
+          "name": "stores_uid_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "uid"
+          ]
+        }
+      }
+    },
+    "public.collections": {
+      "name": "collections",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "uid": {
+          "name": "uid",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "store_uid": {
+          "name": "store_uid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "origin": {
+          "name": "origin",
+          "type": "origin",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'external'"
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "collections_store_uid_stores_uid_fk": {
+          "name": "collections_store_uid_stores_uid_fk",
+          "tableFrom": "collections",
+          "tableTo": "stores",
+          "columnsFrom": [
+            "store_uid"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "collections_uid_unique": {
+          "name": "collections_uid_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "uid"
+          ]
+        }
+      }
+    },
+    "public.products_policies": {
+      "name": "products_policies",
+      "schema": "",
+      "columns": {
+        "product_id": {
+          "name": "product_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "policy_uid": {
+          "name": "policy_uid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "products_policies_product_id_products_id_fk": {
+          "name": "products_policies_product_id_products_id_fk",
+          "tableFrom": "products_policies",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "products_policies_policy_uid_policies_uid_fk": {
+          "name": "products_policies_policy_uid_policies_uid_fk",
+          "tableFrom": "products_policies",
+          "tableTo": "policies",
+          "columnsFrom": [
+            "policy_uid"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "products_policies_product_id_policy_uid_pk": {
+          "name": "products_policies_product_id_policy_uid_pk",
+          "columns": [
+            "product_id",
+            "policy_uid"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.collections_to_products": {
+      "name": "collections_to_products",
+      "schema": "",
+      "columns": {
+        "collection_id": {
+          "name": "collection_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "collections_to_products_collection_id_collections_id_fk": {
+          "name": "collections_to_products_collection_id_collections_id_fk",
+          "tableFrom": "collections_to_products",
+          "tableTo": "collections",
+          "columnsFrom": [
+            "collection_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "collections_to_products_product_id_products_id_fk": {
+          "name": "collections_to_products_product_id_products_id_fk",
+          "tableFrom": "collections_to_products",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "collections_to_products_collection_id_product_id_pk": {
+          "name": "collections_to_products_collection_id_product_id_pk",
+          "columns": [
+            "collection_id",
+            "product_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
     }
   },
   "enums": {
@@ -934,6 +1221,25 @@
         "order",
         "customer",
         "duration"
+      ]
+    },
+    "public.store_type": {
+      "name": "store_type",
+      "schema": "public",
+      "values": [
+        "shopify",
+        "woocommerce",
+        "etsy",
+        "amazon",
+        "custom"
+      ]
+    },
+    "public.origin": {
+      "name": "origin",
+      "schema": "public",
+      "values": [
+        "internal",
+        "external"
       ]
     }
   },

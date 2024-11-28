@@ -25,6 +25,7 @@ export class PoliciesService {
 
   private _flowIsComplete(policy_flow: PolicyFlowDto, policy_type: PolicyType) {
     let isValid = true;
+
     try {
 
       switch (policy_type) { 
@@ -42,7 +43,6 @@ export class PoliciesService {
       }
 
     } catch (error) {
-      console.log(error)
       isValid = false;
     }
 
@@ -53,24 +53,44 @@ export class PoliciesService {
     return Object.keys(diff(original, current)).length > 0
   }
 
-  async create(createPolicyDto: CreatePolicyDto) {
+  async create(createPolicyDto: CreatePolicyDto,  organization_uid: string) {
     try {
-      return await this.policiesRepository.create({
-        ...createPolicyDto,
-        policy_status: 'draft'
-      });
+      return await this.policiesRepository.create(
+        {
+          ...createPolicyDto, 
+          policy_status: 'draft',
+          organization_uid
+        },  
+      );
     } catch (error) {
       throw new InternalServerErrorException('Error saving policy');
     }
   }
 
-  async findAll(organization_uid?: string) {
+  async findAll(organization_uid: string) {
     try {
-      return await this.policiesRepository.list();
+      return await this.policiesRepository.list(organization_uid);
     } catch (error) {
       throw new InternalServerErrorException('Error fetching policies');
     }
   }
+  
+  async filterFetch(filters: string[], organization_uid: string) {
+    try {
+      return await this.policiesRepository.filterFetch(filters, organization_uid)
+    } catch (error) {
+      throw new InternalServerErrorException('Error fetching policies');
+    }
+  }
+
+  async filterFetchInArray(filters: string[], organization_uid: string) {
+    try {
+      return await this.policiesRepository.filterFetchInArray(filters, organization_uid)
+    } catch (error) {
+      throw new InternalServerErrorException('Error fetching policies');
+    }
+  }
+
   
   async findOne(uid: string) {
     const policy = await this.policiesRepository.get('uid', uid);
@@ -121,7 +141,7 @@ export class PoliciesService {
     return rest;
   }
 
-  async update(uid: string, updateData: UpdatePolicyDto) {
+  async update(uid: string, updateData: UpdatePolicyDto, organization_uid: string) {
 
     const updatePolicyDto = this.filterOut(updateData, 'policy_status');
 
@@ -148,11 +168,16 @@ export class PoliciesService {
     }
 
  
-    return await this.policiesRepository.update(uid, updatePolicyDto)   
+    return await this.policiesRepository.update(uid, updatePolicyDto, organization_uid)   
     
   }
 
-  async updateStatus(uid: string, updatePolicyStatusDto: UpdatePolicyStatusDto) {
+  async updateStatus(
+    uid: string, 
+    updatePolicyStatusDto: UpdatePolicyStatusDto, 
+    user_id: string,
+    organization_uid: string,
+  ) {
     const { policy_status } = updatePolicyStatusDto;
 
     const existing_policy = await this.findOne(uid);
@@ -169,35 +194,44 @@ export class PoliciesService {
       throw new BadRequestException(`Sorry you cannot downgrade the status of an active policy`);
     }
 
-    const flowIsValid = this._flowIsComplete(existing_policy.policy_flow, existing_policy.policy_type);
+    
 
-    if(policy_status !== 'draft' && !flowIsValid) {
-      throw new BadRequestException(`Invalid policy flow, make sure it is complete and valid`);
+    if(policy_status !== 'draft') {
+      try {
+        const validate_flow = this._flowIsComplete(existing_policy.policy_flow, existing_policy.policy_type);
+        if(!validate_flow) {
+          throw new BadRequestException(`Invalid policy flow, make sure it is complete and valid`);
+        }
+      }catch {
+        console.log('Policy not complete')
+        throw new BadRequestException(`Invalid policy flow, make sure it is complete and valid`);
+      }
     }
 
     try {
 
       if(policy_status === 'active') {
         // // Authorized user_uid is required
-        // return await this.policiesRepository.activate(uid, 'authorized_user_uid');
+        console.log('status', policy_status, user_id)
+        return await this.policiesRepository.activate(uid, user_id, organization_uid);
       }else {
-        return await this.policiesRepository.updateStatus(uid, updatePolicyStatusDto);
+        return await this.policiesRepository.updateStatus(uid, updatePolicyStatusDto, organization_uid);
       }
 
     } catch (error) {
-      throw new InternalServerErrorException('Error updating policy status');
+      throw new BadRequestException('Error updating policy status');
     }
     
   }
 
-  async delete(uid: string) {
+  async delete(uid: string, organization_uid: string) {
     const policy = await this.policiesRepository.get('uid', uid);
     if (!policy) {
       throw new NotFoundException(`Policy with UID ${uid} not found.`);
     }
 
     try {
-        return await this.policiesRepository.softDelete(uid);
+        return await this.policiesRepository.softDelete(uid, organization_uid);
     } catch (error) {
       throw new InternalServerErrorException('Error deleting policy');
     }

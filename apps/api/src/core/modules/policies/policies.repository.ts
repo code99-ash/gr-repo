@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, DBQueryConfig, eq, isNull } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, ne, notInArray } from 'drizzle-orm';
 import { type Database } from 'src/common/db/db.types';
 import { DB } from 'src/common/db/drizzle.provider';
 import { policies } from './db/policies.db';
@@ -21,9 +21,41 @@ export class PoliciesRepository {
         return data ?? null;
     }
 
-    async list() {
+    async list(organization_uid: string) {
         return await this.db.query.policies.findMany({
-            where: isNull(policies.deleted_at)
+            where: and(
+                isNull(policies.deleted_at),
+                eq(policies.organization_uid, organization_uid),
+            ),
+            columns: {
+                policy_flow: false
+            },
+            orderBy: desc(policies.created_at),
+            with: {
+                product_policies: true
+            }
+        });
+    }
+
+    async filterFetch(filters: string[], organization_uid: string) {
+        return await this.db.query.policies.findMany({
+            where: and(
+                eq(policies.organization_uid, organization_uid),
+                isNull(policies.deleted_at),
+                ne(policies.policy_status, 'draft'),
+                notInArray(policies.uid, filters),
+            )
+        });
+    }
+
+    async filterFetchInArray(filters: string[], organization_uid: string) {
+        return await this.db.query.policies.findMany({
+            where: and(
+                eq(policies.organization_uid, organization_uid),
+                isNull(policies.deleted_at),
+                ne(policies.policy_status, 'draft'),
+                inArray(policies.uid, filters),
+            )
         });
     }
 
@@ -39,44 +71,57 @@ export class PoliciesRepository {
         return policy;
     }
 
-    async update(uid: string, policySchema: UpdatePolicyDto) {
+    async update(uid: string, policySchema: UpdatePolicyDto, organization_uid: string) {
         
         const [updatedPolicy] = await this.db.update(policies)
                                             .set(policySchema)
-                                            .where(eq(policies.uid, uid))
+                                            .where(and(
+                                                eq(policies.uid, uid),
+                                                eq(policies.organization_uid, organization_uid),
+                                            ))
                                             .returning();
 
         return updatedPolicy;
     }
 
-    async updateStatus(uid: string, updatePolicyStatusDto: UpdatePolicyStatusDto) {
+    async updateStatus(
+        uid: string, 
+        updatePolicyStatusDto: UpdatePolicyStatusDto,
+        organization_uid: string
+    ) {
         return await this.db.update(policies)
                             .set(updatePolicyStatusDto)
-                            .where(eq(policies.uid, uid))
+                            .where(and(
+                                eq(policies.uid, uid),
+                                eq(policies.organization_uid, organization_uid),
+                            ))
                             .returning();
     }
 
-    async activate(uid: string,  user_uid: string) {
+    async activate(uid: string,  user_uid: string, organization_uid: string) {
         const [activated] = await this.db.update(policies).set({
             policy_status: 'active',
             activated_at: new Date(),
             activated_by: user_uid,
         })
         .where(and(
+            eq(policies.organization_uid, organization_uid),
             isNull(policies.deleted_at), 
-            eq(policies.uid, uid),
-            eq(policies.policy_status, 'published')
+            eq(policies.uid, uid)
         ))
         .returning()
 
         return activated;
     }
 
-    async softDelete(uid: string) {
+    async softDelete(uid: string, organization_uid: string) {
         return await this.db
                     .update(policies)
                     .set({deleted_at: new Date()})
-                    .where(eq(policies.uid, uid))
+                    .where(and(
+                        eq(policies.uid, uid),
+                        eq(policies.organization_uid, organization_uid),
+                    ))
                     .returning();
                     
     }

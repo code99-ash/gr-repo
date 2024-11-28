@@ -1,0 +1,6 @@
+.product-item {
+    @apply px-2 py-3 border-0 border-b grid grid-cols-1 items-center grid-cols-6 gap-2 shadow-none rounded-none;
+}
+.placeholder-img {
+    @apply w-[35px] h-[35px] rounded-full bg-accent;
+}
