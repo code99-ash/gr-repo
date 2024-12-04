@@ -1,0 +1,11 @@
+
+
+> refund-protect-web@0.1.0 lint /home/dell/Documents/projects/returnsprotect/gr-repo/apps/admin
+> next lint
+
+[31mFailed to load plugin 'import' declared in '.eslintrc.json » eslint-config-next/core-web-vitals » /home/dell/Documents/projects/returnsprotect/gr-repo/node_modules/.pnpm/eslint-config-next@14.2.5_eslint@8.57.0_typescript@5.5.4/node_modules/eslint-config-next/index.js': Cannot find module 'eslint-module-utils/resolve'
+Require stack:
+- /home/dell/Documents/projects/returnsprotect/gr-repo/node_modules/.pnpm/eslint-plugin-import@2.29.1_@typescript-eslint+parser@6.21.0_eslint@8.57.0_typescript@5.5.4___th4f2gpupggha5y5wyf7wutbdq/node_modules/eslint-plugin-import/lib/rules/no-unresolved.js
+- /home/dell/Documents/projects/returnsprotect/gr-repo/node_modules/.pnpm/eslint-plugin-import@2.29.1_@typescript-eslint+parser@6.21.0_eslint@8.57.0_typescript@5.5.4___th4f2gpupggha5y5wyf7wutbdq/node_modules/eslint-plugin-import/lib/index.js
+- /home/dell/Documents/projects/returnsprotect/gr-repo/node_modules/.pnpm/@eslint+eslintrc@2.1.4/node_modules/@eslint/eslintrc/dist/eslintrc.cjs[39m
+[41m[30m ELIFECYCLE [39m[49m [31mCommand failed with exit code 1.[39m

@@ -1,6 +1,6 @@
 'use client';
 import { redirect, useRouter } from 'next/navigation';
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 
 interface AuthContextType {
   user: any;
@@ -22,7 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const profile = async () => {
+  const profile = useCallback(async () => {
     try {
   
       setLoading(true);
@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }finally{
       setLoading(false);
     }
-  };
+  }, [])
 
 
   useEffect(() => {
