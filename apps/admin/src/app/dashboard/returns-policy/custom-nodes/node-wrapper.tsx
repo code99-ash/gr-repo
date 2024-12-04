@@ -1,5 +1,6 @@
-import { usePolicyForm } from '@/store/policies/policy-form'
+"use client";
 import React from 'react'
+import { usePolicyForm } from '@/store/policies/policy-form'
 
 interface PropType {
     children: React.ReactNode, 
@@ -14,6 +15,8 @@ export default function NodeWrapper({children, node_id, muted}: PropType) {
 
     const handleClick = () => {
         if(!node_id) return;
+
+        console.log("Selected node:", policy_flow[node_id]);
 
         selectNode(policy_flow[node_id])
     }

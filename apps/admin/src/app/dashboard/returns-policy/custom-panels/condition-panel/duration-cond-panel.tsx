@@ -54,7 +54,7 @@ export default function DurationConditionPanel() {
 
     updateNode({...selectedNode, data: form})
 
-  }, [form, selectedNode, updateNode])
+  }, [form])
 
   return (
     <div className='space-y-3'>

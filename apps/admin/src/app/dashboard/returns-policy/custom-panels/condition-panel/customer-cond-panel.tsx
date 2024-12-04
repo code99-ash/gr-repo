@@ -63,7 +63,7 @@ export default function CustomerConditionPanel() {
 
     updateNode({...selectedNode, data: form})
 
-  }, [form, selectedNode, updateNode])
+  }, [form])
 
 
   return (
