@@ -2,7 +2,7 @@
 import React, { useContext } from 'react'
 import PolicyTypeMenu from './policy-type-menu';
 import ChangePolicyStatus from './change-status';
-import { SelectionCtx } from '../page';
+import { SelectionCtx } from '@/contexts/policy-selection-context';
 
 
 
