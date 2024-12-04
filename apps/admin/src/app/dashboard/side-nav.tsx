@@ -1,5 +1,5 @@
 'use client';
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -59,11 +59,15 @@ const btm_navs = [
 
 export default function SideNav() {
     const pathname = usePathname();
-    const { setOpen, open } = useSidebar()
+    const { openMobile, setOpenMobile } = useSidebar()
 
     React.useEffect(() => {
-        if(open) setOpen(false);
-    }, [pathname, setOpen]);
+
+        if(openMobile) {
+            setOpenMobile(false)
+        } 
+
+    }, [pathname, setOpenMobile]);
 
     return <>
         <Sidebar variant='sidebar' collapsible='icon'>

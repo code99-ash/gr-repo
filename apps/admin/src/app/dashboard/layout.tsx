@@ -6,7 +6,6 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 
 export default function DashboardLayout({children}: Readonly<{ children: React.ReactNode }>) {
     
-
     return (
         <SidebarProvider>
             <div className='w-full flex flex-1'>
