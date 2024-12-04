@@ -4,9 +4,9 @@ import { LoaderCircle } from 'lucide-react';
 import { DropdownMenu, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DropdownMenuContent } from '@radix-ui/react-dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { SelectionCtx } from '../page';
 import useResponse from '@/hooks/use-response';
 import { usePolicyStore, PolicyStatus } from '@/store/policies/policy-store';
+import { SelectionCtx } from '../../../../contexts/policy-selection-context';
 
 
 interface Option {
