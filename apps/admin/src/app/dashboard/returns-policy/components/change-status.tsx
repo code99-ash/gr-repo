@@ -78,8 +78,8 @@ export default function ChangePolicyStatus() {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <div className='bg-white w-[120px] border shadow-xl'>
-                    {options.map(option => (
-                        <DropdownMenuItem className="hover:bg-primary p-0">
+                    {options.map((option, i) => (
+                        <DropdownMenuItem className="hover:bg-primary p-0" key={i}>
                             <Button 
                                 onClick={() => switchStatus(option.value)}
                                 className='bg-white text-foreground shadow-none px-3 rounded-none w-full flex items-center justify-between hover:bg-primary hover:text-white'

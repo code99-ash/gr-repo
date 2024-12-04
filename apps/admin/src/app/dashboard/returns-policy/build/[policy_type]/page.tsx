@@ -1,6 +1,6 @@
 'use client';
 import { ReactFlowProvider } from '@xyflow/react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import SelectedPanel from '../../custom-panels/selected-panel';
 import BuildOption from './build-option';
 import EdittableTitle from './edittable-title';
@@ -31,12 +31,12 @@ export default function ProductPolicyBuiler() {
 
   const [loading, setLoading] = useState(false)
 
-  const initializePage = () => {
-    const param_type = params?.policy_type as PolicyTypes
-    const policy_type = accepted_types.includes(param_type)? param_type : 'product'
+  const initializePage = useCallback(() => {
+    const param_type = params?.policy_type as PolicyTypes;
+    const policy_type = accepted_types.includes(param_type) ? param_type : 'product';
 
-    setPolicyType(policy_type)
-  }
+    setPolicyType(policy_type);
+  }, [params?.policy_type, setPolicyType]);
   
   useEffect(() => {
     

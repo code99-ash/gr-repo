@@ -20,7 +20,7 @@ export default function ReturnPolicy() {
 
     const [selected, setSelected] = useState(null);
 
-    const fetchPolicies = async() => {
+    const fetchPolicies = React.useCallback(async() => {
         try {
             setLoading(true)
             const response = await fetch(`/api/policies/fetch`);
@@ -38,7 +38,7 @@ export default function ReturnPolicy() {
         }finally {
             setLoading(false)
         }
-    }
+    }, [])
 
     useEffect(() => {
         if(fetched) return;

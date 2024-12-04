@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import useResponse from '@/hooks/use-response';
 import { LoaderCircle } from 'lucide-react';
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { PolicyListType } from '@/store/policies/policy-store';
 import SinglePolicy from './single-policy';
 import { SelectionContext } from '../../product-list';
@@ -24,7 +24,7 @@ export default function AssignToManyProducts() {
     const [policies, setPolicies] = useState<PolicyListType[]>([]);
     const { errorResponse } = useResponse();
 
-    const fetchAllPolicies = async () => {
+    const fetchAllPolicies = useCallback(async () => {
         try {
             setLoading(true);
             const response = await fetch('/api/policies/fetch');
@@ -39,7 +39,7 @@ export default function AssignToManyProducts() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         if (open) {

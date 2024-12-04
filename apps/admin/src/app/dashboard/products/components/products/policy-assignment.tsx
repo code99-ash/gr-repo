@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import useResponse from '@/hooks/use-response';
 import { LoaderCircle } from 'lucide-react';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { PolicyListType } from '@/store/policies/policy-store';
 import { ProductPolicy } from '../../interfaces';
 import PolicyItem from './policy-item';
@@ -40,7 +40,7 @@ export default function PolicyAssignment({
     const [to_assign, setToAssign] = useState<string[]>([]);
     const [to_unassign, setToUnAssign] = useState<string[]>([]);
 
-    const fetchAllPolicies = async () => {
+    const fetchAllPolicies = useCallback(async() => {
         try {
             setLoading(true);
             const response = await fetch('/api/policies/fetch');
@@ -55,7 +55,7 @@ export default function PolicyAssignment({
         } finally {
             setLoading(false);
         }
-    };
+    }, [])
 
     useEffect(() => {
         if (open) {
