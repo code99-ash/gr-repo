@@ -24,12 +24,6 @@ export default function AssignToManyProducts() {
     const [policies, setPolicies] = useState<PolicyListType[]>([]);
     const { errorResponse } = useResponse();
 
-    useEffect(() => {
-        if (open) {
-            fetchAllPolicies();
-        }
-    }, [open]);
-
     const fetchAllPolicies = async () => {
         try {
             setLoading(true);
@@ -46,6 +40,14 @@ export default function AssignToManyProducts() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (open) {
+            fetchAllPolicies();
+        }
+    }, [open, fetchAllPolicies]);
+
+   
 
     const assignPolicies = async() => {
         try {

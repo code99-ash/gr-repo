@@ -20,10 +20,11 @@ export default function UpdateClient({ response_data }: { response_data: PolicyD
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if(response_data) {
+      policyForm.setPolicy(response_data);
+    }
 
-    policyForm.setPolicy(response_data);
-
-  }, [response_data])
+  }, [policyForm, response_data])
 
   const update = async () => {
     setLoading(true);

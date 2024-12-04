@@ -63,7 +63,7 @@ export default function CustomerConditionPanel() {
 
     updateNode({...selectedNode, data: form})
 
-  }, [form])
+  }, [form, selectedNode, updateNode])
 
 
   return (
@@ -75,7 +75,7 @@ export default function CustomerConditionPanel() {
 
         <main className='border rounded-xl p-3'>
           <header className='flex items-center justify-between mb-5'>
-            <h4 className='text-grey text-base'>Customer's Returns count</h4>
+            <h4 className='text-grey text-base'>Customer&apos;s Returns count</h4>
           </header>
 
           <div className="main space-y-3">

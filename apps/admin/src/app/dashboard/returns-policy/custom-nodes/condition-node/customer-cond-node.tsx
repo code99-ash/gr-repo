@@ -17,7 +17,7 @@ export default function CustomerConditionNode({data}: PropType) {
                     className="material-symbols-outlined"
                     style={{fontSize: '8px'}}    
                 >autorenew</span>
-                Customer's Returns count
+                Customer&apos;s Returns count
             </header>
             <p className="text-[7px]">
                 {data.operator.replaceAll('_', ' ')} {data.expected_period}

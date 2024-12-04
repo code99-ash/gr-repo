@@ -40,7 +40,7 @@ export default function YesNoBranches() {
       }
     }
 
-  }, [selected_node])
+  }, [selected_node, updateBranchLabel])
 
   return (
     <section className="flex flex-col gap-3">

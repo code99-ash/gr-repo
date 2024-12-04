@@ -25,7 +25,7 @@ export default function YesNoQuestionNode({ data }: { data: any }) {
             branch_length === MAX_BRANCHES && data.message.trim()
         )
 
-    }, [branch_length, data])
+    }, [branch_length, data, validateNode])
 
     return (
         <NodeWrapper node_id={data.node_id}>

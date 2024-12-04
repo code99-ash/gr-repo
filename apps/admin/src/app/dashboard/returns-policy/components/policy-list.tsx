@@ -18,8 +18,8 @@ export default function PolicyList({policies, setSelected}: PolicyListProp) {
 
   return <section className='space-y-3'>
     <RadioGroup onValueChange={onSelect}>
-      { policies.map(policy => (
-        <div className="bg-white flex items-center pl-2 gap-2">
+      { policies.map((policy, index) => (
+        <div className="bg-white flex items-center pl-2 gap-2" key={index}>
           <RadioGroupItem value={policy.uid} id={policy.uid} />
           <PolicyItem key={policy.id} policy={policy} />
         </div>

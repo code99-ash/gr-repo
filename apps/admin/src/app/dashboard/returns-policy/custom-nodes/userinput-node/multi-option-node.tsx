@@ -19,7 +19,7 @@ export default function MultiChoiceQuestion({ data }: { data: any }) {
 
         validateNode(data.node_id, branch_length >= MIN_BRANCHES && data.message.trim())
 
-    }, [branch_length, data])
+    }, [branch_length, data, validateNode])
 
 
     return (

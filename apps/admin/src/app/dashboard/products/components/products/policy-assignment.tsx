@@ -40,12 +40,6 @@ export default function PolicyAssignment({
     const [to_assign, setToAssign] = useState<string[]>([]);
     const [to_unassign, setToUnAssign] = useState<string[]>([]);
 
-    useEffect(() => {
-        if (open) {
-            fetchAllPolicies();
-        }
-    }, [open]);
-
     const fetchAllPolicies = async () => {
         try {
             setLoading(true);
@@ -62,6 +56,12 @@ export default function PolicyAssignment({
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (open) {
+            fetchAllPolicies();
+        }
+    }, [open, fetchAllPolicies]);
 
     const initialCheck = (policy_uid: string): boolean => {
         return product_policies.some(each => each.policy_uid === policy_uid);

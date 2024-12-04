@@ -20,8 +20,8 @@ export default function MultpleChoiceBranches() {
   return (
     <section className="flex flex-col gap-3">
       {
-        flow_node.branches.map(branch => (
-          <BranchLabel branch={branch} updateLabel={updateLabel} branches={flow_node.branches} />
+        flow_node.branches.map((branch, i) => (
+          <BranchLabel branch={branch} key={i} updateLabel={updateLabel} branches={flow_node.branches} />
         ))
       }
     </section>

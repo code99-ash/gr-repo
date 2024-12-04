@@ -141,8 +141,9 @@ export default function ActionPanel() {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                {actions.map(action => (
+                {actions.map((action, index) => (
                   <SelectItem 
+                    key={index}
                     value={action.value}
                   >
                     {action.label}

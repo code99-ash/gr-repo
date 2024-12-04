@@ -25,7 +25,7 @@ export default function AssetUpload({ data }: { data: any }) {
             branch_length === MAX_BRANCHES && data.message.trim()
         )
 
-    }, [branch_length, data])
+    }, [branch_length, data, validateNode])
 
 
     return (

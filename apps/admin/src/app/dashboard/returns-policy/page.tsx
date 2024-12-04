@@ -44,7 +44,7 @@ export default function ReturnPolicy() {
         if(fetched) return;
 
         fetchPolicies();
-    }, [fetched])
+    }, [fetched, fetchPolicies])
 
 
     return (

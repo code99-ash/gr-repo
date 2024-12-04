@@ -30,12 +30,6 @@ export default function ProductPolicyBuiler() {
   const { defaultResponse, errorResponse } = useResponse()
 
   const [loading, setLoading] = useState(false)
-  
-  useEffect(() => {
-    
-      initializePage()
-
-  }, [initializeGraph])
 
   const initializePage = () => {
     const param_type = params?.policy_type as PolicyTypes
@@ -43,6 +37,13 @@ export default function ProductPolicyBuiler() {
 
     setPolicyType(policy_type)
   }
+  
+  useEffect(() => {
+    
+      initializePage()
+
+  }, [initializeGraph, initializePage])
+
 
   const saveToDraft = async() => {
     

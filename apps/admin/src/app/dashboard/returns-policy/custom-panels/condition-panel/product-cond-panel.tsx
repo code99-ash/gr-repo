@@ -41,7 +41,7 @@ export default function ProductConditionPanel() {
       data: { ruling: 'all', list: [condition] }
     };
     updateNode(updatedNode);
-  }, [condition]);
+  }, [condition, selectedNode, updateNode]);
 
   const handleSelectChange = (selectedCondition: string) => {
     setCondition(selectedCondition);

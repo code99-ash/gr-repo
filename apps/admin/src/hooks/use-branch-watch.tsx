@@ -44,7 +44,7 @@ export function useBranchwatch(node_id: string, conditionConfig?: ConditionConfi
         const edgeCount = edges.filter(each => each.source === node_id).length;
         setIsConnectable(evaluateCondition(edgeCount))
 
-    }, [flow_node, edges, node_id])
+    }, [flow_node, edges, node_id, evaluateCondition])
 
     return {
         branch_length,

@@ -24,7 +24,7 @@ export default function BranchLabel({ branch, updateLabel, branches }: BranchLab
         
       setLabel(branch.label || '');
   
-    }, [edit])
+    }, [edit, branch.label])
   
     const update = () => {
       if(!label) return;

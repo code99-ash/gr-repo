@@ -43,8 +43,8 @@ export default function ProductView({data}: {data: Product}) {
             <Label className="text-base satoshi-medium">Images:</Label>
             <div className="flex items-center gap-2">
               {
-                data.images.map(each => (
-                  <div className='w-[120px] h-[120px] rounded-md overflow-hidden'>
+                data.images.map((each, index) => (
+                  <div className='w-[120px] h-[120px] rounded-md overflow-hidden' key={index}>
                     <Image
                       src={each.src}
                       alt=""

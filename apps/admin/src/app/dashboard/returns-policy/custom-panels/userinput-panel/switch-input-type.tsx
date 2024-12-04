@@ -50,9 +50,10 @@ export default function SwitchInputType() {
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-            {input_types.map(input_type => (
+            {input_types.map((input_type, index) => (
               <SelectItem 
                 value={input_type.key}
+                key={index}
               >
                 {input_type.label}
               </SelectItem>

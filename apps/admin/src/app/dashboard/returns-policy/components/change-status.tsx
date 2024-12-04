@@ -40,7 +40,7 @@ export default function ChangePolicyStatus() {
     useEffect(() => {
         const policy = policies.find(each => each.uid === selected);
         setCurrentStatus(policy?.policy_status || 'Change')
-    }, [selected])
+    }, [selected, policies])
 
     const switchStatus = async(policy_status: 'draft' | 'active' | 'published') => {
         try {

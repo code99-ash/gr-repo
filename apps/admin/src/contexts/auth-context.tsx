@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     profile();
-  }, []);
+  }, [profile]);
 
   return (
     <AuthContext.Provider value={{ user, loading }}>

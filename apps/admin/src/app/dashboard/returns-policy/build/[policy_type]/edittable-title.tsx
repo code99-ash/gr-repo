@@ -27,7 +27,7 @@ export default function EdittableTitle() {
     // Update the name in the global store when it's valid and non-empty
     useEffect(() => {
         setPolicyName(name)
-    }, [name])
+    }, [setPolicyName, name])
 
     const handleBlur = () => {
         // If user kept the input empty, return back to initial name
@@ -52,7 +52,7 @@ export default function EdittableTitle() {
         setName(policy.policy_name)
 
 
-    }, [policyUID])
+    }, [policyUID, policies])
 
     return (
         <div className="flex items-center gap-1">

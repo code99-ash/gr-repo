@@ -32,7 +32,7 @@ export default function BuildSuccess({policy}: {policy: PolicyData}) {
                       height={160}
                   />
                   <div className="space-y-1 mb-10">
-                    <p>Your <span className="satoshi-bold">'{policy.policy_name}' </span>
+                    <p>Your <span className="satoshi-bold">&apos;{policy.policy_name}&apos;</span>
                     {policy.policy_type} policy has been published successfully!</p>
                     <p>Would you like to add more conditions to your Returns policy?</p>
                   </div>
