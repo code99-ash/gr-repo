@@ -1,11 +1,7 @@
 "use client";
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { usePolicyForm } from '@/store/policies/policy-form'
-import { Label } from '@radix-ui/react-label'
 import { useNodeEdge } from '@/hooks/use-node-edge';
-import { BranchType } from '@/interfaces/common.interface';
-import { Edit2Icon, X as CancelIcon, Forward } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import BranchLabel from './branch-label';
 
 export default function MultpleChoiceBranches() {

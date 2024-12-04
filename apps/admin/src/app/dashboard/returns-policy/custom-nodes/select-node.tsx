@@ -97,7 +97,7 @@ export default function SelectNode({ data }: { data: any }) {
 
         return edgeLabel;
 
-    }, [data, edges, parent_node, parent_node_type, setEdges])
+    }, [data])
 
 
 

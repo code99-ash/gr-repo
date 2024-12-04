@@ -36,7 +36,7 @@ export default function ReturnPolicy() {
         }finally {
             setLoading(false)
         }
-    }, [])
+    }, [setPolicies])
 
     useEffect(() => {
         if(fetched) return;
