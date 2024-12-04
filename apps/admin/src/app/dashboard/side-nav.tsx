@@ -18,6 +18,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from "@/components/ui/sidebar"
 import './layout.css';
 
@@ -58,6 +59,12 @@ const btm_navs = [
 
 export default function SideNav() {
     const pathname = usePathname();
+    const { setOpen, open } = useSidebar()
+
+    React.useEffect(() => {
+        if(open) setOpen(false);
+    }, [pathname, setOpen]);
+
     return <>
         <Sidebar variant='sidebar' collapsible='icon'>
             <SidebarHeader>
