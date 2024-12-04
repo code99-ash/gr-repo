@@ -1,15 +1,13 @@
 'use client';
-import React, { createContext, useEffect, useState } from 'react';
-import { PolicyListType, usePolicyStore } from '@/store/policies/policy-store';
+import React, { useEffect, useState } from 'react';
+import { usePolicyStore } from '@/store/policies/policy-store';
 import EmptyData from './components/empty-data';
 import PolicyList from './components/policy-list';
 import PageHeader from './components/page-header';
 import useResponse from '@/hooks/use-response';
+import { SelectionCtx } from '@/contexts/policy-selection-context';
 
-export const SelectionCtx = createContext<{ 
-    selected: any,
-    policies: PolicyListType[]
-}>({ selected: null, policies: [] });
+
 
 export default function ReturnPolicy() {
     const [loading, setLoading] = useState(false)
